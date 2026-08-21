@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
+import ThajWordmarkAr from './ThajWordmarkAr';
 
 export const NAVLINKS: [string, string, string][] = [
   ['/shop', 'Shop', 'المتجر'],
@@ -36,8 +37,12 @@ export default function Header() {
   return (
     <header id="hdr" className={`${solid ? 'solid' : ''} ${onDark ? 'on-dark' : ''}`.trim()}>
       <Link className="brand" href="/">
-        <img className="lg-lt" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
-        <img className="lg-dk" src="/assets/logo/wordmark-beige.png" alt="THAJ" />
+        {AR() ? <ThajWordmarkAr /> : (
+          <>
+            <img className="lg-lt" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
+            <img className="lg-dk" src="/assets/logo/wordmark-beige.png" alt="THAJ" />
+          </>
+        )}
       </Link>
       <nav id="nav">
         {NAVLINKS.map(([href, e, a]) => (

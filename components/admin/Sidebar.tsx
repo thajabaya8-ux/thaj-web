@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
+import ThajWordmarkAr from '../ThajWordmarkAr';
 
 const NAV: [string, string, string][] = [
   ['/admin', 'Dashboard', 'الرئيسية'], ['/admin/pieces', 'Pieces', 'القطع'], ['/admin/collections', 'Collections', 'المجموعات'],
@@ -17,7 +18,9 @@ export default function Sidebar() {
 
   return (
     <aside className="adm-side">
-      <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}><img src="/assets/logo/wordmark-beige.png" alt="THAJ" /></Link>
+      <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}>
+        {AR() ? <ThajWordmarkAr /> : <img src="/assets/logo/wordmark-beige.png" alt="THAJ" />}
+      </Link>
       <div className="lang" style={{ marginBottom: 30 }}>
         <button className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
         <i>/</i>
