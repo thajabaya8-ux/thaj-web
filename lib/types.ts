@@ -70,6 +70,7 @@ export interface Order {
   st: string;
   name?: string;
   email?: string;
+  phone?: string;
   items: OrderLineItem[];
 }
 
