@@ -1,10 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
-import ThajMarkAr from './ThajMarkAr';
 
 export default function Footer() {
-  const { L, AR, settings } = useSite();
+  const { L, settings } = useSite();
   return (
     <footer id="foot">
       <div className="wrap">
@@ -38,7 +37,7 @@ export default function Footer() {
             <span className="fl">{L('Care & repair', 'العناية والإصلاح')}</span>
           </div>
         </div>
-        {AR() ? <ThajMarkAr /> : <img className="fmark" src="/assets/logo/logo-beige.png" alt="THAJ" />}
+        <img className="fmark" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <div className="fbot">
           <span>© 2026 THAJ · {L('Kingdom of Saudi Arabia', 'المملكة العربية السعودية')}</span>
           <span className="arabic" style={{ letterSpacing: 0 }}>الأناقة صمت</span>

@@ -20,7 +20,6 @@ body{background:var(--bone-2)}
 .adm-side{width:230px;flex:0 0 230px;background:var(--emerald-deep);color:var(--on-dark);
   display:flex;flex-direction:column;padding:30px 24px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .adm-side .brand img{height:34px;margin-bottom:44px}
-.adm-side .brand .thaj-wordmark-ar{font-size:30px;margin-bottom:44px;color:var(--on-dark)}
 .adm-side nav{display:flex;flex-direction:column;gap:0;flex:1}
 .adm-side nav a{padding:13px 2px;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--on-dark-soft);cursor:pointer;border-bottom:1px solid var(--on-dark-line);transition:color .4s var(--e)}

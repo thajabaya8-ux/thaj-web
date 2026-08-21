@@ -10,7 +10,6 @@
    ========================================================== */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import ThajMarkAr from './ThajMarkAr';
 
 type Mode = 'login' | 'signup';
 type Lang = 'en' | 'ar';
@@ -73,7 +72,7 @@ export default function AuthForm() {
           <i>/</i>
           <button type="button" className={AR ? 'on' : ''} onClick={() => setLang('ar')}>ع</button>
         </div>
-        {AR ? <ThajMarkAr /> : <img className="adm-login-mark" src="/assets/logo/logo-beige.png" alt="THAJ" />}
+        <img className="adm-login-mark" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <div className="lbl" style={{ color: 'var(--champagne)', textAlign: 'center', marginBottom: 34 }}>
           {mode === 'login' ? L('Sign in to THAJ', 'تسجيل الدخول لثاج') : L('Create your THAJ account', 'إنشاء حساب في ثاج')}
         </div>

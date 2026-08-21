@@ -80,7 +80,10 @@
   --display:"Didot","Bodoni 72","Bodoni MT","Playfair Display",'Times New Roman',Georgia,serif;
   --sans:"Helvetica Neue","Inter","Segoe UI",Arial,sans-serif;
   --ar:var(--font-cairo),"SF Arabic","Segoe UI",Tahoma,sans-serif;
-  --ar-display:var(--font-amiri),"SF Arabic","Traditional Arabic",serif;
+  /* Was Amiri (a Naskh serif) — its letterforms run wider than Cairo's at
+     the same font-size and were overflowing tight layouts (product cards,
+     buttons). One predictable font everywhere is safer than two. */
+  --ar-display:var(--ar);
   --e:cubic-bezier(.16,1,.3,1);
   --nav-h:96px;
 }
@@ -101,14 +104,6 @@ a{color:inherit;text-decoration:none}
 .body{font-size:13.5px;line-height:2;color:var(--ink-soft);letter-spacing:.01em}
 .arabic{font-family:var(--ar);direction:rtl}
 
-/* ============ ARABIC WORDMARK / MARK (text, not raster) ============ */
-.thaj-wordmark-ar{font-family:var(--ar-display);line-height:1;display:inline-block;font-size:clamp(30px,3.4vw,44px)}
-.thaj-mark-ar{display:inline-block;text-align:center}
-.thaj-mark-ar .tm-word{font-family:var(--ar-display);line-height:.95;font-size:clamp(64px,9vw,100px)}
-.thaj-mark-ar .tm-tag{font-family:var(--ar);letter-spacing:.08em;opacity:.75;margin-top:.5em;font-size:clamp(11px,1.1vw,15px)}
-.thaj-mark-ar .tm-dots{display:inline-flex;gap:5px;margin-top:10px}
-.thaj-mark-ar .tm-dots i{width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block;opacity:.8}
-
 /* ============ REVEAL ============ */
 .rv{opacity:0;transform:translateY(24px);transition:opacity 1.1s var(--e),transform 1.1s var(--e)}
 .rv.in{opacity:1;transform:none}
@@ -122,9 +117,6 @@ a{color:inherit;text-decoration:none}
   transition:opacity 1s var(--e),visibility 1s}
 #curtain .c-mark{width:min(420px,58vw);clip-path:inset(0 0 110% 0);transition:clip-path 1.5s var(--e) .25s}
 #curtain.go .c-mark{clip-path:inset(0 0 -10% 0)}
-#curtain .thaj-mark-ar{color:var(--on-dark);clip-path:inset(0 0 110% 0);transition:clip-path 1.5s var(--e) .25s}
-#curtain.go .thaj-mark-ar{clip-path:inset(0 0 -10% 0)}
-#curtain .thaj-mark-ar .tm-word{font-size:clamp(76px,12vw,130px)}
 #curtain .c-sub{position:absolute;bottom:12%;left:0;right:0;text-align:center;opacity:0;transition:opacity 1s var(--e) 1s}
 #curtain.go .c-sub{opacity:1}
 #curtain.out{opacity:0;visibility:hidden}
@@ -141,8 +133,6 @@ header .brand img{height:clamp(40px,4vw,56px);width:auto;transition:opacity .6s 
 header .brand .lg-dk{display:none}
 header.on-dark .brand .lg-lt{display:none}
 header.on-dark .brand .lg-dk{display:block}
-header .brand .thaj-wordmark-ar{color:var(--ink);transition:color .6s var(--e)}
-header.on-dark .brand .thaj-wordmark-ar{color:var(--on-dark)}
 header nav{display:flex;gap:clamp(18px,2.3vw,40px);margin-right:auto;align-items:center}
 header nav a{font-size:clamp(13px,1.05vw,16px);letter-spacing:.13em;text-transform:uppercase;color:inherit;opacity:.82;
   white-space:nowrap;padding:10px 0;border-bottom:1px solid transparent;transition:opacity .5s var(--e),border-color .5s var(--e);cursor:pointer}
@@ -228,11 +218,6 @@ section{position:relative}
 .hm-logo{width:min(460px,42vw);display:block;margin-bottom:clamp(22px,2.8vw,38px);
   clip-path:inset(0 0 112% 0);transition:clip-path 1.7s var(--e) .25s}
 .hero-m.in .hm-logo{clip-path:inset(0 0 -12% 0)}
-.hm-in .thaj-mark-ar{text-align:start;color:var(--on-dark);margin-bottom:clamp(22px,2.8vw,38px);
-  clip-path:inset(0 0 112% 0);transition:clip-path 1.7s var(--e) .25s}
-.hero-m.in .hm-in .thaj-mark-ar{clip-path:inset(0 0 -12% 0)}
-.hm-in .thaj-mark-ar .tm-word{font-size:clamp(80px,10vw,130px)}
-.hm-in .thaj-mark-ar .tm-tag,.hm-in .thaj-mark-ar .tm-dots{margin-inline-start:0}
 .hm-h{font-family:var(--display);font-weight:400;font-size:clamp(25px,2.9vw,44px);line-height:1.12;letter-spacing:.01em;
   max-width:19ch;color:var(--on-dark)}
 .hm-row{display:flex;align-items:flex-end;justify-content:space-between;gap:34px;flex-wrap:wrap;
@@ -510,8 +495,6 @@ footer h5{font-size:8.5px;letter-spacing:.3em;text-transform:uppercase;color:var
 footer a,footer span.fl{display:block;font-size:12px;line-height:2.3;color:rgba(242,238,228,.78);cursor:pointer;transition:color .4s}
 footer a:hover,footer span.fl:hover{color:var(--on-dark)}
 footer .fmark{margin:clamp(40px,6vw,80px) auto 0;display:block;width:min(420px,64vw)}
-footer .thaj-mark-ar{margin:clamp(40px,6vw,80px) auto 0;color:var(--on-dark)}
-footer .thaj-mark-ar .tm-word{font-size:clamp(70px,11vw,120px)}
 footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--on-dark-line);
   margin-top:34px;padding-top:22px;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--on-dark-soft)}
 
@@ -678,9 +661,6 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 #login-screen:not([hidden]){min-height:100vh;background:var(--emerald-deep);display:flex;align-items:center;justify-content:center;padding:24px}
 .adm-login{width:min(380px,100%)}
 .adm-login-mark{width:120px;display:block;margin:0 auto 30px}
-#login-screen .thaj-mark-ar{color:var(--champagne);margin:0 auto 30px}
-#login-screen .thaj-mark-ar .tm-word{font-size:44px}
-#login-screen .thaj-mark-ar .tm-tag{font-size:10px}
 .adm-login .field label{color:var(--on-dark-soft)}
 .adm-login .field input{border-color:var(--on-dark-line);color:var(--on-dark)}
 .adm-error{color:#E39A9A;font-size:11px;letter-spacing:.05em;min-height:16px;margin-top:4px}

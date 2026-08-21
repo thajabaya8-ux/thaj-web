@@ -4,7 +4,6 @@ import { useSite } from '@/lib/siteContext';
 import { IMG } from '@/lib/img';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
-import ThajMarkAr from '@/components/ThajMarkAr';
 
 export default function HomePage() {
   const { L, AR, esc, pName, byId, pieces, collections, journal, settings } = useSite();
@@ -18,7 +17,7 @@ export default function HomePage() {
         <div className="hm-in">
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-            {AR() ? <ThajMarkAr /> : <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />}
+            <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
             <h1 className="hm-h">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
             <div className="hm-row">
               <p>{L('Eleven pieces, catalogued and editioned. Cut in Riyadh, washed three times, and finished by hand before they are named.', 'إحدى عشرة قطعة، مفهرسة ومرقّمة. تُقص في الرياض، وتُغسل ثلاث مرات، وتُنهى باليد قبل أن تُسمّى.')}</p>
