@@ -129,7 +129,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:120;height:var(--nav-h);
 header.solid{border-color:var(--line-soft)}
 header.on-dark{background:linear-gradient(180deg,rgba(4,45,41,.66),rgba(4,45,41,0));backdrop-filter:none;color:var(--on-dark);border-color:transparent}
 header .brand{margin-right:auto;cursor:pointer;display:flex;align-items:center;height:100%}
-header .brand img{height:clamp(40px,4vw,56px);width:auto;transition:opacity .6s var(--e)}
+header .brand img{height:clamp(52px,5.2vw,72px);width:auto;transition:opacity .6s var(--e)}
 header .brand .lg-dk{display:none}
 header.on-dark .brand .lg-lt{display:none}
 header.on-dark .brand .lg-dk{display:block}
@@ -602,7 +602,7 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 @media(max-width:640px){
   :root{--nav-h:64px}
   header{padding:0 16px;gap:14px}
-  header .brand img{height:30px}
+  header .brand img{height:38px}
   header .util{gap:14px}
   header .util button{font-size:11.5px;letter-spacing:.06em;padding:8px 0}
   header .util .n{font-size:13px;margin-left:5px}
