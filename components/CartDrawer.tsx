@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 
 export default function CartDrawer() {
-  const { L, esc, cart, byId, qty, rmItem, cartTotal, SAR, drawerOpen, setDrawerOpen } = useSite();
+  const { L, esc, cart, byId, qty, rmItem, cartTotal, itemPrice, SAR, drawerOpen, setDrawerOpen } = useSite();
 
   return (
     <>
@@ -25,9 +25,9 @@ export default function CartDrawer() {
                 <div className="ci">
                   <div className="top">
                     <span className="h-s" style={{ fontSize: 17 }}>{esc(p.n)}</span>
-                    <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(p.price * c.q)}</span>
+                    <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(itemPrice(c) * c.q)}</span>
                   </div>
-                  <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}</span>
+                  <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   <div className="qty" style={{ marginTop: 8 }}>
                     <button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button>
                   </div>

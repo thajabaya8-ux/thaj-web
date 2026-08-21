@@ -14,6 +14,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
       <Link href={`/product/${piece.id}`} className="frame" style={{ display: 'block', position: 'relative' }}>
         <div className="veil" />
         <div className="ed">{esc(piece.ed)}</div>
+        {piece.pantsImg ? <div className="pants-badge">{L('+ Trousers available', '+ بنطلون متاح')}</div> : null}
         <button
           type="button"
           className={`save ${saved ? 'on' : ''}`}

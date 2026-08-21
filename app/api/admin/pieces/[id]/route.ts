@@ -29,6 +29,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const b = await req.json().catch(() => ({}));
   if (b.coll !== undefined && !(await collectionExists(b.coll))) return NextResponse.json({ error: 'Unknown collection' }, { status: 400 });
   if (b.av !== undefined && b.av !== '' && !AVAILABILITY.includes(b.av)) return NextResponse.json({ error: 'Invalid availability value' }, { status: 400 });
+  if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 5)) {
+    return NextResponse.json({ error: 'images must be an array of at most 5 photos' }, { status: 400 });
+  }
+
+  const nextImages = b.images !== undefined ? strArray(b.images, 5, 300) : parseArr(existing.images);
+  const nextPantsImg = b.pantsImg !== undefined ? (str(b.pantsImg, 300) || null) : existing.pants_image;
+  const nextPantsPrice = b.pantsImg !== undefined
+    ? (nextPantsImg ? nonNegativeInt(b.pantsPrice, existing.pants_price ?? 0) : null)
+    : (b.pantsPrice !== undefined && existing.pants_image ? nonNegativeInt(b.pantsPrice, existing.pants_price ?? 0) : existing.pants_price);
 
   const next = {
     ed: b.ed !== undefined ? str(b.ed, 40) : existing.ed,
@@ -51,7 +60,10 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     desc_ar: b.dAr !== undefined ? str(b.dAr, 4000) : existing.desc_ar,
     story_en: JSON.stringify(b.story !== undefined ? strArray(b.story) : parseArr(existing.story_en)),
     story_ar: JSON.stringify(b.storyAr !== undefined ? strArray(b.storyAr) : parseArr(existing.story_ar)),
-    image: b.img !== undefined ? str(b.img, 300) : existing.image
+    image: nextImages[0] || null,
+    images: JSON.stringify(nextImages),
+    pants_image: nextPantsImg,
+    pants_price: nextPantsPrice
   };
 
   await sql`UPDATE pieces SET ed=${next.ed}, name_en=${next.name_en}, name_ar=${next.name_ar}, price=${next.price},
@@ -59,7 +71,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     mat_en=${next.mat_en}, mat_ar=${next.mat_ar}, silf_en=${next.silf_en}, silf_ar=${next.silf_ar},
     pal_en=${next.pal_en}, pal_ar=${next.pal_ar}, availability=${next.availability},
     desc_en=${next.desc_en}, desc_ar=${next.desc_ar}, story_en=${next.story_en}, story_ar=${next.story_ar},
-    image=${next.image}, updated_at=now() WHERE id=${id}`;
+    image=${next.image}, images=${next.images}, pants_image=${next.pants_image}, pants_price=${next.pants_price},
+    updated_at=now() WHERE id=${id}`;
 
   const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
   return NextResponse.json(pieceOut(rows[0]));

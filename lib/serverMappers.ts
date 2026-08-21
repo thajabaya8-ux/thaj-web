@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Appointment, Collection, JournalArticle, Order, OrderLineItem, Piece } from '@/lib/types';
+import type { Appointment, Collection, JournalArticle, Order, OrderLineItem, Piece, Review } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -23,6 +23,11 @@ function toIso(v: unknown): string {
 }
 
 export function pieceOut(r: any): Piece {
+  // Older rows (seeded before the gallery feature) only ever had a single
+  // `image` column and no `images` array — fall back to a one-photo
+  // gallery so the product page's gallery UI still has something to show.
+  const gallery = parseArr<string>(r.images);
+  const images = gallery.length ? gallery : (r.image ? [r.image] : []);
   return {
     id: r.id, ed: r.ed, n: r.name_en, ar: r.name_ar, price: r.price, coll: r.coll_key,
     fabric: r.fabric, sil: r.sil, colour: r.colour, occ: r.occ,
@@ -30,7 +35,10 @@ export function pieceOut(r: any): Piece {
     pal: r.pal_en, palAr: r.pal_ar, av: r.availability,
     d: r.desc_en, dAr: r.desc_ar,
     story: parseArr(r.story_en), storyAr: parseArr(r.story_ar),
-    img: r.image
+    img: images[0] || r.image || '',
+    images,
+    pantsImg: r.pants_image ?? null,
+    pantsPrice: r.pants_price ?? null
   };
 }
 
@@ -75,4 +83,12 @@ export function appointmentOut(r: any): Appointment {
     id: r.id, name: r.name, email: r.email, date: r.date, time: r.time,
     type: r.type, mode: r.mode, notes: r.notes, status: r.status, d: toIso(r.created_at)
   } as Appointment;
+}
+
+export function reviewOut(r: any): Review {
+  return {
+    id: r.id, pieceId: r.piece_id,
+    pieceName: r.name_en, pieceNameAr: r.name_ar,
+    name: r.name, email: r.email, message: r.message, d: toIso(r.created_at)
+  };
 }

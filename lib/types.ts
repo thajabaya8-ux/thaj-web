@@ -28,6 +28,9 @@ export interface Piece {
   story: string[];
   storyAr: string[];
   img: string;
+  images: string[];
+  pantsImg: string | null;
+  pantsPrice: number | null;
 }
 
 export interface Collection {
@@ -60,6 +63,7 @@ export interface JournalArticle {
 export interface OrderLineItem {
   id: string;
   size: string;
+  withPants?: boolean;
 }
 
 export interface Order {
@@ -101,6 +105,18 @@ export interface CartItem {
   pid: string;
   size: string;
   q: number;
+  withPants?: boolean;
+}
+
+export interface Review {
+  id: number;
+  pieceId: string;
+  pieceName?: string;
+  pieceNameAr?: string;
+  name: string;
+  email?: string;
+  message: string;
+  d: string;
 }
 
 export interface Facets {

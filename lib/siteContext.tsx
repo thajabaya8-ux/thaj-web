@@ -67,7 +67,8 @@ interface SiteContextValue {
   cart: CartItem[];
   wish: string[];
   cartTotal: number;
-  addToCart: (id: string, size?: string) => void;
+  itemPrice: (c: CartItem) => number;
+  addToCart: (id: string, size?: string, withPants?: boolean) => void;
   quickAdd: (id: string) => void;
   qty: (i: number, d: number) => void;
   rmItem: (i: number) => void;
@@ -78,6 +79,7 @@ interface SiteContextValue {
   setCoStep: React.Dispatch<React.SetStateAction<number>>;
   submitOrder: () => Promise<boolean>;
   submitAppointment: (data: Record<string, string>) => Promise<boolean>;
+  submitReview: (pieceId: string, data: { name: string; email?: string; message: string }) => Promise<boolean>;
   acctTab: string;
   setAcctTab: React.Dispatch<React.SetStateAction<string>>;
   sort: string;
@@ -165,17 +167,24 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     toastTimer.current = setTimeout(() => setToastMsg(null), 2200);
   }, []);
 
-  const cartTotal = useMemo(() => cart.reduce((s, c) => {
+  // Piece price, plus trousers if this line selected them and the piece
+  // still has that option (protects against a piece's pants offer being
+  // removed after something was already added to a cart held in state).
+  const itemPrice = useCallback((c: CartItem) => {
     const p = byId(c.pid);
-    return s + (p ? p.price * c.q : 0);
-  }, 0), [cart, byId]);
+    if (!p) return 0;
+    const pants = c.withPants && p.pantsPrice ? p.pantsPrice : 0;
+    return p.price + pants;
+  }, [byId]);
 
-  const addToCart = useCallback((id: string, size?: string) => {
+  const cartTotal = useMemo(() => cart.reduce((s, c) => s + itemPrice(c) * c.q, 0), [cart, itemPrice]);
+
+  const addToCart = useCallback((id: string, size?: string, withPants?: boolean) => {
     const useSize = size || '54';
     setCart((cur) => {
-      const i = cur.findIndex((c) => c.pid === id && c.size === useSize);
+      const i = cur.findIndex((c) => c.pid === id && c.size === useSize && !!c.withPants === !!withPants);
       if (i > -1) { const next = [...cur]; next[i] = { ...next[i], q: next[i].q + 1 }; return next; }
-      return [...cur, { pid: id, size: useSize, q: 1 }];
+      return [...cur, { pid: id, size: useSize, q: 1, withPants: !!withPants }];
     });
     setDrawerOpen(true);
     const p = byId(id);
@@ -213,7 +222,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, [L, toast]);
 
   const submitOrder = useCallback(async () => {
-    const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q }));
+    const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q, withPants: !!c.withPants }));
     const name = [coData.fn, coData.ln].filter(Boolean).join(' ');
     let ok = true;
     try {
@@ -246,6 +255,21 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     }
   }, [L, toast]);
 
+  const submitReview = useCallback(async (pieceId: string, data: { name: string; email?: string; message: string }) => {
+    try {
+      const r = await fetch('/api/reviews', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pieceId, ...data })
+      });
+      if (!r.ok) throw new Error('review failed');
+      toast(L('Thank you — your note has reached the atelier.', 'شكرًا — رسالتك وصلت للأتيليه.'));
+      return true;
+    } catch {
+      toast(L('Could not reach the server — try again.', 'معرفناش نوصل للسيرفر — جرّبي تاني.'));
+      return false;
+    }
+  }, [L, toast]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setSearchOpen(false); setDrawerOpen(false); setMenuOpen(false); } };
     document.addEventListener('keydown', onKey);
@@ -256,8 +280,8 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     lang, setLang, AR, L, num, ord, SAR, fa, stLabel, esc,
     pieces, collections, journal, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
-    cart, wish, cartTotal, addToCart, quickAdd, qty, rmItem, toggleWish,
-    coData, setCoData, coStep, setCoStep, submitOrder, submitAppointment,
+    cart, wish, cartTotal, itemPrice, addToCart, quickAdd, qty, rmItem, toggleWish,
+    coData, setCoData, coStep, setCoStep, submitOrder, submitAppointment, submitReview,
     acctTab, setAcctTab, sort, setSort, facets, setFacets,
     drawerOpen, setDrawerOpen, searchOpen, setSearchOpen, menuOpen, setMenuOpen,
     toastMsg, toast

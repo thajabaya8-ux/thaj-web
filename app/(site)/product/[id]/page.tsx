@@ -5,17 +5,23 @@ import { useSite } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
+import ReviewForm from '@/components/ReviewForm';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const { L, AR, esc, num, fa, collName, pName, SAR, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR } = useSite();
   const [size, setSize] = useState<string | null>(null);
+  const [withPants, setWithPants] = useState(false);
+  const [active, setActive] = useState(0);
 
   const p = byId(id) || pieces[0];
   if (!p) return null;
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
   const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
+  const gallery = p.images.length ? p.images : [p.img];
+  const activeImg = gallery[active] || p.img;
+  const total = p.price + (withPants && p.pantsPrice ? p.pantsPrice : 0);
   const specs: [string, string][] = [
     [L('Material', 'الخامة'), esc(L(p.mat, p.matAr))],
     [L('Silhouette', 'السيلويت'), esc(L(p.silf, p.silfAr))],
@@ -30,13 +36,50 @@ export default function ProductPage() {
   return (
     <>
       <section className="pdp">
-        <div className="gal"><img src={`/${p.img}`} alt={pName(p)} /></div>
+        <div className="gal">
+          <img src={`/${activeImg}`} alt={pName(p)} />
+          {gallery.length > 1 && (
+            <div className="gal-thumbs">
+              {gallery.map((img, i) => (
+                <button key={img + i} type="button" className={i === active ? 'on' : ''} onClick={() => setActive(i)}>
+                  <img src={`/${img}`} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="info">
           <div className="lbl ed rv">{esc(p.ed)} · {collName(p.coll)}</div>
           <h1 className="h-l rv"><span className="clip">{pName(p)}</span></h1>
           {AR() ? null : <div className="arn rv">{esc(p.ar)}</div>}
-          <div className="price rv">{SAR(p.price)}</div>
+
+          {p.pantsImg ? (
+            <div className="rv price-breakdown">
+              <div className="pb-row"><span>{L('Abaya', 'العباية')}</span><b>{SAR(p.price)}</b></div>
+              {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{SAR(p.pantsPrice || 0)}</b></div>}
+              <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{SAR(total)}</b></div>
+            </div>
+          ) : (
+            <div className="price rv">{SAR(p.price)}</div>
+          )}
+
           <p className="body desc rv">{esc(L(p.d, p.dAr))}</p>
+
+          {p.pantsImg && (
+            <div className="rv pants-select">
+              <img src={`/${p.pantsImg}`} alt="" />
+              <div className="pants-select-body">
+                <label>
+                  <input type="checkbox" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
+                  <span>{L('Add matching trousers', 'أضيفي البنطلون المطابق')} — {SAR(p.pantsPrice || 0)}</span>
+                </label>
+                <p className="body" style={{ fontSize: 11, marginTop: 6, color: 'var(--ink-faint)' }}>
+                  {L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="rv">
             <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'المقاس')}</div>
             <div className="sizes">
@@ -47,7 +90,7 @@ export default function ProductPage() {
             <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Measurements taken from the shoulder. Made to measure adds three weeks.', 'المقاسات محسوبة من الكتف. التفصيل بيزوّد تلات أسابيع.')}</div>
           </div>
           <div className="acts rv">
-            <button className="btn fill" onClick={() => addToCart(p.id, size || '54')}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
+            <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>
           <div className="spec rv">
@@ -70,6 +113,11 @@ export default function ProductPage() {
             <div className="veil" /><img src={`/${p.img}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 60%' }} alt="" />
           </div>
         </div>
+      </section>
+
+      <section className="pad wrap-n">
+        <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('A note to the atelier', 'رسالة للأتيليه')}</div>
+        <ReviewForm pieceId={p.id} />
       </section>
 
       {rel.length > 0 && (

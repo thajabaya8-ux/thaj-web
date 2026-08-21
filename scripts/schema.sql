@@ -37,9 +37,16 @@ CREATE TABLE IF NOT EXISTS pieces (
   story_en TEXT DEFAULT '[]',
   story_ar TEXT DEFAULT '[]',
   image TEXT,
+  images TEXT DEFAULT '[]',
+  pants_image TEXT,
+  pants_price INTEGER,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]';
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
 
 CREATE TABLE IF NOT EXISTS journal (
   id TEXT PRIMARY KEY,
@@ -72,4 +79,15 @@ CREATE TABLE IF NOT EXISTS appointments (
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT
+);
+
+-- Customer comments/requests on a specific piece, surfaced to the admin
+-- (e.g. "I'd like this in a size 56"). Not shown back to other visitors.
+CREATE TABLE IF NOT EXISTS reviews (
+  id SERIAL PRIMARY KEY,
+  piece_id TEXT NOT NULL REFERENCES pieces(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

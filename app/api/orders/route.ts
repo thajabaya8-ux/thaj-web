@@ -29,15 +29,20 @@ export async function POST(req: Request) {
   }
 
   let total = 0;
-  const cleanItems: { id: string; size: string; qty: number }[] = [];
+  const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
   for (const it of items) {
     const pid = String((it && it.id) || '');
-    const rows = await sql`SELECT id, price FROM pieces WHERE id = ${pid}`;
+    const rows = await sql`SELECT id, price, pants_price FROM pieces WHERE id = ${pid}`;
     if (!rows.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
     const p = rows[0];
     const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
-    total += p.price * qty;
-    cleanItems.push({ id: p.id, size: str(it.size, 40), qty });
+    // Trousers can only be added alongside the piece they belong to, and
+    // only when that piece still offers them server-side — never trust
+    // the client's price math.
+    const withPants = !!it.withPants && p.pants_price != null;
+    const unitPrice = p.price + (withPants ? p.pants_price : 0);
+    total += unitPrice * qty;
+    cleanItems.push({ id: p.id, size: str(it.size, 40), qty, withPants });
   }
 
   const orderNumber = await nextOrderNumber();

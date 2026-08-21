@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
 import ImageUpload from './ImageUpload';
+import MultiImageUpload from './MultiImageUpload';
 import type { Collection, Piece } from '@/lib/types';
 
 const AVAIL_OPTS = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only'];
@@ -13,12 +14,19 @@ export default function PieceForm({ piece, collections, onSaved }: {
   const isNew = !piece;
   const { call, toast } = useAdmin();
   const router = useRouter();
-  const [img, setImg] = useState(piece?.img || '');
+  const [images, setImages] = useState<string[]>(piece?.images || []);
+  const [hasPants, setHasPants] = useState(!!piece?.pantsImg);
+  const [pantsImg, setPantsImg] = useState(piece?.pantsImg || '');
+  const [saving, setSaving] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = e.currentTarget;
     const val = (n: string) => (f.elements.namedItem(n) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement).value;
+
+    if (!images.length) { toast('At least one photo of the piece is required'); return; }
+    if (hasPants && !pantsImg) { toast('Add a trouser photo, or turn the trousers toggle off'); return; }
+
     const body = {
       id: val('id'), ed: val('ed'), n: val('n'), ar: val('ar'),
       price: parseInt(val('price'), 10) || 0, coll: val('coll'),
@@ -27,14 +35,18 @@ export default function PieceForm({ piece, collections, onSaved }: {
       pal: val('pal'), palAr: val('palAr'), d: val('d'), dAr: val('dAr'),
       story: val('story').split('\n').map((s) => s.trim()).filter(Boolean),
       storyAr: val('storyAr').split('\n').map((s) => s.trim()).filter(Boolean),
-      img
+      images,
+      pantsImg: hasPants ? pantsImg : '',
+      pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null
     };
+    setSaving(true);
     try {
       if (isNew) await call('/pieces', { method: 'POST', body: JSON.stringify(body) });
       else await call(`/pieces/${piece.id}`, { method: 'PUT', body: JSON.stringify(body) });
       toast('Saved');
       if (onSaved) onSaved(); else router.push('/admin/pieces');
     } catch (err) { toast(err instanceof Error ? err.message : String(err)); }
+    finally { setSaving(false); }
   };
 
   const v = (k: keyof Piece, d: string | number = '') => piece?.[k] ?? d;
@@ -88,8 +100,24 @@ export default function PieceForm({ piece, collections, onSaved }: {
         <div className="field"><label>Story paragraphs (EN, one per line)</label><textarea name="story" style={{ minHeight: 110 }} defaultValue={(piece?.story || []).join('\n')} /></div>
         <div className="field"><label>Story paragraphs (AR, one per line)</label><textarea name="storyAr" style={{ minHeight: 110 }} defaultValue={(piece?.storyAr || []).join('\n')} /></div>
       </div>
-      <ImageUpload value={img} onChange={setImg} />
-      <button className="btn fill" style={{ width: 'max-content' }} type="submit">{isNew ? 'Create piece' : 'Save changes'}</button>
+      <MultiImageUpload value={images} onChange={setImages} label="Piece photos (up to 5 — first is the cover)" />
+
+      <div className="adm-pants">
+        <label className="adm-pants-toggle">
+          <input type="checkbox" checked={hasPants} onChange={(e) => setHasPants(e.target.checked)} />
+          <span>This piece includes matching trousers</span>
+        </label>
+        {hasPants && (
+          <div className="adm-pants-body">
+            <ImageUpload value={pantsImg} onChange={setPantsImg} />
+            <div className="field"><label>Trousers price (SAR)</label><input name="pantsPrice" type="number" min="0" defaultValue={piece?.pantsPrice ?? 0} required /></div>
+          </div>
+        )}
+      </div>
+
+      <button className="btn fill" style={{ width: 'max-content' }} type="submit" disabled={saving}>
+        {saving ? 'Saving…' : isNew ? 'Create piece' : 'Save changes'}
+      </button>
     </form>
   );
 }

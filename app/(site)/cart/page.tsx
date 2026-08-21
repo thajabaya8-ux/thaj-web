@@ -4,7 +4,7 @@ import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
 
 export default function CartPage() {
-  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotal, SAR } = useSite();
+  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotal, itemPrice, SAR } = useSite();
 
   if (!cart.length) {
     return (
@@ -32,13 +32,13 @@ export default function CartPage() {
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>
-                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}</div>
+                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
               </div>
               <div style={{ gridColumn: '8/11' }}>
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>
                 <button className="rm" style={{ background: 'none', border: 0, cursor: 'pointer', fontSize: 8.5, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginTop: 12 }} onClick={() => rmItem(i)}>{L('Remove', 'إزالة')}</button>
               </div>
-              <div style={{ gridColumn: '11/13', textAlign: 'end', fontFamily: 'var(--display)', fontSize: 17 }}>{SAR(p.price * c.q)}</div>
+              <div style={{ gridColumn: '11/13', textAlign: 'end', fontFamily: 'var(--display)', fontSize: 17 }}>{SAR(itemPrice(c) * c.q)}</div>
             </div>
           );
         })}

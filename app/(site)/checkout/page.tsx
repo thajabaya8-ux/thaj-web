@@ -7,7 +7,7 @@ import Mast from '@/components/Mast';
 type FormEl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 export default function CheckoutPage() {
-  const { L, esc, pName, cart, byId, cartTotal, SAR, coData, setCoData, coStep, setCoStep, submitOrder } = useSite();
+  const { L, esc, pName, cart, byId, cartTotal, itemPrice, SAR, coData, setCoData, coStep, setCoStep, submitOrder } = useSite();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const steps = [L('Details', 'البيانات'), L('Delivery', 'التوصيل'), L('Payment', 'الدفع')];
@@ -103,9 +103,9 @@ export default function CheckoutPage() {
                   <div className="ci">
                     <div className="top">
                       <span className="h-s" style={{ fontSize: 16 }}>{pName(p)}</span>
-                      <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(p.price * c.q)}</span>
+                      <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(itemPrice(c) * c.q)}</span>
                     </div>
-                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)} · ×{c.q}</span>
+                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   </div>
                 </div>
               );
