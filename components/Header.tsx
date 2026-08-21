@@ -57,7 +57,7 @@ export default function Header() {
         ) : (
           <Link id="u-login" href="/login">{L('Login', 'تسجيل الدخول')}</Link>
         )}
-        <div className="lang">
+        <div className="lang u-hide">
           <button id="cur-sar" className={currency === 'SAR' ? 'on' : ''} onClick={() => setCurrency('SAR')}>SAR</button>
           <i>/</i>
           <button id="cur-egp" className={currency === 'EGP' ? 'on' : ''} onClick={() => setCurrency('EGP')}>EGP</button>
