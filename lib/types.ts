@@ -98,6 +98,7 @@ export interface Settings {
   contact_email?: string;
   contact_location_en?: string;
   contact_location_ar?: string;
+  egp_per_sar?: string;
   [key: string]: string | undefined;
 }
 

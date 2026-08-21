@@ -14,7 +14,7 @@ export const NAVLINKS: [string, string, string][] = [
 ];
 
 export default function Header() {
-  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang } = useSite();
+  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, currency, setCurrency, authRole } = useSite();
   const pathname = usePathname();
   const [solid, setSolid] = useState(false);
   const [onDark, setOnDark] = useState(false);
@@ -50,7 +50,18 @@ export default function Header() {
         <Link id="u-wish" href="/wishlist"><span className="t">{L('Saved', 'المحفوظ')}</span><span className="n">{wish.length}</span></Link>
         <button id="u-cart" onClick={() => setDrawerOpen(true)}><span className="t">{L('Selection', 'اختيارك')}</span><span className="n">{cartCount}</span></button>
         <Link className="u-hide" id="u-acct" href="/account">{L('My THAJ', 'حسابي')}</Link>
-        <Link id="u-login" href="/login">{L('Login', 'تسجيل الدخول')}</Link>
+        {authRole === 'admin' ? (
+          <Link id="u-login" href="/admin">{L('Admin Panel', 'لوحة التحكم')}</Link>
+        ) : authRole === 'customer' ? (
+          <Link id="u-login" href="/account">{L('My Account', 'حسابي')}</Link>
+        ) : (
+          <Link id="u-login" href="/login">{L('Login', 'تسجيل الدخول')}</Link>
+        )}
+        <div className="lang">
+          <button id="cur-sar" className={currency === 'SAR' ? 'on' : ''} onClick={() => setCurrency('SAR')}>SAR</button>
+          <i>/</i>
+          <button id="cur-egp" className={currency === 'EGP' ? 'on' : ''} onClick={() => setCurrency('EGP')}>EGP</button>
+        </div>
         <div className="lang">
           <button id="lg-en" className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
           <i>/</i>

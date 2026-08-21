@@ -6,11 +6,11 @@ import type { JournalArticle } from '@/lib/types';
 
 export default function JournalPage() {
   const { data: posts, loading, error, reload } = useAdminFetch<JournalArticle[]>('/journal');
-  const { call, toast } = useAdmin();
+  const { call, toast, L, AR } = useAdmin();
 
   const onDelete = async (id: string) => {
-    if (!confirm('Delete this article?')) return;
-    try { await call(`/journal/${id}`, { method: 'DELETE' }); toast('Deleted'); reload(); }
+    if (!confirm(L('Delete this article?', 'تحذفي المقال ده؟'))) return;
+    try { await call(`/journal/${id}`, { method: 'DELETE' }); toast(L('Deleted', 'اتمسح')); reload(); }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
   };
 
@@ -20,18 +20,18 @@ export default function JournalPage() {
 
   return (
     <>
-      <div className="adm-head"><h1>Journal</h1><Link className="btn fill" href="/admin/journal/new">New article</Link></div>
+      <div className="adm-head"><h1>{L('Journal', 'المجلة')}</h1><Link className="btn fill" href="/admin/journal/new">{L('New article', 'مقال جديد')}</Link></div>
       <div className="adm-row adm-row-head" style={{ gridTemplateColumns: '50px 2fr 1fr auto' }}>
-        <span></span><span>Article</span><span>Category</span><span></span>
+        <span></span><span>{L('Article', 'المقال')}</span><span>{L('Category', 'التصنيف')}</span><span></span>
       </div>
       {posts.length ? posts.map((j) => (
         <div className="adm-row" style={{ gridTemplateColumns: '50px 2fr 1fr auto' }} key={j.id}>
           {j.img ? <img className="thumb" src={abs(j.img)} alt="" /> : <span className="thumb" style={{ display: 'block', background: 'var(--sand)' }} />}
-          <div><div className="h-s" style={{ fontSize: 15 }}>{j.t}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{j.tAr}</div></div>
-          <span className="body" style={{ fontSize: 12 }}>{j.cat}</span>
-          <div className="actions"><Link href={`/admin/journal/${j.id}/edit`}>Edit</Link><span onClick={() => onDelete(j.id)}>Delete</span></div>
+          <div><div className="h-s" style={{ fontSize: 15 }}>{AR() ? j.tAr : j.t}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{j.tAr}</div></div>
+          <span className="body" style={{ fontSize: 12 }}>{AR() ? j.catAr : j.cat}</span>
+          <div className="actions"><Link href={`/admin/journal/${j.id}/edit`}>{L('Edit', 'تعديل')}</Link><span onClick={() => onDelete(j.id)}>{L('Delete', 'حذف')}</span></div>
         </div>
-      )) : <p className="body" style={{ padding: '26px 0' }}>No articles yet.</p>}
+      )) : <p className="body" style={{ padding: '26px 0' }}>{L('No articles yet.', 'مافيش مقالات لسه.')}</p>}
     </>
   );
 }

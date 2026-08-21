@@ -1,8 +1,11 @@
 'use client';
 /* ==========================================================
    THAJ admin — context
-   Session state (who's logged in) and the API helper that talks
-   to /api/admin/* — the client-side equivalent of the old
+   Session state (who's logged in), the bilingual EN/AR toggle for
+   the admin UI itself (separate from lib/siteContext's — the two
+   never mount at once, since admin and the public site are
+   different route groups), and the API helper that talks to
+   /api/admin/* — the client-side equivalent of the old
    admin/js/admin-data.js + admin-app.js boot()/toast() logic.
    Auth itself (login/signup) now lives on the shared /login page —
    this context only reads the session (/api/auth/me) and, if it
@@ -30,12 +33,18 @@ export async function api(path: string, opts?: RequestInit) {
   return res.json();
 }
 
+type Lang = 'en' | 'ar';
+
 interface AdminContextValue {
   me: AdminUser | null | undefined; // undefined = still checking, null = logged out (or not an admin)
   logout: () => Promise<void>;
   toast: (m: string) => void;
   toastMsg: string | null;
   call: (path: string, opts?: RequestInit) => Promise<unknown>;
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  AR: () => boolean;
+  L: <T = string>(e?: T, a?: T) => T;
 }
 
 const AdminContext = createContext<AdminContextValue | null>(null);
@@ -44,6 +53,16 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [me, setMe] = useState<AdminUser | null | undefined>(undefined);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [lang, setLangState] = useState<Lang>('en');
+
+  const AR = useCallback(() => lang === 'ar', [lang]);
+  const L = useCallback(<T,>(e?: T, a?: T) => ((lang === 'ar' ? a : e) as T), [lang]);
+  const setLang = useCallback((l: Lang) => setLangState((cur) => (cur === l ? cur : l)), []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  }, [lang]);
 
   const refreshMe = useCallback(async () => {
     try {
@@ -76,10 +95,10 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     try {
       return await api(path, opts);
     } catch (e) {
-      if (e instanceof Error && e.message === '__UNAUTHENTICATED__') { setMe(null); throw new Error('Session expired — please log in again.'); }
+      if (e instanceof Error && e.message === '__UNAUTHENTICATED__') { setMe(null); throw new Error(L('Session expired — please log in again.', 'انتهت الجلسة — سجّلي دخول تاني.')); }
       throw e;
     }
-  }, []);
+  }, [L]);
 
   const logout = useCallback(async () => {
     try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch { /* best-effort */ }
@@ -87,7 +106,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AdminContext.Provider value={{ me, logout, toast, toastMsg, call }}>
+    <AdminContext.Provider value={{ me, logout, toast, toastMsg, call, lang, setLang, AR, L }}>
       {children}
     </AdminContext.Provider>
   );

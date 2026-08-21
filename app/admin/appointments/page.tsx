@@ -4,13 +4,14 @@ import { useAdmin } from '@/lib/adminContext';
 import type { Appointment } from '@/lib/types';
 
 const STATUSES = ['Requested', 'Confirmed', 'Declined'];
+const STATUS_AR: Record<string, string> = { Requested: 'مطلوب', Confirmed: 'مؤكد', Declined: 'مرفوض' };
 
 export default function AppointmentsPage() {
   const { data: appts, loading, error, reload } = useAdminFetch<Appointment[]>('/appointments');
-  const { call, toast } = useAdmin();
+  const { call, toast, L, AR } = useAdmin();
 
   const onStatus = async (id: string | number, status: string) => {
-    try { await call(`/appointments/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast('Updated'); }
+    try { await call(`/appointments/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast(L('Updated', 'اتحدّث')); }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); reload(); }
   };
 
@@ -20,9 +21,9 @@ export default function AppointmentsPage() {
 
   return (
     <>
-      <div className="adm-head"><h1>Appointments</h1></div>
+      <div className="adm-head"><h1>{L('Appointments', 'المواعيد')}</h1></div>
       <div className="adm-row adm-row-head" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 160px' }}>
-        <span>Client</span><span>Date</span><span>Type</span><span>Status</span>
+        <span>{L('Client', 'العميلة')}</span><span>{L('Date', 'التاريخ')}</span><span>{L('Type', 'النوع')}</span><span>{L('Status', 'الحالة')}</span>
       </div>
       {appts.length ? appts.map((a) => (
         <div className="adm-row" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 160px' }} key={a.id}>
@@ -30,10 +31,10 @@ export default function AppointmentsPage() {
           <span className="body" style={{ fontSize: 12 }}>{a.date || '—'} · {a.time || ''}</span>
           <span className="body" style={{ fontSize: 12 }}>{a.type || '—'}<br />{a.mode || ''}</span>
           <select defaultValue={a.status} onChange={(e) => onStatus(a.id, e.target.value)}>
-            {STATUSES.map((s) => <option key={s}>{s}</option>)}
+            {STATUSES.map((s) => <option key={s} value={s}>{AR() ? STATUS_AR[s] : s}</option>)}
           </select>
         </div>
-      )) : <p className="body" style={{ padding: '26px 0' }}>No appointments yet.</p>}
+      )) : <p className="body" style={{ padding: '26px 0' }}>{L('No appointments yet.', 'مافيش مواعيد لسه.')}</p>}
     </>
   );
 }

@@ -7,7 +7,7 @@ import type { JournalArticle } from '@/lib/types';
 
 export default function JournalForm({ article, onSaved }: { article?: JournalArticle; onSaved?: () => void }) {
   const isNew = !article;
-  const { call, toast } = useAdmin();
+  const { call, toast, L } = useAdmin();
   const router = useRouter();
   const [img, setImg] = useState(article?.img || '');
 
@@ -24,7 +24,7 @@ export default function JournalForm({ article, onSaved }: { article?: JournalArt
     try {
       if (isNew) await call('/journal', { method: 'POST', body: JSON.stringify(body) });
       else await call(`/journal/${article.id}`, { method: 'PUT', body: JSON.stringify(body) });
-      toast('Saved');
+      toast(L('Saved', 'اتحفظ'));
       if (onSaved) onSaved(); else router.push('/admin/journal');
     } catch (err) { toast(err instanceof Error ? err.message : String(err)); }
   };
@@ -33,21 +33,21 @@ export default function JournalForm({ article, onSaved }: { article?: JournalArt
 
   return (
     <form className="form" style={{ maxWidth: 760 }} onSubmit={onSubmit}>
-      <div className="field"><label>ID (slug)</label><input name="id" defaultValue={v('id')} readOnly={!isNew} required pattern="[a-z0-9]+(-[a-z0-9]+)*" title="lowercase letters, numbers, hyphens" placeholder="e.g. j5" /></div>
+      <div className="field"><label>{L('ID (slug)', 'المعرّف (slug)')}</label><input name="id" defaultValue={v('id')} readOnly={!isNew} required pattern="[a-z0-9]+(-[a-z0-9]+)*" title="lowercase letters, numbers, hyphens" placeholder="e.g. j5" /></div>
       <div className="f2">
-        <div className="field"><label>Category (EN)</label><input name="cat" defaultValue={v('cat')} /></div>
-        <div className="field"><label>Category (AR)</label><input name="catAr" defaultValue={v('catAr')} /></div>
+        <div className="field"><label>{L('Category (EN)', 'التصنيف (إنجليزي)')}</label><input name="cat" defaultValue={v('cat')} /></div>
+        <div className="field"><label>{L('Category (AR)', 'التصنيف (عربي)')}</label><input name="catAr" defaultValue={v('catAr')} /></div>
       </div>
       <div className="f2">
-        <div className="field"><label>Title (EN)</label><input name="t" defaultValue={v('t')} required /></div>
-        <div className="field"><label>Title (AR)</label><input name="tAr" defaultValue={v('tAr')} required /></div>
+        <div className="field"><label>{L('Title (EN)', 'العنوان (إنجليزي)')}</label><input name="t" defaultValue={v('t')} required /></div>
+        <div className="field"><label>{L('Title (AR)', 'العنوان (عربي)')}</label><input name="tAr" defaultValue={v('tAr')} required /></div>
       </div>
       <div className="f2">
-        <div className="field"><label>Body paragraphs (EN, one per line)</label><textarea name="x" style={{ minHeight: 140 }} defaultValue={(article?.x || []).join('\n')} /></div>
-        <div className="field"><label>Body paragraphs (AR, one per line)</label><textarea name="xAr" style={{ minHeight: 140 }} defaultValue={(article?.xAr || []).join('\n')} /></div>
+        <div className="field"><label>{L('Body paragraphs (EN, one per line)', 'فقرات المقال (إنجليزي، سطر لكل فقرة)')}</label><textarea name="x" style={{ minHeight: 140 }} defaultValue={(article?.x || []).join('\n')} /></div>
+        <div className="field"><label>{L('Body paragraphs (AR, one per line)', 'فقرات المقال (عربي، سطر لكل فقرة)')}</label><textarea name="xAr" style={{ minHeight: 140 }} defaultValue={(article?.xAr || []).join('\n')} /></div>
       </div>
       <ImageUpload value={img} onChange={setImg} aspectRatio="4/3" />
-      <button className="btn fill" style={{ width: 'max-content' }} type="submit">{isNew ? 'Publish article' : 'Save changes'}</button>
+      <button className="btn fill" style={{ width: 'max-content' }} type="submit">{isNew ? L('Publish article', 'نشر المقال') : L('Save changes', 'حفظ التعديلات')}</button>
     </form>
   );
 }

@@ -1,11 +1,10 @@
 'use client';
-import { abs } from '@/lib/adminContext';
-import { useAdmin } from '@/lib/adminContext';
+import { abs, useAdmin } from '@/lib/adminContext';
 
 export default function ImageUpload({ value, onChange, aspectRatio = '3/4' }: {
   value: string; onChange: (path: string) => void; aspectRatio?: string;
 }) {
-  const { toast } = useAdmin();
+  const { toast, L } = useAdmin();
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,7 +23,7 @@ export default function ImageUpload({ value, onChange, aspectRatio = '3/4' }: {
 
   return (
     <div className="field">
-      <label>Photo</label>
+      <label>{L('Photo', 'الصورة')}</label>
       <div className="adm-upload">
         {value ? <img src={abs(value)} style={{ width: 110, aspectRatio, objectFit: 'cover', background: 'var(--sand)' }} alt="" /> : null}
         <input type="file" accept="image/*" onChange={onFile} />

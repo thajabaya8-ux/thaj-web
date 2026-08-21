@@ -4,10 +4,11 @@ import { abs, useAdmin } from '@/lib/adminContext';
 
 const MAX = 5;
 
-export default function MultiImageUpload({ value, onChange, label = 'Photos', max = MAX }: {
+export default function MultiImageUpload({ value, onChange, label, max = MAX }: {
   value: string[]; onChange: (images: string[]) => void; label?: string; max?: number;
 }) {
-  const { toast } = useAdmin();
+  const { toast, L } = useAdmin();
+  const fieldLabel = label ?? L('Photos', 'الصور');
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +24,7 @@ export default function MultiImageUpload({ value, onChange, label = 'Photos', ma
   const onFiles = async (files: FileList | null) => {
     if (!files || !files.length) return;
     const room = max - value.length;
-    if (room <= 0) { toast(`You can have up to ${max} photos`); return; }
+    if (room <= 0) { toast(L(`You can have up to ${max} photos`, `الحد الأقصى ${max} صور`)); return; }
     const batch = Array.from(files).slice(0, room);
     setBusy(true);
     try {
@@ -48,12 +49,12 @@ export default function MultiImageUpload({ value, onChange, label = 'Photos', ma
 
   return (
     <div className="field">
-      <label>{label} <span style={{ opacity: 0.6 }}>({value.length}/{max})</span></label>
+      <label>{fieldLabel} <span style={{ opacity: 0.6 }}>({value.length}/{max})</span></label>
       <div className="adm-gallery">
         {value.map((path, i) => (
           <div className="adm-gallery-tile" key={path + i}>
             <img src={abs(path)} alt="" />
-            {i === 0 && <span className="cover">Cover</span>}
+            {i === 0 && <span className="cover">{L('Cover', 'الغلاف')}</span>}
             <button type="button" className="rm" onClick={() => remove(i)} aria-label="Remove photo">×</button>
             <div className="mv">
               <button type="button" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move earlier">‹</button>
@@ -64,7 +65,7 @@ export default function MultiImageUpload({ value, onChange, label = 'Photos', ma
         {value.length < max && (
           <label className={`adm-gallery-add ${busy ? 'busy' : ''}`}>
             <input ref={inputRef} type="file" accept="image/*" multiple disabled={busy} onChange={(e) => onFiles(e.target.files)} />
-            {busy ? 'Uploading…' : '+ Add photo'}
+            {busy ? L('Uploading…', 'بيترفع…') : L('+ Add photo', '+ إضافة صورة')}
           </label>
         )}
       </div>

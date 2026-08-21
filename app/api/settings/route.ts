@@ -3,7 +3,7 @@ import { sql } from '@/lib/db';
 
 const PUBLIC_SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar'
+  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar'
 ];
 
 export async function GET() {

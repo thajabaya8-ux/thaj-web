@@ -187,7 +187,8 @@ const SETTINGS = {
   hero_eyebrow_en: 'Autumn 2026 · The Signature Chapter', hero_eyebrow_ar: 'خريف ٢٠٢٦ · فصل التوقيع',
   hero_title_en: 'Where the seam is the only line.', hero_title_ar: 'حيث الدرزة هي الخط الوحيد.',
   contact_email: 'atelier@thaj.house',
-  contact_location_en: 'Riyadh · By appointment', contact_location_ar: 'الرياض · بموعد'
+  contact_location_en: 'Riyadh · By appointment', contact_location_ar: 'الرياض · بموعد',
+  egp_per_sar: '13.5'
 };
 
 async function run() {

@@ -16,6 +16,8 @@ import type {
 } from '@/lib/types';
 
 type Lang = 'en' | 'ar';
+type Currency = 'SAR' | 'EGP';
+type AuthRole = 'admin' | 'customer' | null | undefined; // undefined = still checking
 
 const ESC_MAP: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (s: unknown): string => String(s ?? '').replace(/[&<>"']/g, (c) => ESC_MAP[c]);
@@ -50,6 +52,9 @@ interface SiteContextValue {
   num: (n: number | string) => string;
   ord: (i: number) => string;
   SAR: (n: number) => string;
+  currency: Currency;
+  setCurrency: (c: Currency) => void;
+  authRole: AuthRole;
   fa: (v: string) => string;
   stLabel: (s: string) => string;
   esc: typeof esc;
@@ -109,6 +114,8 @@ interface SiteProviderProps {
 
 export function SiteProvider({ initialPieces, initialCollections, initialJournal, initialOrders, initialSettings, children }: SiteProviderProps) {
   const [lang, setLangState] = useState<Lang>('en');
+  const [currency, setCurrencyState] = useState<Currency>('SAR');
+  const [authRole, setAuthRole] = useState<AuthRole>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wish, setWish] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>(initialOrders || []);
@@ -137,11 +144,37 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
+  // Admin-editable rate (Settings → "Egyptian pounds per 1 Saudi riyal"),
+  // with a sane fallback if it's never been set.
+  const egpPerSar = useMemo(() => {
+    const n = parseFloat(settings.egp_per_sar || '');
+    return Number.isFinite(n) && n > 0 ? n : 13.5;
+  }, [settings.egp_per_sar]);
+
+  // Every price in the DB is entered by the admin in SAR — this only
+  // converts what's shown to the shopper; order totals are always
+  // computed server-side in SAR regardless of the display currency.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/me', { credentials: 'same-origin' }).then(async (r) => {
+      if (cancelled) return;
+      if (!r.ok) { setAuthRole(null); return; }
+      const body = await r.json();
+      setAuthRole(body.role === 'admin' ? 'admin' : 'customer');
+    }).catch(() => { if (!cancelled) setAuthRole(null); });
+    return () => { cancelled = true; };
+  }, []);
+
   const AR = useCallback(() => lang === 'ar', [lang]);
   const L = useCallback(<T,>(e?: T, a?: T) => ((lang === 'ar' ? a : e) as T), [lang]);
   const num = useCallback((n: number | string) => (AR() ? String(n).replace(/[0-9]/g, (d) => AD[+d]) : String(n)), [AR]);
   const ord = useCallback((i: number) => num(String(i).padStart(2, '0')), [num]);
-  const SAR = useCallback((n: number) => (AR() ? `${(n || 0).toLocaleString('en-US')} ر.س` : `${(n || 0).toLocaleString('en-US')} SAR`), [AR]);
+  const setCurrency = useCallback((c: Currency) => setCurrencyState((cur) => (cur === c ? cur : c)), []);
+  const SAR = useCallback((n: number) => {
+    const converted = currency === 'EGP' ? Math.round((n || 0) * egpPerSar) : (n || 0);
+    const symbol = currency === 'EGP' ? (AR() ? 'ج.م' : 'EGP') : (AR() ? 'ر.س' : 'SAR');
+    return `${converted.toLocaleString('en-US')} ${symbol}`;
+  }, [AR, currency, egpPerSar]);
   const fa = useCallback((v: string) => esc(AR() ? (FACET_AR[v] || v) : v), [AR]);
   const stLabel = useCallback((s: string) => esc(AR() ? (STATUS_AR[s] || s) : s), [AR]);
   const byId = useCallback((id: string) => pieces.find((p) => p.id === id), [pieces]);
@@ -277,7 +310,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, []);
 
   const value: SiteContextValue = {
-    lang, setLang, AR, L, num, ord, SAR, fa, stLabel, esc,
+    lang, setLang, AR, L, num, ord, SAR, currency, setCurrency, authRole, fa, stLabel, esc,
     pieces, collections, journal, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
     cart, wish, cartTotal, itemPrice, addToCart, quickAdd, qty, rmItem, toggleWish,

@@ -7,7 +7,7 @@ import { str } from '@/lib/serverValidators';
 // pairs shouldn't be able to grow the settings table without bound.
 const SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar'
+  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar'
 ];
 
 async function readSettings() {
@@ -30,7 +30,14 @@ export async function PUT(req: Request) {
   const b = await req.json().catch(() => ({}));
   for (const key of SETTINGS_ALLOWLIST) {
     if (Object.prototype.hasOwnProperty.call(b, key)) {
-      const value = key === 'contact_email' ? str(b[key], 254) : str(b[key], 500);
+      let value: string;
+      if (key === 'egp_per_sar') {
+        const n = parseFloat(b[key]);
+        if (!Number.isFinite(n) || n <= 0) continue; // ignore garbage, keep the previous rate
+        value = String(n);
+      } else {
+        value = key === 'contact_email' ? str(b[key], 254) : str(b[key], 500);
+      }
       await sql`INSERT INTO settings (key,value) VALUES (${key},${value})
         ON CONFLICT (key) DO UPDATE SET value = excluded.value`;
     }
