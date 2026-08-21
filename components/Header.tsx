@@ -50,6 +50,7 @@ export default function Header() {
         <Link id="u-wish" href="/wishlist"><span className="t">{L('Saved', 'المحفوظ')}</span><span className="n">{wish.length}</span></Link>
         <button id="u-cart" onClick={() => setDrawerOpen(true)}><span className="t">{L('Selection', 'اختيارك')}</span><span className="n">{cartCount}</span></button>
         <Link className="u-hide" id="u-acct" href="/account">{L('My THAJ', 'حسابي')}</Link>
+        <Link className="u-hide" id="u-admin" href="/admin">{L('Admin', 'الإدارة')}</Link>
         <div className="lang">
           <button id="lg-en" className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
           <i>/</i>
