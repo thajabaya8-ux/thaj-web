@@ -1,9 +1,11 @@
 -- THAJ — Postgres schema (Neon), ported from thaj-site/server/db.js (SQLite)
 
-CREATE TABLE IF NOT EXISTS admins (
+CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('admin','customer')),
+  name TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

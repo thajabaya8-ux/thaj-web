@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "migrate:users": "node --env-file=.env.local scripts/migrate-users.mjs",
     "seed": "node --env-file=.env.local scripts/seed.mjs"
   },
   "dependencies": {

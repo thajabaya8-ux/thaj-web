@@ -16,7 +16,7 @@ export default function MobileMenu() {
         <Link href="/account" onClick={() => setMenuOpen(false)}>{L('My THAJ', 'حسابي')}</Link>
         <Link href="/wishlist" onClick={() => setMenuOpen(false)}>{L('My Archive', 'أرشيفي')}</Link>
         <Link href="/room" onClick={() => setMenuOpen(false)}>{L('Control Room', 'غرفة التحكم')}</Link>
-        <Link href="/admin" onClick={() => setMenuOpen(false)}>{L('Admin login', 'دخول الإدارة')}</Link>
+        <Link href="/login" onClick={() => setMenuOpen(false)}>{L('Login', 'تسجيل الدخول')}</Link>
       </div>
     </div>
   );

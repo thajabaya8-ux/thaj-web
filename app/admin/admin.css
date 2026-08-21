@@ -11,13 +11,9 @@
 @layer thaj {
 body{background:var(--bone-2)}
 
-/* ============ LOGIN ============ */
-#login-screen:not([hidden]){min-height:100vh;background:var(--emerald-deep);display:flex;align-items:center;justify-content:center;padding:24px}
-.adm-login{width:min(380px,100%)}
-.adm-login-mark{width:120px;display:block;margin:0 auto 30px}
-.adm-login .field label{color:var(--on-dark-soft)}
-.adm-login .field input{border-color:var(--on-dark-line);color:var(--on-dark)}
-.adm-error{color:#E39A9A;font-size:11px;letter-spacing:.05em;min-height:16px;margin-top:4px}
+/* Login/sign-up styles (#login-screen, .adm-login*, .adm-error) now live
+   in app/globals.css — the shared /login page needs them too, and that's
+   loaded by the root layout regardless of which route group is active. */
 
 /* ============ SHELL ============ */
 #shell:not([hidden]){display:flex;min-height:100vh}

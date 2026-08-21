@@ -14,14 +14,14 @@ export async function POST(req: Request) {
   const email = String((body && body.email) || '').trim().toLowerCase();
   const password = String((body && body.password) || '');
 
-  const rows = await sql`SELECT * FROM admins WHERE email = ${email}`;
-  const admin = rows[0];
-  const validPassword = bcrypt.compareSync(password, admin ? admin.password_hash : DUMMY_HASH);
+  const rows = await sql`SELECT * FROM users WHERE email = ${email}`;
+  const user = rows[0];
+  const validPassword = bcrypt.compareSync(password, user ? user.password_hash : DUMMY_HASH);
 
-  if (!admin || !validPassword) {
+  if (!user || !validPassword) {
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
   }
 
-  await createSession({ adminId: admin.id, adminEmail: admin.email });
-  return NextResponse.json({ email: admin.email });
+  await createSession({ userId: user.id, email: user.email, role: user.role, name: user.name });
+  return NextResponse.json({ email: user.email, role: user.role, name: user.name });
 }

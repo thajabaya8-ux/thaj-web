@@ -4,6 +4,10 @@
    Session state (who's logged in) and the API helper that talks
    to /api/admin/* — the client-side equivalent of the old
    admin/js/admin-data.js + admin-app.js boot()/toast() logic.
+   Auth itself (login/signup) now lives on the shared /login page —
+   this context only reads the session (/api/auth/me) and, if it
+   doesn't belong to an admin, treats the visitor as logged out so
+   AdminGate sends them to /login instead of showing the panel.
    ========================================================== */
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { AdminUser } from '@/lib/types';
@@ -27,8 +31,7 @@ export async function api(path: string, opts?: RequestInit) {
 }
 
 interface AdminContextValue {
-  me: AdminUser | null | undefined; // undefined = still checking, null = logged out
-  login: (email: string, password: string) => Promise<void>;
+  me: AdminUser | null | undefined; // undefined = still checking, null = logged out (or not an admin)
   logout: () => Promise<void>;
   toast: (m: string) => void;
   toastMsg: string | null;
@@ -44,8 +47,11 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const refreshMe = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/me', { credentials: 'same-origin' });
-      if (res.ok) { setMe(await res.json()); return; }
+      const res = await fetch('/api/auth/me', { credentials: 'same-origin' });
+      if (res.ok) {
+        const body = await res.json();
+        if (body.role === 'admin') { setMe({ email: body.email }); return; }
+      }
     } catch { /* falls through to logged-out state below */ }
     setMe(null);
   }, []);
@@ -75,24 +81,13 @@ export function AdminProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch('/api/admin/login', {
-      method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(body.error || 'Could not log in');
-    setMe({ email: body.email });
-  }, []);
-
   const logout = useCallback(async () => {
-    try { await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' }); } catch { /* best-effort */ }
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch { /* best-effort */ }
     setMe(null);
   }, []);
 
   return (
-    <AdminContext.Provider value={{ me, login, logout, toast, toastMsg, call }}>
+    <AdminContext.Provider value={{ me, logout, toast, toastMsg, call }}>
       {children}
     </AdminContext.Provider>
   );

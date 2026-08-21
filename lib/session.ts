@@ -1,11 +1,14 @@
 /* ==========================================================
    THAJ — session
-   Admin auth session as a signed cookie instead of server-side
-   session storage: Vercel serverless functions don't share
-   memory between invocations, so express-session's in-memory
-   store (what thaj-site used) can't survive across requests.
-   The cookie carries {adminId, adminEmail, exp}, HMAC-signed
-   with SESSION_SECRET so it can't be forged or tampered with.
+   Auth session as a signed cookie instead of server-side session
+   storage: Vercel serverless functions don't share memory between
+   invocations, so express-session's in-memory store (what
+   thaj-site used) can't survive across requests.
+   The cookie carries {userId, email, role, exp}, HMAC-signed with
+   SESSION_SECRET so it can't be forged or tampered with. `role`
+   ('admin' | 'customer') is set once at login from the users
+   table and never trusted from the client — it's what lets
+   lib/adminAuth.ts tell the two kinds of account apart.
    ========================================================== */
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
@@ -16,9 +19,13 @@ if (!SECRET) throw new Error('SESSION_SECRET is not set');
 export const SESSION_COOKIE = 'thaj.sid';
 const MAX_AGE_SECONDS = 60 * 60 * 8; // 8 hours, matches thaj-site's session cookie
 
+export type Role = 'admin' | 'customer';
+
 export interface SessionPayload {
-  adminId: number;
-  adminEmail: string;
+  userId: number;
+  email: string;
+  role: Role;
+  name: string | null;
 }
 
 function sign(data: string): string {
@@ -42,8 +49,9 @@ function decode(token: string): SessionPayload | null {
   try {
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
     if (typeof payload.exp !== 'number' || Date.now() > payload.exp) return null;
-    if (typeof payload.adminId !== 'number' || typeof payload.adminEmail !== 'string') return null;
-    return { adminId: payload.adminId, adminEmail: payload.adminEmail };
+    if (typeof payload.userId !== 'number' || typeof payload.email !== 'string') return null;
+    if (payload.role !== 'admin' && payload.role !== 'customer') return null;
+    return { userId: payload.userId, email: payload.email, role: payload.role, name: payload.name ?? null };
   } catch {
     return null;
   }

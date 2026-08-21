@@ -229,10 +229,10 @@ async function run() {
   if (password === 'change-this-password' || password.length < 12) {
     console.warn('WARNING: ADMIN_PASSWORD is missing, default, or shorter than 12 characters.');
   }
-  const existing = await sql`SELECT id FROM admins WHERE email = ${email}`;
+  const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
   if (existing.length === 0) {
     const hash = bcrypt.hashSync(password, 12);
-    await sql`INSERT INTO admins (email, password_hash) VALUES (${email}, ${hash})`;
+    await sql`INSERT INTO users (email, password_hash, role) VALUES (${email}, ${hash}, 'admin')`;
     console.log(`Seeded admin user: ${email}`);
   } else {
     console.log(`Admin user already exists: ${email}`);

@@ -627,4 +627,13 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   .lrow{grid-template-columns:1fr;gap:14px}
   footer .fcol{grid-column:span 6}
 }
+
+/* ============ LOGIN / SIGN UP (shared by app/login) ============ */
+#login-screen:not([hidden]){min-height:100vh;background:var(--emerald-deep);display:flex;align-items:center;justify-content:center;padding:24px}
+.adm-login{width:min(380px,100%)}
+.adm-login-mark{width:120px;display:block;margin:0 auto 30px}
+.adm-login .field label{color:var(--on-dark-soft)}
+.adm-login .field input{border-color:var(--on-dark-line);color:var(--on-dark)}
+.adm-error{color:#E39A9A;font-size:11px;letter-spacing:.05em;min-height:16px;margin-top:4px}
+.adm-switch{background:none;border:0;color:var(--on-dark-soft);font-size:11px;letter-spacing:.05em;text-decoration:underline;cursor:pointer;display:block;margin:18px auto 0}
 } /* end @layer thaj */
