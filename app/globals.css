@@ -79,7 +79,8 @@
   --on-dark-line:rgba(239,235,224,.18);
   --display:"Didot","Bodoni 72","Bodoni MT","Playfair Display",'Times New Roman',Georgia,serif;
   --sans:"Helvetica Neue","Inter","Segoe UI",Arial,sans-serif;
-  --ar:"SF Arabic","Geeza Pro","Noto Naskh Arabic","Traditional Arabic",serif;
+  --ar:var(--font-cairo),"SF Arabic","Segoe UI",Tahoma,sans-serif;
+  --ar-display:var(--font-amiri),"SF Arabic","Traditional Arabic",serif;
   --e:cubic-bezier(.16,1,.3,1);
   --nav-h:96px;
 }
@@ -506,44 +507,46 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] .h-xl,[dir="rtl"] .h-l,[dir="rtl"] .h-m,[dir="rtl"] .h-s,
 [dir="rtl"] .hm-h,[dir="rtl"] .hero .h-in h1,[dir="rtl"] .pdp .price,
 [dir="rtl"] .card .meta h3,[dir="rtl"] .arch-row .nm,[dir="rtl"] .spec .r .v,
-[dir="rtl"] .tot b,[dir="rtl"] .orow .on,[dir="rtl"] .price-breakdown b{font-family:var(--ar)}
-[dir="rtl"] .h-xl,[dir="rtl"] .h-l{line-height:1.12}
-[dir="rtl"] .h-m,[dir="rtl"] .h-s{line-height:1.3}
+[dir="rtl"] .tot b,[dir="rtl"] .orow .on,[dir="rtl"] .price-breakdown b{font-family:var(--ar-display)}
+[dir="rtl"] .h-xl,[dir="rtl"] .h-l{line-height:1.16}
+[dir="rtl"] .h-m,[dir="rtl"] .h-s{line-height:1.35}
 [dir="rtl"] .lbl{letter-spacing:0}
-/* ---- Arabic type scale: Arabic script needs more size than Latin caps ---- */
-[dir="rtl"] .lbl{font-size:12.5px !important;line-height:1.7}
-[dir="rtl"] .body{font-size:14px !important;line-height:2.05}
-[dir="rtl"] .btn{font-size:12.5px !important;padding:16px 32px}
-[dir="rtl"] .link{font-size:12.5px !important}
-[dir="rtl"] .fopts button,[dir="rtl"] .filters button{font-size:13.5px;letter-spacing:0;padding-bottom:5px}
-[dir="rtl"] .ftoggle{font-size:13px}
-[dir="rtl"] .shopbar .lbl{font-size:12.5px}
-[dir="rtl"] .card .meta span,[dir="rtl"] .card .meta .pr small{font-size:11px;letter-spacing:0}
-[dir="rtl"] .card .quick{font-size:12px;letter-spacing:0;padding:14px}
-[dir="rtl"] .card .save{font-size:14px}
-[dir="rtl"] .sizes button{font-size:13px;letter-spacing:0;padding:13px 20px}
-[dir="rtl"] .spec .r .k{font-size:12px;letter-spacing:0}
-[dir="rtl"] .spec .r .v{font-size:16px}
-[dir="rtl"] .pdp .desc{font-size:14.5px !important}
-[dir="rtl"] .arch-row .th{font-size:12px;letter-spacing:0}
-[dir="rtl"] .arch-row .nm i{font-size:14px}
-[dir="rtl"] .pill{font-size:11.5px;letter-spacing:0;padding:7px 12px}
-[dir="rtl"] .steps span{font-size:12.5px;letter-spacing:0}
-[dir="rtl"] .acct .side button{font-size:13.5px;letter-spacing:0}
-[dir="rtl"] .field label{font-size:11.5px;letter-spacing:0}
-[dir="rtl"] .field input,[dir="rtl"] .field select,[dir="rtl"] .field textarea{font-size:15px}
-[dir="rtl"] .citem .rm,[dir="rtl"] #drawer .rm{font-size:11.5px;letter-spacing:0}
-[dir="rtl"] footer h5{font-size:12px;letter-spacing:0}
-[dir="rtl"] footer a,[dir="rtl"] footer span.fl{font-size:14px}
-[dir="rtl"] footer .fbot{font-size:12px;letter-spacing:0}
-[dir="rtl"] .masthead .mh .d{font-size:14px}
-[dir="rtl"] .article p{font-size:16.5px;line-height:2.15}
-[dir="rtl"] .hm-row p{font-size:14px !important}
-[dir="rtl"] .hm-th span{font-size:12px;letter-spacing:0;padding:8px}
-[dir="rtl"] .jcard .cat{font-size:12.5px}
-[dir="rtl"] #menu a{font-size:clamp(30px,7vw,48px)}
-[dir="rtl"] #menu .m-foot span,[dir="rtl"] #menu .close{font-size:13.5px;letter-spacing:0}
-[dir="rtl"] #search input{font-size:clamp(30px,6vw,74px)}
+/* ---- Arabic type scale: Cairo/Amiri read smaller than the Latin faces
+   at the same font-size, so every RTL size here runs larger than its
+   LTR counterpart on purpose — this is the fix, not a temporary bump. ---- */
+[dir="rtl"] .lbl{font-size:14px !important;line-height:1.75}
+[dir="rtl"] .body{font-size:16.5px !important;line-height:1.95}
+[dir="rtl"] .btn{font-size:14.5px !important;padding:16px 32px}
+[dir="rtl"] .link{font-size:14px !important}
+[dir="rtl"] .fopts button,[dir="rtl"] .filters button{font-size:15px;letter-spacing:0;padding-bottom:5px}
+[dir="rtl"] .ftoggle{font-size:14.5px}
+[dir="rtl"] .shopbar .lbl{font-size:14px}
+[dir="rtl"] .card .meta span,[dir="rtl"] .card .meta .pr small{font-size:13px;letter-spacing:0}
+[dir="rtl"] .card .quick{font-size:13.5px;letter-spacing:0;padding:14px}
+[dir="rtl"] .card .save{font-size:15px}
+[dir="rtl"] .sizes button{font-size:14.5px;letter-spacing:0;padding:13px 20px}
+[dir="rtl"] .spec .r .k{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] .spec .r .v{font-size:17.5px}
+[dir="rtl"] .pdp .desc{font-size:16.5px !important}
+[dir="rtl"] .arch-row .th{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] .arch-row .nm i{font-size:16px}
+[dir="rtl"] .pill{font-size:13px;letter-spacing:0;padding:7px 12px}
+[dir="rtl"] .steps span{font-size:14px;letter-spacing:0}
+[dir="rtl"] .acct .side button{font-size:15px;letter-spacing:0}
+[dir="rtl"] .field label{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] .field input,[dir="rtl"] .field select,[dir="rtl"] .field textarea{font-size:16.5px}
+[dir="rtl"] .citem .rm,[dir="rtl"] #drawer .rm{font-size:13px;letter-spacing:0}
+[dir="rtl"] footer h5{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] footer a,[dir="rtl"] footer span.fl{font-size:15.5px}
+[dir="rtl"] footer .fbot{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] .masthead .mh .d{font-size:16px}
+[dir="rtl"] .article p{font-size:18px;line-height:2}
+[dir="rtl"] .hm-row p{font-size:16px !important}
+[dir="rtl"] .hm-th span{font-size:13.5px;letter-spacing:0;padding:8px}
+[dir="rtl"] .jcard .cat{font-size:14px}
+[dir="rtl"] #menu a{font-size:clamp(30px,7vw,48px);font-family:var(--ar-display)}
+[dir="rtl"] #menu .m-foot span,[dir="rtl"] #menu .close{font-size:15px;letter-spacing:0}
+[dir="rtl"] #search input{font-size:clamp(30px,6vw,74px);font-family:var(--ar-display)}
 [dir="rtl"] #search .sugg button{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] #search .close,[dir="rtl"] #s-lbl{font-size:12.5px;letter-spacing:0}
 [dir="rtl"] #toast{font-size:13px;letter-spacing:0;padding:16px 28px}
