@@ -72,8 +72,13 @@ export default function SocialFab() {
         </a>
       ))}
       <button type="button" className={`social-fab-toggle ${open ? 'open' : ''}`} onClick={() => setOpen((o) => !o)} aria-label="Social">
-        <i />
-        <i />
+        <svg className="icon-social" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+          <circle cx="6" cy="12" r="2.4" /><circle cx="17.5" cy="5.5" r="2.4" /><circle cx="17.5" cy="18.5" r="2.4" />
+          <path d="M8.1 10.8 15.4 6.9M8.1 13.2l7.3 3.9" />
+        </svg>
+        <svg className="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg>
       </button>
     </div>
   );

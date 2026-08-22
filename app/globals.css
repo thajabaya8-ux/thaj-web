@@ -619,13 +619,13 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .social-fab-item.open{opacity:1;transform:scale(1);pointer-events:auto;margin-bottom:12px}
 .social-fab-item svg{width:20px;height:20px;flex:0 0 auto}
-.social-fab-toggle{width:52px;height:52px;border-radius:50%;background:var(--gold);border:0;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;position:relative;flex:0 0 auto;
-  box-shadow:0 8px 24px rgba(0,0,0,.22);-webkit-tap-highlight-color:transparent}
-.social-fab-toggle i{position:absolute;width:20px;height:1.6px;background:var(--ink);transition:transform .3s var(--e)}
-.social-fab-toggle i:last-child{transform:rotate(90deg)}
-.social-fab-toggle.open i:first-child{transform:rotate(45deg)}
-.social-fab-toggle.open i:last-child{transform:rotate(-45deg)}
+.social-fab-toggle{width:52px;height:52px;border-radius:50%;background:var(--emerald-deep);color:var(--champagne);
+  border:1px solid var(--champagne);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  position:relative;flex:0 0 auto;box-shadow:0 8px 24px rgba(0,0,0,.22);-webkit-tap-highlight-color:transparent}
+.social-fab-toggle svg{position:absolute;width:22px;height:22px;transition:opacity .25s var(--e),transform .3s var(--e)}
+.social-fab-toggle .icon-close{opacity:0;transform:rotate(-45deg) scale(.6)}
+.social-fab-toggle.open .icon-social{opacity:0;transform:rotate(45deg) scale(.6)}
+.social-fab-toggle.open .icon-close{opacity:1;transform:rotate(0) scale(1)}
 @media(max-width:640px){.social-fab{bottom:18px;right:16px}}
 
 /* ============ TOAST ============ */
