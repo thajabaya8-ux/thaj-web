@@ -37,7 +37,7 @@ export default function Footer() {
             <span className="fl">{L('Care & repair', 'العناية والإصلاح')}</span>
           </div>
         </div>
-        <img className="fmark" src="/assets/logo/logo-beige.png" alt="THAJ" />
+        <img className="fmark" src={`/${settings.img_logo_mark || 'assets/logo/logo-beige.png'}`} alt="THAJ" />
         <div className="fbot">
           <span>© 2026 THAJ · {L('Kingdom of Saudi Arabia', 'المملكة العربية السعودية')}</span>
           <span className="arabic" style={{ letterSpacing: 0 }}>الأناقة صمت</span>

@@ -6,7 +6,7 @@ import { useAdmin } from '@/lib/adminContext';
 const NAV: [string, string, string][] = [
   ['/admin', 'Dashboard', 'الرئيسية'], ['/admin/pieces', 'Pieces', 'القطع'], ['/admin/collections', 'Collections', 'المجموعات'],
   ['/admin/journal', 'Journal', 'المجلة'], ['/admin/orders', 'Orders', 'الطلبات'], ['/admin/appointments', 'Appointments', 'المواعيد'],
-  ['/admin/reviews', 'Reviews', 'الرسائل'], ['/admin/settings', 'Settings', 'الإعدادات']
+  ['/admin/reviews', 'Reviews', 'الرسائل'], ['/admin/media', 'Site images', 'صور الموقع'], ['/admin/settings', 'Settings', 'الإعدادات']
 ];
 
 export default function Sidebar() {

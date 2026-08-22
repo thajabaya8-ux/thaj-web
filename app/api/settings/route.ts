@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
+import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 
 const PUBLIC_SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar'
+  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
+  ...IMAGE_SETTINGS_KEYS
 ];
 
 export async function GET() {

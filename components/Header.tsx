@@ -14,7 +14,7 @@ export const NAVLINKS: [string, string, string][] = [
 ];
 
 export default function Header() {
-  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, currency, setCurrency, authRole } = useSite();
+  const { L, AR, cart, wish, settings, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, currency, setCurrency, authRole } = useSite();
   const pathname = usePathname();
   const [solid, setSolid] = useState(false);
   const [onDark, setOnDark] = useState(false);
@@ -36,8 +36,8 @@ export default function Header() {
   return (
     <header id="hdr" className={`${solid ? 'solid' : ''} ${onDark ? 'on-dark' : ''}`.trim()}>
       <Link className="brand" href="/">
-        <img className="lg-lt" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
-        <img className="lg-dk" src="/assets/logo/wordmark-beige.png" alt="THAJ" />
+        <img className="lg-lt" src={`/${settings.img_wordmark_light || 'assets/logo/wordmark-emerald.png'}`} alt="THAJ" />
+        <img className="lg-dk" src={`/${settings.img_wordmark_dark || 'assets/logo/wordmark-beige.png'}`} alt="THAJ" />
       </Link>
       <nav id="nav">
         {NAVLINKS.map(([href, e, a]) => (

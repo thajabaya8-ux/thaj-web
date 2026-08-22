@@ -85,6 +85,11 @@ body{background:var(--bone-2)}
 .adm-pants-body{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-top:18px}
 .adm-pants-body .field{min-width:180px}
 
+.adm-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px 28px}
+.adm-media-slot .field{margin:0}
+.adm-media-slot .adm-upload{flex-direction:column;align-items:flex-start}
+.adm-media-slot .adm-upload img{width:100%!important;aspect-ratio:16/9;object-fit:cover}
+
 @media(max-width:820px){
   #shell{flex-direction:column}
   .adm-side{width:100%;flex:none;height:auto;position:static;padding:20px}

@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 import { str } from '@/lib/serverValidators';
+import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 
 // Only known keys can be written — the client sending arbitrary key/value
 // pairs shouldn't be able to grow the settings table without bound.
 const SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar'
+  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
+  ...IMAGE_SETTINGS_KEYS
 ];
 
 async function readSettings() {

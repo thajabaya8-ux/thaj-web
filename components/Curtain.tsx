@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSite } from '@/lib/siteContext';
 
 export default function Curtain() {
+  const { settings } = useSite();
   const [go, setGo] = useState(false);
   const [out, setOut] = useState(false);
 
@@ -13,7 +15,7 @@ export default function Curtain() {
 
   return (
     <div id="curtain" className={`${go ? 'go' : ''} ${out ? 'out' : ''}`.trim()}>
-      <img className="c-mark" src="/assets/logo/logo-beige.png" alt="THAJ" />
+      <img className="c-mark" src={`/${settings.img_logo_mark || 'assets/logo/logo-beige.png'}`} alt="THAJ" />
       <div className="c-sub lbl" style={{ color: 'var(--on-dark-soft)' }}>
         THAJ ABAYA BRAND &nbsp;·&nbsp; دار ثاج للأزياء
       </div>

@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
-import { IMG } from '@/lib/img';
+import { stockImg } from '@/lib/img';
 
 export default function MaisonPage() {
-  const { L, ord } = useSite();
+  const { L, ord, settings } = useSite();
   const four: [string, string][] = [
     [L('Materials', 'الخامات'), L('Jacquard, crepe, silk-satin, washed linen, voile. Bought in small lengths, often the last of a run.', 'جاكار، كريب، ساتان حرير، كتان مغسول، فوال. بتتشترى بأطوال صغيرة، وغالبًا آخر تشغيلة.')],
     [L('Craft', 'الصنعة'), L('Lace set by hand against the wearer, not the block. Crushing done after dye, in small batches.', 'الدانتيل بيتركّب باليد على اللابسة، مش على الباترون. والكرمشة بعد الصباغة، في دفعات صغيرة.')],
@@ -14,7 +14,7 @@ export default function MaisonPage() {
   return (
     <>
       <section className="hero bleed rv" style={{ height: 'min(84vh,820px)' }}>
-        <img src={`/${IMG[2]}`} alt="THAJ" style={{ objectPosition: '50% 58%' }} />
+        <img src={`/${stockImg(settings, 2)}`} alt="THAJ" style={{ objectPosition: '50% 58%' }} />
         <div className="h-in">
           <div className="lbl">{L('The Maison', 'الدار')}</div>
           <h1>{L('A house built on proportion, not ornament.', 'دار مبنية على النسبة، مش على الزخرفة.')}</h1>

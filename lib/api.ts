@@ -7,6 +7,7 @@
    ========================================================== */
 import { sql } from '@/lib/db';
 import { collectionOut, journalOut, orderPublicOut, pieceOut } from '@/lib/serverMappers';
+import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 import type { Collection, JournalArticle, Order, Piece, Settings } from '@/lib/types';
 
 export async function getPieces(): Promise<Piece[]> {
@@ -46,7 +47,8 @@ export async function getOrders(): Promise<Order[]> {
 
 const PUBLIC_SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar'
+  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
+  ...IMAGE_SETTINGS_KEYS
 ];
 
 export async function getSettings(): Promise<Settings> {

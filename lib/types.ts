@@ -99,6 +99,9 @@ export interface Settings {
   contact_location_en?: string;
   contact_location_ar?: string;
   egp_per_sar?: string;
+  img_logo_mark?: string;
+  img_wordmark_light?: string;
+  img_wordmark_dark?: string;
   [key: string]: string | undefined;
 }
 

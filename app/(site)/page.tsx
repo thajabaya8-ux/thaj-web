@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
-import { IMG } from '@/lib/img';
+import { stockImg } from '@/lib/img';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 
@@ -17,7 +17,7 @@ export default function HomePage() {
         <div className="hm-in">
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-            <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
+            <img className="hm-logo" src={`/${settings.img_logo_mark || 'assets/logo/logo-beige.png'}`} alt="THAJ" />
             <h1 className="hm-h">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
             <div className="hm-row">
               <p>{L('Eleven pieces, catalogued and editioned. Cut in Riyadh, washed three times, and finished by hand before they are named.', 'إحدى عشرة قطعة، مفهرسة ومرقّمة. تُقص في الرياض، وتُغسل ثلاث مرات، وتُنهى باليد قبل أن تُسمّى.')}</p>
@@ -61,10 +61,10 @@ export default function HomePage() {
           </div>
           <div style={{ gridColumn: '7/13', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(14px,2vw,28px)' }}>
             <div className="rv" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--emerald)' }}>
-              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${IMG[4]}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${stockImg(settings, 4)}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
             </div>
             <div className="rv" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--emerald)', marginTop: 'clamp(24px,5vw,70px)' }}>
-              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${IMG[7]}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${stockImg(settings, 7)}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function HomePage() {
       <section className="tone pad">
         <div className="wrap split">
           <div className="rv" style={{ gridColumn: '1/7', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: 'var(--sand)' }}>
-            <div className="veil" /><img src={`/${IMG[8]}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} alt="" />
+            <div className="veil" /><img src={`/${stockImg(settings, 8)}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} alt="" />
           </div>
           <div style={{ gridColumn: '8/13' }}>
             <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('04 · The Atelier', '٠٤ · الأتيليه')}</div>
