@@ -9,14 +9,26 @@ import type { Governorate, PaymentMethod } from '@/lib/types';
 
 type FormEl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-function PaymentMethodCard({ active, onSelect, name, sub }: {
+function PaymentOption({ active, onSelect, name, sub, account, handle, handleLabel, amount, L, esc }: {
   active: boolean; onSelect: () => void; name: string; sub: string;
+  account: string; handle: string; handleLabel: string; amount: string;
+  L: <T = string>(e?: T, a?: T) => T; esc: (s: unknown) => string;
 }) {
   return (
-    <button type="button" className={`pm-card ${active ? 'on' : ''}`} onClick={onSelect}>
-      <span className="pm-radio" />
-      <span className="pm-body"><b>{name}</b><small>{sub}</small></span>
-    </button>
+    <div className={`pm-option ${active ? 'on' : ''}`}>
+      <button type="button" className={`pm-card ${active ? 'on' : ''}`} onClick={onSelect}>
+        <span className="pm-radio" />
+        <span className="pm-body"><b>{name}</b><small>{sub}</small></span>
+      </button>
+      {active && (
+        <div className="pm-instructions">
+          <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 10 }}>{L('Send the deposit to', 'حوّلي العربون على')}</div>
+          <div className="pm-detail"><span>{L('Account name', 'اسم الحساب')}</span><b>{esc(account) || '—'}</b></div>
+          <div className="pm-detail"><span>{handleLabel}</span><b>{esc(handle) || '—'}</b></div>
+          <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{amount}</b></div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -148,19 +160,24 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '28px 0 12px' }}>{L('Pay with', 'الدفع بواسطة')}</div>
-                  <div className="pm-grid">
-                    <PaymentMethodCard active={method === 'vodafone_cash'} onSelect={() => setMethod('vodafone_cash')} name="Vodafone Cash" sub={methodInfo.vodafone_cash.sub} />
-                    <PaymentMethodCard active={method === 'instapay'} onSelect={() => setMethod('instapay')} name="InstaPay" sub={methodInfo.instapay.sub} />
+                  <div className="pm-list">
+                    <PaymentOption
+                      active={method === 'vodafone_cash'} onSelect={() => setMethod('vodafone_cash')}
+                      name="Vodafone Cash" sub={methodInfo.vodafone_cash.sub}
+                      account={methodInfo.vodafone_cash.account} handle={methodInfo.vodafone_cash.handle}
+                      handleLabel={L('Number', 'الرقم')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}
+                    />
+                    <PaymentOption
+                      active={method === 'instapay'} onSelect={() => setMethod('instapay')}
+                      name="InstaPay" sub={methodInfo.instapay.sub}
+                      account={methodInfo.instapay.account} handle={methodInfo.instapay.handle}
+                      handleLabel={L('Handle', 'المعرّف')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}
+                    />
                   </div>
 
                   {method && (
-                    <div className="pm-instructions rv">
-                      <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 10 }}>{L('Send the deposit to', 'حوّلي العربون على')}</div>
-                      <div className="pm-detail"><span>{L('Account name', 'اسم الحساب')}</span><b>{esc(methodInfo[method].account) || '—'}</b></div>
-                      <div className="pm-detail"><span>{method === 'vodafone_cash' ? L('Number', 'الرقم') : L('Handle', 'المعرّف')}</span><b>{esc(methodInfo[method].handle) || '—'}</b></div>
-                      <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
-
-                      <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '22px 0 10px' }}>{L('Upload your transfer receipt', 'ارفعي صورة إيصال التحويل')}</div>
+                    <div className="receipt-upload">
+                      <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '18px 0 10px' }}>{L('Upload your transfer receipt', 'ارفعي صورة إيصال التحويل')}</div>
                       <label className={`receipt-drop ${receiptKey ? 'has-file' : ''} ${uploading ? 'busy' : ''}`}>
                         <input ref={fileRef} type="file" accept="image/*" disabled={uploading} onChange={onFile} />
                         {uploading ? L('Uploading…', 'بيترفع…') : receiptKey ? `✓ ${receiptName}` : L('Choose a photo of the receipt', 'اختاري صورة الإيصال')}

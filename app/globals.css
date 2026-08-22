@@ -404,11 +404,12 @@ section{position:relative}
 .pay-summary .pb-deposit span{color:var(--emerald);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:10.5px}
 .pay-summary .pb-deposit b{color:var(--emerald);font-size:19px}
 
-.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pm-list{display:flex;flex-direction:column;gap:14px}
+.pm-option.on{background:var(--bone-2)}
 .pm-card{display:flex;align-items:center;gap:12px;border:1px solid var(--line);padding:16px 18px;
   background:none;cursor:pointer;text-align:start;width:100%;transition:border-color .25s var(--e),background .25s var(--e)}
 .pm-card:hover{border-color:var(--ink-soft)}
-.pm-card.on{border-color:var(--emerald);background:var(--bone-2)}
+.pm-card.on{border-color:var(--emerald);background:var(--bone-2);border-bottom-color:transparent}
 .pm-radio{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);flex:0 0 auto;position:relative}
 .pm-card.on .pm-radio{border-color:var(--emerald)}
 .pm-card.on .pm-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--emerald)}
@@ -416,7 +417,10 @@ section{position:relative}
 .pm-body b{font-family:var(--display);font-size:15px;font-weight:400}
 .pm-body small{font-size:11px;color:var(--ink-faint)}
 
-.pm-instructions{border:1px solid var(--line);padding:22px;margin-top:18px}
+/* Sits flush beneath its own card (not a separate block further down
+   the page) — the deposit instructions for the selected method should
+   appear immediately under it, with no visual gap in between. */
+.pm-instructions{border:1px solid var(--emerald);border-top:0;padding:18px 18px 20px;background:var(--bone-2)}
 .pm-detail{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
 .pm-detail span{color:var(--ink-faint)}
 .pm-detail b{font-family:var(--display);font-weight:400;text-align:end}
@@ -481,7 +485,6 @@ section{position:relative}
 .ts-row.now .ts-label{color:var(--ink);font-weight:600}
 [dir="rtl"] .ts-row::before{left:auto;right:5px}
 
-@media(max-width:640px){.pm-grid{grid-template-columns:1fr}}
 .sizes{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 8px}
 .sizes button{background:none;border:1px solid var(--line);cursor:pointer;padding:13px 19px;font-size:10px;letter-spacing:.16em;
   transition:all .5s var(--e)}
