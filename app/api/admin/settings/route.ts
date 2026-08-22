@@ -4,13 +4,15 @@ import { requireAdmin } from '@/lib/adminAuth';
 import { str } from '@/lib/serverValidators';
 import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 import { ADMIN_ONLY_SETTINGS_KEYS, PAYMENT_SETTINGS_KEYS } from '@/lib/payment';
+import { META_ADMIN_ONLY_SETTINGS_KEYS, META_SETTINGS_KEYS } from '@/lib/marketing';
 
 // Only known keys can be written — the client sending arbitrary key/value
 // pairs shouldn't be able to grow the settings table without bound.
 const SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
-  ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...ADMIN_ONLY_SETTINGS_KEYS
+  ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...ADMIN_ONLY_SETTINGS_KEYS,
+  ...META_SETTINGS_KEYS, ...META_ADMIN_ONLY_SETTINGS_KEYS
 ];
 
 const PERCENT_KEYS = new Set(['egp_per_sar', 'deposit_percent']);

@@ -26,7 +26,12 @@ const PAYMENT_FIELDS: [string, string, string][] = [
   ['admin_whatsapp_number', "Admin's WhatsApp number (for order alerts)", 'رقم واتساب الأدمن (لإشعارات الطلبات)']
 ];
 
-const ALL_FIELDS = [...CONTENT_FIELDS, ...PAYMENT_FIELDS];
+const MARKETING_FIELDS: [string, string, string][] = [
+  ['meta_pixel_id', 'Meta Pixel ID', 'معرّف Meta Pixel'],
+  ['meta_capi_token', 'Meta Conversions API token (optional)', 'توكن Meta Conversions API (اختياري)']
+];
+
+const ALL_FIELDS = [...CONTENT_FIELDS, ...PAYMENT_FIELDS, ...MARKETING_FIELDS];
 
 export default function SettingsPage() {
   const { data: settings, loading, error } = useAdminFetch<Settings>('/settings');
@@ -67,6 +72,13 @@ export default function SettingsPage() {
           <Link href="/admin/shipping">{L('Shipping page', 'الشحن')}</Link>.
         </p>
         {PAYMENT_FIELDS.map(renderField)}
+        <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>
+          {L('Marketing', 'التسويق')}
+        </div>
+        <p className="body" style={{ fontSize: 12, marginBottom: 18, color: 'var(--ink-faint)' }}>
+          {L('Powers Meta Pixel tracking site-wide (page views, add-to-cart, purchases…). The API token is optional — it only enables the server-side Conversions API for extra reliability.', 'بيشغّل تتبّع Meta Pixel في كل الموقع (زيارات، إضافة للسلة، طلبات…). التوكن اختياري — بيفعّل بس الـ Conversions API من السيرفر لدقة أعلى.')}
+        </p>
+        {MARKETING_FIELDS.map(renderField)}
         <button className="btn fill" style={{ width: 'max-content' }} type="submit">{L('Save settings', 'حفظ الإعدادات')}</button>
       </form>
     </>

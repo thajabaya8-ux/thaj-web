@@ -136,16 +136,14 @@ export interface Settings {
   contact_location_en?: string;
   contact_location_ar?: string;
   egp_per_sar?: string;
-  img_logo_mark?: string;
-  img_wordmark_light?: string;
-  img_wordmark_dark?: string;
   deposit_percent?: string;
-  shipping_fee_egp?: string;
   vodafone_cash_number?: string;
   vodafone_cash_name?: string;
   instapay_handle?: string;
   instapay_name?: string;
   admin_whatsapp_number?: string;
+  meta_pixel_id?: string;
+  meta_capi_token?: string;
   [key: string]: string | undefined;
 }
 

@@ -7,13 +7,16 @@
    browser Pixel used for this order (Meta's documented dedup key)
    plus non-identifying connection signals (ip/user-agent/fbp/fbc)
    that improve match quality without identifying the customer.
-   No-ops entirely until both env vars below are set — the browser
-   Pixel call in lib/pixel.ts already covers the event on its own.
+   Both the Pixel ID and the access token are admin-editable settings
+   (Settings → Marketing), not env vars — the caller (app/api/orders/route.ts)
+   already has the settings row loaded for other purposes, so it's passed
+   straight in here rather than this file querying the DB itself.
+   No-ops entirely until both are set — the browser Pixel call in
+   lib/pixel.ts already covers the event on its own.
    ========================================================== */
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '';
-const ACCESS_TOKEN = process.env.META_CONVERSIONS_API_TOKEN || '';
-
 interface CapiPurchaseInput {
+  pixelId: string;
+  accessToken: string;
   eventId: string;
   value: number;
   currency: string;
@@ -27,7 +30,7 @@ interface CapiPurchaseInput {
 }
 
 export async function sendPurchaseToCapi(input: CapiPurchaseInput): Promise<void> {
-  if (!PIXEL_ID || !ACCESS_TOKEN) return;
+  if (!input.pixelId || !input.accessToken) return;
 
   const userData: Record<string, string> = {};
   if (input.clientIp) userData.client_ip_address = input.clientIp;
@@ -54,7 +57,7 @@ export async function sendPurchaseToCapi(input: CapiPurchaseInput): Promise<void
   };
 
   try {
-    await fetch(`https://graph.facebook.com/v21.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`, {
+    await fetch(`https://graph.facebook.com/v21.0/${input.pixelId}/events?access_token=${input.accessToken}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

@@ -108,8 +108,11 @@ export async function POST(req: Request) {
 
   // Fire-and-forget server-side mirror of the browser Purchase event — never
   // block or slow the order response on Meta's API being slow or down.
-  // No-ops on its own until META_CONVERSIONS_API_TOKEN is configured.
+  // No-ops on its own until both meta_pixel_id and meta_capi_token are set
+  // in Settings → Marketing.
   sendPurchaseToCapi({
+    pixelId: settings.meta_pixel_id || '',
+    accessToken: settings.meta_capi_token || '',
     eventId: orderNumber,
     value: total,
     currency: 'EGP',

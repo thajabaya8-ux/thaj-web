@@ -2,16 +2,11 @@
 /* ==========================================================
    THAJ — Meta Pixel
    Thin fbq() wrapper any client component/context can import to
-   fire a standard event. The base script load + automatic
+   fire a standard event. The base script load, the Pixel ID
+   (admin-editable — see Settings → Marketing) and the automatic
    PageView-per-route wiring live in components/MetaPixel.tsx —
-   this file only owns the Pixel ID and the trackPixel() call.
+   this file only owns the trackPixel() call.
    ========================================================== */
-
-// Set in Vercel + .env.local as NEXT_PUBLIC_META_PIXEL_ID — never
-// hardcoded here. Must be NEXT_PUBLIC_-prefixed since it's read in the
-// browser. The same numeric ID is also used server-side by
-// lib/metaCapi.ts for the Conversions API, so the two always agree.
-export const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '';
 
 export type PixelEventName =
   | 'ViewContent' | 'AddToCart' | 'InitiateCheckout'
