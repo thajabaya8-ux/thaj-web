@@ -187,6 +187,17 @@ export interface AdminUser {
   email: string;
 }
 
+export type CustomerStatus = 'active' | 'suspended';
+
+export interface Customer {
+  id: number;
+  name: string | null;
+  email: string;
+  status: CustomerStatus;
+  createdAt: string;
+  lastLogin: string | null;
+}
+
 export interface CollectionProgress {
   key: string;
   name: string;

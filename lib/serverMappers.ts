@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Appointment, Collection, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Appointment, Collection, Customer, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -101,6 +101,15 @@ export function governorateOut(r: any): Governorate {
 
 export function socialLinkOut(r: any): SocialLink {
   return { platform: r.platform, url: r.url || '', active: !!r.active };
+}
+
+// Deliberately excludes password_hash and role — this is only ever used to
+// list/show customers to the admin.
+export function customerOut(r: any): Customer {
+  return {
+    id: r.id, name: r.name, email: r.email, status: r.status === 'suspended' ? 'suspended' : 'active',
+    createdAt: toIso(r.created_at), lastLogin: r.last_login ? toIso(r.last_login) : null
+  };
 }
 
 export function reviewOut(r: any): Review {

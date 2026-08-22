@@ -6,8 +6,13 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('admin','customer')),
   name TEXT,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended')),
+  last_login TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended'));
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS collections (
   key TEXT PRIMARY KEY,

@@ -21,7 +21,11 @@ export async function POST(req: Request) {
   if (!user || !validPassword) {
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
   }
+  if (user.status === 'suspended') {
+    return NextResponse.json({ error: 'This account has been suspended' }, { status: 403 });
+  }
 
+  await sql`UPDATE users SET last_login = now() WHERE id = ${user.id}`;
   await createSession({ userId: user.id, email: user.email, role: user.role, name: user.name });
   return NextResponse.json({ email: user.email, role: user.role, name: user.name });
 }

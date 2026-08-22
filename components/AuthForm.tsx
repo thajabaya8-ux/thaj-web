@@ -55,7 +55,10 @@ export default function AuthForm() {
         body: JSON.stringify(mode === 'login' ? { email, password } : { name, email, password })
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(body.error || L('Something went wrong', 'حصل خطأ'));
+      if (!res.ok) {
+        if (body.error === 'This account has been suspended') throw new Error(L('This account has been suspended', 'الحساب ده متوقف'));
+        throw new Error(body.error || L('Something went wrong', 'حصل خطأ'));
+      }
       if (mode === 'signup' && body.role !== 'admin') trackPixel('CompleteRegistration', { content_name: 'THAJ account' });
       router.replace(body.role === 'admin' ? '/admin' : '/account');
       router.refresh();
