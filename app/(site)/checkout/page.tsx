@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { computeOrderTotals } from '@/lib/payment';
 import Mast from '@/components/Mast';
+import GovernorateSelect from '@/components/GovernorateSelect';
 import type { Governorate, PaymentMethod } from '@/lib/types';
 
 type FormEl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
@@ -123,23 +124,15 @@ export default function CheckoutPage() {
               )}
               {coStep === 1 && (
                 <>
-                  <div className="f2">
-                    <div className="field">
-                      <label>{L('Governorate', 'المحافظة')}</label>
-                      <select data-f="governorate" value={govKey} onChange={(e) => setGovKey(e.target.value)} required disabled={!govs}>
-                        <option value="" disabled>{!govs && !govsError ? L('Loading…', 'بيتحمّل…') : L('Select', 'اختاري')}</option>
-                        {(govs || []).map((g) => <option key={g.key} value={g.key}>{L(g.name, g.nameAr)}</option>)}
-                      </select>
-                      {govsError && <div className="adm-error" style={{ minHeight: 'auto', marginTop: 6 }}>{L('Could not load governorates — refresh and try again.', 'معرفناش نحمّل المحافظات — حدّثي الصفحة وجرّبي تاني.')}</div>}
-                    </div>
-                    <div className="field"><label>{L('City / area', 'المدينة / المنطقة')}</label><input data-f="city" defaultValue={coData.city || ''} required /></div>
+                  <div className="field">
+                    <label>{L('Governorate', 'المحافظة')}</label>
+                    <GovernorateSelect
+                      governorates={govs} value={govKey} onChange={setGovKey} L={L}
+                      placeholder={L('Select your governorate', 'اختاري محافظتك')}
+                      loading={!govs && !govsError} error={govsError}
+                    />
                   </div>
-                  {selectedGov && (
-                    <div className="ship-fee-line rv">
-                      <span>{L('Shipping to', 'الشحن لـ')} {L(selectedGov.name, selectedGov.nameAr)}</span>
-                      <b>{money(selectedGov.price)}</b>
-                    </div>
-                  )}
+                  <div className="field"><label>{L('City / area', 'المدينة / المنطقة')}</label><input data-f="city" defaultValue={coData.city || ''} required /></div>
                   <div className="field"><label>{L('Address', 'العنوان بالتفصيل')}</label>
                     <textarea data-f="address" defaultValue={coData.address || ''} required placeholder={L('Street, building, floor, apartment, landmark', 'الشارع، المبنى، الدور، الشقة، علامة مميزة')} />
                   </div>
