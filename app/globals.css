@@ -722,10 +722,11 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   header .util button{font-size:11.5px;letter-spacing:.06em;padding:8px 0}
   header .util .n{font-size:13px;margin-left:5px}
   [dir="rtl"] header .util .n{margin-right:5px}
-  /* Icons-only header at phone width — Search, Login/Admin and the EN/ع
-     toggle move into the side menu (still reachable there) so the row
-     never has to fight the burger button for space. */
-  #u-wish,#u-search,#u-login,header .util>.lang{display:none}
+  /* Logo + burger only at phone width — Search, Saved, Selection,
+     Login/Admin and the EN/ع toggle all live in the side menu's own
+     utility row instead (see #menu .m-util), so the header row never
+     has to fight the burger button for space. */
+  #u-wish,#u-search,#u-login,#u-cart,header .util>.lang{display:none}
   .burger{padding:10px 2px}
   .burger i{width:24px}
 }
