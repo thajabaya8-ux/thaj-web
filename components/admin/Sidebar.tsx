@@ -4,8 +4,8 @@ import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
 
 const NAV: [string, string, string][] = [
-  ['/admin', 'Dashboard', 'الرئيسية'], ['/admin/pieces', 'Pieces', 'القطع'], ['/admin/collections', 'Collections', 'المجموعات'],
-  ['/admin/journal', 'Journal', 'المجلة'], ['/admin/orders', 'Orders', 'الطلبات'], ['/admin/shipping', 'Shipping', 'الشحن'],
+  ['/admin', 'Dashboard', 'الرئيسية'], ['/admin/collections', 'Categories', 'الفئات'],
+  ['/admin/orders', 'Orders', 'الطلبات'], ['/admin/shipping', 'Shipping', 'الشحن'],
   ['/admin/appointments', 'Appointments', 'المواعيد'],
   ['/admin/reviews', 'Reviews', 'الرسائل'], ['/admin/media', 'Site images', 'صور الموقع'],
   ['/admin/social', 'Social', 'السوشيال ميديا'], ['/admin/settings', 'Settings', 'الإعدادات']

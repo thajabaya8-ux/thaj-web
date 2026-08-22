@@ -6,7 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 
 export default function HomePage() {
-  const { L, AR, esc, pName, byId, pieces, collections, journal, settings } = useSite();
+  const { L, AR, esc, pName, byId, pieces, collections, settings } = useSite();
   const feat = ['najma', 'harir', 'warda', 'fahm'].map(byId).filter(Boolean);
   const strip = [...pieces, ...pieces];
 
@@ -96,19 +96,6 @@ export default function HomePage() {
             <p className="body rv" style={{ marginTop: 22 }}>{L('A toile in calico hangs for a week before the real cloth is touched. Linen is washed three times before the pattern goes near it. Ivory is cut last, because every seam shows.', 'تواليه من الكاليكو بتتعلّق أسبوع قبل ما نلمس القماش الحقيقي. الكتان بيتغسل تلات مرات قبل ما الباترون يقرب منه. والعاجي بيتقص في الآخر، لأن كل درزة بتبان.')}</p>
             <div className="rv" style={{ marginTop: 28 }}><Link className="link" href="/atelier">{L('Enter the atelier', 'ادخلي الأتيليه')}</Link></div>
           </div>
-        </div>
-      </section>
-
-      <section className="pad wrap">
-        <EdHead n="05" title={L('The Journal', 'المجلة')} aside={L('A publication, not a blog.', 'إصدار، مش مدوّنة.')} />
-        <div className="jgrid">
-          {journal.slice(0, 3).map((j, i) => (
-            <Link key={j.id} className="jcard rv" href={`/journal/${j.id}`} style={{ gridColumn: 'span 4', ...(i === 1 ? { marginTop: 'clamp(20px,4vw,60px)' } : {}) }}>
-              <div className="frame"><div className="veil" /><img src={`/${j.img}`} loading="lazy" alt="" /></div>
-              <div className="cat lbl">{esc(L(j.cat, j.catAr))}</div>
-              <div className="h-s">{esc(L(j.t, j.tAr))}</div>
-            </Link>
-          ))}
         </div>
       </section>
 

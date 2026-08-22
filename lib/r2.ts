@@ -1,7 +1,7 @@
 /* ==========================================================
    THAJ — r2
    Cloudflare R2 client (S3-compatible API) for admin-uploaded
-   piece/collection/journal photos. Buckets are kept private —
+   piece/collection photos. Buckets are kept private —
    app/assets/uploads/[filename]/route.ts proxies reads through
    this app's own origin instead, so no public R2 access needs
    to be configured and the existing 'assets/uploads/...' image

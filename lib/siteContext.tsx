@@ -4,15 +4,15 @@
    Client-side global state: language, cart, wishlist, checkout
    draft, shop filters, and the drawer/search/menu/toast UI state
    that used to live as module-level variables in js/data.js and
-   js/app.js. Content (pieces/collections/journal/settings) is
-   fetched once server-side (see lib/api.ts) and handed in as the
-   initial value here — no client boot-time fetch/flash.
+   js/app.js. Content (pieces/collections/settings) is fetched
+   once server-side (see lib/api.ts) and handed in as the initial
+   value here — no client boot-time fetch/flash.
    ========================================================== */
 import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode
 } from 'react';
 import type {
-  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, PaymentMethod, Piece, PieceCurrency, Settings
+  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, Order, PaymentMethod, Piece, PieceCurrency, Settings
 } from '@/lib/types';
 import { trackPixel, trackPurchase } from '@/lib/pixel';
 
@@ -66,7 +66,6 @@ interface SiteContextValue {
   esc: typeof esc;
   pieces: Piece[];
   collections: CollectionMap;
-  journal: JournalArticle[];
   settings: Settings;
   orders: Order[];
   byId: (id: string) => Piece | undefined;
@@ -115,13 +114,12 @@ const SiteContext = createContext<SiteContextValue | null>(null);
 interface SiteProviderProps {
   initialPieces?: Piece[];
   initialCollections?: Collection[];
-  initialJournal?: JournalArticle[];
   initialOrders?: Order[];
   initialSettings?: Settings;
   children: ReactNode;
 }
 
-export function SiteProvider({ initialPieces, initialCollections, initialJournal, initialOrders, initialSettings, children }: SiteProviderProps) {
+export function SiteProvider({ initialPieces, initialCollections, initialOrders, initialSettings, children }: SiteProviderProps) {
   const [lang, setLangState] = useState<Lang>('en');
   const [authRole, setAuthRole] = useState<AuthRole>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -144,7 +142,6 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     (initialCollections || []).forEach((c) => { out[c.key] = c; });
     return out;
   }, [initialCollections]);
-  const journal = initialJournal || [];
   const settings = initialSettings || {};
 
   useEffect(() => {
@@ -367,7 +364,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
 
   const value: SiteContextValue = {
     lang, setLang, AR, L, num, ord, money, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
-    pieces, collections, journal, settings, orders,
+    pieces, collections, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
     cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, quickAdd, qty, rmItem, toggleWish,
     coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitAppointment, submitReview,

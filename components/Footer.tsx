@@ -12,7 +12,6 @@ export default function Footer() {
             <h5>{L('The Maison', 'الدار')}</h5>
             <Link className="fl" href="/maison">{L('Our story', 'قصتنا')}</Link>
             <Link className="fl" href="/atelier">{L('The atelier', 'الأتيليه')}</Link>
-            <Link className="fl" href="/journal">{L('Journal', 'المجلة')}</Link>
             <Link className="fl" href="/archive">{L('The archive', 'الأرشيف')}</Link>
           </div>
           <div className="fcol">

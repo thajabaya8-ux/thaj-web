@@ -35,9 +35,9 @@ thaj-web/
 │   └── admin/
 │       ├── layout.js             imports admin.css, wraps in AdminProvider + AdminGate
 │       ├── admin.css              copied from thaj-site/admin/css/admin.css
-│       └── page.js, pieces/, collections/, journal/, orders/, appointments/, settings/
+│       └── page.js, pieces/, collections/, orders/, appointments/, settings/
 ├── components/                  Header, Footer, ProductCard, CartDrawer, SearchOverlay, …
-│   └── admin/                    Sidebar, LoginForm, PieceForm, CollectionForm, JournalForm, ImageUpload
+│   └── admin/                    Sidebar, LoginForm, PieceForm, CollectionForm, ImageUpload
 ├── lib/
 │   ├── siteContext.js            client state: language, cart, wishlist, checkout draft (React Context)
 │   ├── adminContext.js            admin session state + the api() fetch helper
@@ -55,5 +55,5 @@ thaj-web/
 ## What's genuinely different
 
 - Real URLs and browser back/forward (the old app was a single-page in-memory router).
-- Page content (pieces, collections, journal, settings) is fetched server-side on first load — no boot-time loading flash.
+- Page content (pieces, collections, settings) is fetched server-side on first load — no boot-time loading flash.
 - The admin's list/edit screens are real routes (`/admin/pieces/[id]/edit`) instead of a client-side view toggle.

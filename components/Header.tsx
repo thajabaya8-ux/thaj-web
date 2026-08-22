@@ -9,7 +9,6 @@ export const NAVLINKS: [string, string, string][] = [
   ['/collections', 'Collections', 'المجموعات'],
   ['/maison', 'Maison', 'الدار'],
   ['/atelier', 'Atelier', 'الأتيليه'],
-  ['/journal', 'Journal', 'المجلة'],
   ['/private', 'Private Room', 'الغرفة الخاصة']
 ];
 

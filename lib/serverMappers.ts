@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Appointment, Collection, Governorate, JournalArticle, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Appointment, Collection, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -52,13 +52,6 @@ export function collectionOut(r: any): Collection {
   };
 }
 
-export function journalOut(r: any): JournalArticle {
-  return {
-    id: r.id, cat: r.cat_en, catAr: r.cat_ar, t: r.title_en, tAr: r.title_ar,
-    x: parseArr(r.body_en), xAr: parseArr(r.body_ar),
-    img: r.image
-  };
-}
 
 function parseShipping(v: unknown): ShippingInfo | undefined {
   if (typeof v !== 'string' || !v) return undefined;

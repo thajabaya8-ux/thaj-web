@@ -52,16 +52,6 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]';
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
 
-CREATE TABLE IF NOT EXISTS journal (
-  id TEXT PRIMARY KEY,
-  sort INTEGER NOT NULL DEFAULT 0,
-  cat_en TEXT, cat_ar TEXT,
-  title_en TEXT NOT NULL, title_ar TEXT NOT NULL,
-  body_en TEXT DEFAULT '[]',
-  body_ar TEXT DEFAULT '[]',
-  image TEXT
-);
-
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,
   order_number TEXT UNIQUE NOT NULL,

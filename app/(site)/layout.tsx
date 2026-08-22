@@ -18,13 +18,12 @@ export const metadata: Metadata = {
 };
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
-  const { pieces, collections, journal, orders, settings } = await getSiteData();
+  const { pieces, collections, orders, settings } = await getSiteData();
 
   return (
     <SiteProvider
       initialPieces={pieces}
       initialCollections={collections}
-      initialJournal={journal}
       initialOrders={orders}
       initialSettings={settings}
     >

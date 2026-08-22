@@ -6,11 +6,11 @@
    a separate backend.
    ========================================================== */
 import { sql } from '@/lib/db';
-import { collectionOut, journalOut, orderPublicOut, pieceOut } from '@/lib/serverMappers';
+import { collectionOut, orderPublicOut, pieceOut } from '@/lib/serverMappers';
 import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 import { PAYMENT_SETTINGS_KEYS } from '@/lib/payment';
 import { META_SETTINGS_KEYS } from '@/lib/marketing';
-import type { Collection, JournalArticle, Order, Piece, Settings } from '@/lib/types';
+import type { Collection, Order, Piece, Settings } from '@/lib/types';
 
 export async function getPieces(): Promise<Piece[]> {
   const rows = await sql`SELECT * FROM pieces ORDER BY created_at`;
@@ -32,16 +32,6 @@ export async function getCollection(key: string): Promise<Collection | null> {
   return rows.length ? collectionOut(rows[0]) : null;
 }
 
-export async function getJournal(): Promise<JournalArticle[]> {
-  const rows = await sql`SELECT * FROM journal ORDER BY sort`;
-  return rows.map(journalOut);
-}
-
-export async function getArticle(id: string): Promise<JournalArticle | null> {
-  const rows = await sql`SELECT * FROM journal WHERE id = ${id}`;
-  return rows.length ? journalOut(rows[0]) : null;
-}
-
 export async function getOrders(): Promise<Order[]> {
   const rows = await sql`SELECT * FROM orders ORDER BY id DESC LIMIT 100`;
   return rows.map(orderPublicOut);
@@ -61,8 +51,8 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function getSiteData() {
-  const [pieces, collections, journal, orders, settings] = await Promise.all([
-    getPieces(), getCollections(), getJournal(), getOrders(), getSettings()
+  const [pieces, collections, orders, settings] = await Promise.all([
+    getPieces(), getCollections(), getOrders(), getSettings()
   ]);
-  return { pieces, collections, journal, orders, settings };
+  return { pieces, collections, orders, settings };
 }

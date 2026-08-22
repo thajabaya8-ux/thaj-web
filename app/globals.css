@@ -563,17 +563,6 @@ section{position:relative}
 .arch-row .thumb{width:56px;aspect-ratio:3/4;object-fit:cover;background:var(--sand)}
 .arch-head{border-bottom:1px solid var(--line)}
 
-/* ============ JOURNAL ============ */
-.jgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(20px,3vw,52px)}
-.jcard{cursor:pointer}
-.jcard .frame{overflow:hidden;background:var(--sand);aspect-ratio:4/5;position:relative}
-.jcard img{width:100%;height:100%;object-fit:cover;transition:transform 1.8s var(--e)}
-.jcard:hover img{transform:scale(1.06)}
-.jcard .cat{color:var(--gold);margin:16px 0 8px}
-.article{max-width:760px;margin:0 auto}
-.article p{font-size:15px;line-height:2.1;color:var(--ink-soft);margin-bottom:22px}
-[dir="ltr"] .article p:first-of-type::first-letter{font-family:var(--display);font-size:64px;float:left;line-height:.8;padding:6px 12px 0 0;color:var(--ink)}
-
 /* ============ FORMS ============ */
 .form{display:grid;gap:18px}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -692,10 +681,8 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] footer a,[dir="rtl"] footer span.fl{font-size:15.5px}
 [dir="rtl"] footer .fbot{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] .masthead .mh .d{font-size:16px}
-[dir="rtl"] .article p{font-size:18px;line-height:2}
 [dir="rtl"] .hm-row p{font-size:16px !important}
 [dir="rtl"] .hm-th span{font-size:13.5px;letter-spacing:0;padding:8px}
-[dir="rtl"] .jcard .cat{font-size:14px}
 [dir="rtl"] #menu{right:auto;left:0;transform:translateX(-28px);box-shadow:30px 0 70px rgba(0,0,0,.28)}
 [dir="rtl"] #menu.open{transform:none}
 [dir="rtl"] #menu a{font-size:clamp(20px,4.6vw,26px);font-family:var(--ar-display)}
@@ -798,7 +785,6 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   .co{grid-template-columns:1fr}
   .co .sum{position:static}
   .f2{grid-template-columns:1fr}
-  .jgrid>*{grid-column:span 12 !important}
   .orow{grid-template-columns:1fr 1fr}
   .lrow{grid-template-columns:1fr;gap:14px}
   footer .fcol{grid-column:span 6}

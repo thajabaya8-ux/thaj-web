@@ -139,41 +139,6 @@ const PIECES = [
     story_ar: ['اتعمل منها اتناشر. مافيش ولا واحدة للبيع — القطعة متحفوظة في الأرشيف وبتتعرض بموعد.', 'الطبعة مظبوطة عشان الرسمة ما تتقصّش أبدًا في نص الضهر.'] }
 ];
 
-const JOURNAL = [
-  { id: 'j1', sort: 0, img: 9, cat_en: 'The Atelier', cat_ar: 'الأتيليه', title_en: 'What a seam is for', title_ar: 'الدرزة بتعمل إيه',
-    body_en: ["A seam is not a place where two pieces of cloth are joined. It is a decision about where the eye will stop.",
-      "In an abaya, where the body is not described, the seam is the only line available. Move it two centimetres and the whole silhouette changes character — one position reads severe, the next reads soft, and nothing else about the garment has changed at all.",
-      "This is why the atelier cuts a toile in calico for every new piece and hangs it for a week before a single length of the real fabric is touched. Calico is honest. It does not flatter, it does not drape its way out of a bad decision, and it shows you exactly where the eye lands.",
-      "Most of the work of the house happens in that week."],
-    body_ar: ["الدرزة مش مكان بيتجمع فيه قطعتين قماش. الدرزة قرار عن المكان اللي العين هتقف عنده.",
-      "في العباية، اللي مابتوصفش الجسم، الدرزة هي الخط الوحيد المتاح. حرّكها سنتيمترين وشخصية السيلويت كلها تتغيّر — موضع بيتقرا صارم، واللي بعده بيتقرا ناعم، ومافيش أي حاجة تانية في القطعة اتغيّرت.",
-      "عشان كده الأتيليه بيقص تواليه من الكاليكو لكل قطعة جديدة، ويعلّقها أسبوع قبل ما إيد تلمس متر واحد من القماش الحقيقي. الكاليكو أمين. مابيجاملش، ومابيهربش من قرار وحش بالانسدال، وبيوريك بالظبط العين بتقع فين.",
-      "معظم شغل البيت بيحصل في الأسبوع ده."] },
-  { id: 'j2', sort: 1, img: 2, cat_en: 'The Silhouette', cat_ar: 'السيلويت', title_en: 'On movement, and why we photograph it', title_ar: 'عن الحركة، وليه بنصوّرها',
-    body_en: ["A still photograph of an abaya tells you almost nothing. The garment is designed for the moment after the still — the turn, the step, the arm raised to open a door.",
-      "We photograph movement because movement is the product. The weight of a fabric is not a number on a label; it is how long the hem takes to settle after you stop walking.",
-      "Heavy crepe settles immediately. Voile takes almost a full second. Neither is better. They are different instruments."],
-    body_ar: ["الصورة الثابتة للعباية مابتقولش حاجة تقريبًا. القطعة متصمّمة للحظة اللي بعد الثبات — اللفة، الخطوة، الذراع اللي بترتفع تفتح باب.",
-      "بنصوّر الحركة لأن الحركة هي المنتج. وزن القماش مش رقم على تيكت؛ هو المدة اللي الذيل بياخدها عشان يستقر بعد ما تبطّلي مشي.",
-      "الكريب التقيل بيستقر فورًا. الفوال بياخد ثانية كاملة تقريبًا. ولا واحد أحسن من التاني. دول آلتين مختلفتين."] },
-  { id: 'j3', sort: 2, img: 6, cat_en: 'Materials', cat_ar: 'الخامات', title_en: 'Three washes before cutting', title_ar: 'تلات غسلات قبل القص',
-    body_en: ["Linen shrinks. Everyone knows this, and most of the industry solves it by cutting large and hoping.",
-      "We wash three times before the pattern touches the cloth. The first wash takes out the mill finish, the second takes out the shrinkage, and the third tells us what the fabric will actually be for the rest of its life.",
-      "It costs a week and a percentage of every roll. What it buys is a garment that is the same shape in year three as it was on the first day."],
-    body_ar: ["الكتان بيكشّ. كل الناس عارفة كده، ومعظم الصناعة بتحلّها بإنها تقص كبير وتتمنى خير.",
-      "إحنا بنغسل تلات مرات قبل ما الباترون يلمس القماش. الغسلة الأولى بتشيل تشطيب المصنع، والتانية بتشيل الكشّة، والتالتة بتقولنا القماش ده هيبقى إيه فعلًا لباقي عمره.",
-      "ده بيكلّف أسبوع ونسبة من كل توب. واللي بنشتريه بيه إن القطعة تفضل بنفس شكلها في السنة التالتة زي أول يوم."] },
-  { id: 'j4', sort: 3, img: 4, cat_en: 'Culture', cat_ar: 'ثقافة', title_en: 'Against the cliché', title_ar: 'ضد الكليشيه',
-    body_en: ["There is a version of Saudi design that exists mostly for export: gold everywhere, calligraphy applied like a stamp, the desert used as a backdrop for things that have nothing to do with it.",
-      "We are not interested in it. Not because it is inauthentic — some of it is sincere — but because it describes the region from outside.",
-      "The reference points of this house are closer and less photogenic: the proportion of a doorway in old Riyadh, the specific grey of a shaded courtyard at two in the afternoon, the way a carpet's burgundy has faded unevenly on one side.",
-      "These are harder to put on a moodboard. They are also the only things worth building on."],
-    body_ar: ["في نسخة من التصميم السعودي موجودة أساسًا للتصدير: دهب في كل حتة، وخط عربي متحطّ زي الختم، والصحرا مستخدمة كخلفية لحاجات مالهاش علاقة بيها.",
-      "إحنا مش مهتمين بيها. مش لأنها مش أصيلة — بعضها صادق — لكن لأنها بتوصف المنطقة من بره.",
-      "المراجع بتاعة البيت ده أقرب وأقل تصويرية: نسبة مدخل باب في الرياض القديمة، الرمادي المحدّد لفناء مظلّل الساعة اتنين بعد الضهر، وطريقة ما الخمري في سجادة بهت من ناحية واحدة أكتر من التانية.",
-      "الحاجات دي أصعب إنك تحطها على مودبورد. وهي كمان الحاجات الوحيدة اللي تستاهل تبني عليها."] }
-];
-
 const ORDERS = [
   { order_number: 'THAJ-2026-0184', customer_name: 'Client of the house', email: 'you@domain.com', phone: '+966500000000',
     items: [{ id: 'najma', size: '54', qty: 1 }], total: 2450, status: 'Delivered' },
@@ -231,12 +196,6 @@ async function run() {
       VALUES (${p.id},${p.ed},${p.name_en},${p.name_ar},${p.price},${p.coll_key},${p.fabric},${p.sil},${p.colour},${p.occ},
         ${p.mat_en},${p.mat_ar},${p.silf_en},${p.silf_ar},${p.pal_en},${p.pal_ar},${p.availability},${p.desc_en},${p.desc_ar},
         ${JSON.stringify(p.story_en)},${JSON.stringify(p.story_ar)},${P(p.img)})
-      ON CONFLICT (id) DO NOTHING`;
-  }
-
-  for (const j of JOURNAL) {
-    await sql`INSERT INTO journal (id,sort,cat_en,cat_ar,title_en,title_ar,body_en,body_ar,image)
-      VALUES (${j.id},${j.sort},${j.cat_en},${j.cat_ar},${j.title_en},${j.title_ar},${JSON.stringify(j.body_en)},${JSON.stringify(j.body_ar)},${P(j.img)})
       ON CONFLICT (id) DO NOTHING`;
   }
 

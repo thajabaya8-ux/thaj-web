@@ -52,17 +52,6 @@ export interface Collection {
 
 export type CollectionMap = Record<string, Collection>;
 
-export interface JournalArticle {
-  id: string;
-  cat: string;
-  catAr: string;
-  t: string;
-  tAr: string;
-  x: string[];
-  xAr: string[];
-  img: string;
-}
-
 export interface OrderLineItem {
   id: string;
   size: string;
