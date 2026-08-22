@@ -12,7 +12,7 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode
 } from 'react';
 import type {
-  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, Piece, Settings
+  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, PaymentMethod, Piece, Settings
 } from '@/lib/types';
 
 type Lang = 'en' | 'ar';
@@ -37,7 +37,13 @@ const FACET_AR: Record<string, string> = {
 };
 const STATUS_AR: Record<string, string> = {
   Delivered: 'تم التسليم', 'In atelier': 'في الأتيليه', Cancelled: 'ملغى',
-  Requested: 'مطلوب', Confirmed: 'مؤكد', Declined: 'مرفوض'
+  Requested: 'مطلوب', Confirmed: 'مؤكد', Declined: 'مرفوض',
+  'Under Review': 'قيد المراجعة', Preparing: 'بيتجهّز', Shipped: 'اتشحن'
+};
+const PAYMENT_STATUS_AR: Record<string, string> = { under_review: 'قيد المراجعة', approved: 'معتمد', rejected: 'مرفوض' };
+const PAYMENT_STATUS_EN: Record<string, string> = { under_review: 'Under review', approved: 'Approved', rejected: 'Rejected' };
+const PAYMENT_METHOD_LABEL: Record<string, [string, string]> = {
+  vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي']
 };
 const AD = '٠١٢٣٤٥٦٧٨٩';
 
@@ -57,6 +63,8 @@ interface SiteContextValue {
   authRole: AuthRole;
   fa: (v: string) => string;
   stLabel: (s: string) => string;
+  paymentStatusLabel: (s?: string) => string;
+  paymentMethodLabel: (m?: string) => string;
   esc: typeof esc;
   pieces: Piece[];
   collections: CollectionMap;
@@ -73,6 +81,7 @@ interface SiteContextValue {
   wish: string[];
   cartTotal: number;
   itemPrice: (c: CartItem) => number;
+  egpPerSar: number;
   addToCart: (id: string, size?: string, withPants?: boolean) => void;
   quickAdd: (id: string) => void;
   qty: (i: number, d: number) => void;
@@ -82,7 +91,8 @@ interface SiteContextValue {
   setCoData: React.Dispatch<React.SetStateAction<CheckoutDraft>>;
   coStep: number;
   setCoStep: React.Dispatch<React.SetStateAction<number>>;
-  submitOrder: () => Promise<boolean>;
+  uploadReceipt: (file: File) => Promise<string | null>;
+  submitOrder: (paymentMethod: PaymentMethod, receiptKey: string) => Promise<Order | null>;
   submitAppointment: (data: Record<string, string>) => Promise<boolean>;
   submitReview: (pieceId: string, data: { name: string; email?: string; message: string }) => Promise<boolean>;
   acctTab: string;
@@ -177,6 +187,8 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, [AR, currency, egpPerSar]);
   const fa = useCallback((v: string) => esc(AR() ? (FACET_AR[v] || v) : v), [AR]);
   const stLabel = useCallback((s: string) => esc(AR() ? (STATUS_AR[s] || s) : s), [AR]);
+  const paymentStatusLabel = useCallback((s?: string) => (s ? (AR() ? PAYMENT_STATUS_AR[s] || s : PAYMENT_STATUS_EN[s] || s) : ''), [AR]);
+  const paymentMethodLabel = useCallback((m?: string) => (m && PAYMENT_METHOD_LABEL[m] ? PAYMENT_METHOD_LABEL[m][AR() ? 1 : 0] : (m || '')), [AR]);
   const byId = useCallback((id: string) => pieces.find((p) => p.id === id), [pieces]);
   const pName = useCallback((p: Piece) => esc(L(p.n, p.ar)), [L]);
   const collName = useCallback((k: string) => (collections[k] ? esc(L(collections[k].name, collections[k].nameAr)) : ''), [collections, L]);
@@ -254,25 +266,43 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     });
   }, [L, toast]);
 
-  const submitOrder = useCallback(async () => {
+  const uploadReceipt = useCallback(async (file: File) => {
+    try {
+      const fd = new FormData();
+      fd.append('receipt', file);
+      const r = await fetch('/api/orders/receipt', { method: 'POST', body: fd });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error || 'upload failed');
+      return body.receiptKey as string;
+    } catch (err) {
+      toast(err instanceof Error && err.message !== 'upload failed' ? err.message : L('Could not upload the receipt — try again.', 'معرفناش نرفع الإيصال — جرّبي تاني.'));
+      return null;
+    }
+  }, [L, toast]);
+
+  const submitOrder = useCallback(async (paymentMethod: PaymentMethod, receiptKey: string) => {
     const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q, withPants: !!c.withPants }));
     const name = [coData.fn, coData.ln].filter(Boolean).join(' ');
-    let ok = true;
+    const shipping = {
+      name: name || coData.fn, phone: coData.phone, governorate: coData.governorate,
+      city: coData.city, address: coData.address, notes: coData.notes
+    };
+    let created: Order | null = null;
     try {
       const r = await fetch('/api/orders', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, name, email: coData.email, phone: coData.phone })
+        body: JSON.stringify({ items, name, email: coData.email, phone: coData.phone, shipping, paymentMethod, receiptKey, egpPerSar })
       });
-      if (!r.ok) throw new Error('order failed');
-      const order = await r.json();
-      setOrders((cur) => [order, ...cur]);
-    } catch {
-      ok = false;
-      toast(L('Could not reach the server — order not saved.', 'معرفناش نوصل للسيرفر — الطلب ما اتسجّلش.'));
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.error || 'order failed');
+      created = body as Order;
+      setOrders((cur) => [created!, ...cur]);
+    } catch (err) {
+      toast(err instanceof Error && err.message !== 'order failed' ? err.message : L('Could not reach the server — order not saved.', 'معرفناش نوصل للسيرفر — الطلب ما اتسجّلش.'));
     }
-    setCart([]); setCoStep(0); setCoData({});
-    return ok;
-  }, [cart, coData, L, toast]);
+    if (created) { setCart([]); setCoStep(0); setCoData({}); }
+    return created;
+  }, [cart, coData, egpPerSar, L, toast]);
 
   const submitAppointment = useCallback(async (data: Record<string, string>) => {
     try {
@@ -310,11 +340,11 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, []);
 
   const value: SiteContextValue = {
-    lang, setLang, AR, L, num, ord, SAR, currency, setCurrency, authRole, fa, stLabel, esc,
+    lang, setLang, AR, L, num, ord, SAR, currency, setCurrency, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
     pieces, collections, journal, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
-    cart, wish, cartTotal, itemPrice, addToCart, quickAdd, qty, rmItem, toggleWish,
-    coData, setCoData, coStep, setCoStep, submitOrder, submitAppointment, submitReview,
+    cart, wish, cartTotal, itemPrice, egpPerSar, addToCart, quickAdd, qty, rmItem, toggleWish,
+    coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitAppointment, submitReview,
     acctTab, setAcctTab, sort, setSort, facets, setFacets,
     drawerOpen, setDrawerOpen, searchOpen, setSearchOpen, menuOpen, setMenuOpen,
     toastMsg, toast

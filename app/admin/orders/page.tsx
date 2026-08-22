@@ -1,19 +1,20 @@
 'use client';
+import Link from 'next/link';
 import { useAdminFetch } from '@/lib/useAdminFetch';
-import { useAdmin, SAR } from '@/lib/adminContext';
+import { useAdmin } from '@/lib/adminContext';
 import type { Order } from '@/lib/types';
 
-const STATUSES = ['In atelier', 'Delivered', 'Cancelled'];
-const STATUS_AR: Record<string, string> = { 'In atelier': 'في الأتيليه', Delivered: 'تم التسليم', Cancelled: 'ملغى' };
+const PAY_LABEL: Record<string, [string, string]> = {
+  under_review: ['Under review', 'قيد المراجعة'], approved: ['Approved', 'معتمد'], rejected: ['Rejected', 'مرفوض']
+};
+const PAY_CLASS: Record<string, string> = { under_review: '', approved: 'ok', rejected: 'bad' };
+const METHOD_LABEL: Record<string, string> = { vodafone_cash: 'Vodafone Cash', instapay: 'InstaPay' };
+
+const fmt = (n?: number) => `${(n || 0).toLocaleString('en-US')} ${'EGP'}`;
 
 export default function OrdersPage() {
-  const { data: orders, loading, error, reload } = useAdminFetch<Order[]>('/orders');
-  const { call, toast, L, AR } = useAdmin();
-
-  const onStatus = async (id: string | number | undefined, status: string) => {
-    try { await call(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast(L('Updated', 'اتحدّث')); }
-    catch (e) { toast(e instanceof Error ? e.message : String(e)); reload(); }
-  };
+  const { data: orders, loading, error } = useAdminFetch<Order[]>('/orders');
+  const { L } = useAdmin();
 
   if (loading) return null;
   if (error) return <p className="body" style={{ padding: '40px 0', color: '#B75B5B' }}>{error}</p>;
@@ -22,19 +23,23 @@ export default function OrdersPage() {
   return (
     <>
       <div className="adm-head"><h1>{L('Orders', 'الطلبات')}</h1></div>
-      <div className="adm-row adm-row-head" style={{ gridTemplateColumns: '1fr 100px 2fr 1fr 160px' }}>
-        <span>{L('Order', 'الطلب')}</span><span>{L('Date', 'التاريخ')}</span><span>{L('Customer', 'العميلة')}</span><span>{L('Total', 'الإجمالي')}</span><span>{L('Status', 'الحالة')}</span>
+      <div className="adm-row adm-row-head" style={{ gridTemplateColumns: '1fr 90px 1.5fr 1fr 1fr 130px' }}>
+        <span>{L('Order', 'الطلب')}</span><span>{L('Date', 'التاريخ')}</span><span>{L('Customer', 'العميلة')}</span>
+        <span>{L('Deposit', 'العربون')}</span><span>{L('Method', 'طريقة الدفع')}</span><span>{L('Payment', 'الدفع')}</span>
       </div>
       {orders.length ? orders.map((o) => (
-        <div className="adm-row" style={{ gridTemplateColumns: '1fr 100px 2fr 1fr 160px' }} key={o.id}>
+        <Link className="adm-row" style={{ gridTemplateColumns: '1fr 90px 1.5fr 1fr 1fr 130px', textDecoration: 'none', color: 'inherit' }} key={o.id} href={`/admin/orders/${o.id}`}>
           <span>{o.n}</span>
           <span className="body" style={{ fontSize: 11.5 }}>{(o.d || '').slice(0, 10)}</span>
           <span className="body" style={{ fontSize: 12 }}>{o.name || '—'}<br />{o.email || ''}</span>
-          <span>{SAR(o.tot)}</span>
-          <select defaultValue={o.st} onChange={(e) => onStatus(o.id, e.target.value)}>
-            {STATUSES.map((s) => <option key={s} value={s}>{AR() ? STATUS_AR[s] : s}</option>)}
-          </select>
-        </div>
+          <span>{fmt(o.depositAmount)}</span>
+          <span className="body" style={{ fontSize: 12 }}>{o.paymentMethod ? METHOD_LABEL[o.paymentMethod] || o.paymentMethod : '—'}</span>
+          <span>
+            {o.paymentStatus
+              ? <span className={`pill ${PAY_CLASS[o.paymentStatus] || ''}`}>{L(...(PAY_LABEL[o.paymentStatus] || [o.paymentStatus, o.paymentStatus]))}</span>
+              : '—'}
+          </span>
+        </Link>
       )) : <p className="body" style={{ padding: '26px 0' }}>{L('No orders yet.', 'مافيش طلبات لسه.')}</p>}
     </>
   );

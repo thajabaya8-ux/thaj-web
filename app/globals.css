@@ -392,6 +392,68 @@ section{position:relative}
 .pants-select img{width:64px;aspect-ratio:3/4;object-fit:cover;background:var(--sand);flex:0 0 64px}
 .pants-select-body label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px}
 .pants-select-body input{width:16px;height:16px;margin-top:2px;accent-color:var(--emerald);flex:0 0 auto}
+
+/* ============ DEPOSIT CHECKOUT (Vodafone Cash / InstaPay) ============ */
+.pay-summary{max-width:none}
+.pay-summary .pb-deposit{border:0;background:var(--bone-2);margin:6px -18px 0;padding:14px 18px}
+.pay-summary .pb-deposit span{color:var(--emerald);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:10.5px}
+.pay-summary .pb-deposit b{color:var(--emerald);font-size:19px}
+
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pm-card{display:flex;align-items:center;gap:12px;border:1px solid var(--line);padding:16px 18px;
+  background:none;cursor:pointer;text-align:start;width:100%;transition:border-color .25s var(--e),background .25s var(--e)}
+.pm-card:hover{border-color:var(--ink-soft)}
+.pm-card.on{border-color:var(--emerald);background:var(--bone-2)}
+.pm-radio{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);flex:0 0 auto;position:relative}
+.pm-card.on .pm-radio{border-color:var(--emerald)}
+.pm-card.on .pm-radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--emerald)}
+.pm-body{display:flex;flex-direction:column;gap:3px}
+.pm-body b{font-family:var(--display);font-size:15px;font-weight:400}
+.pm-body small{font-size:11px;color:var(--ink-faint)}
+
+.pm-instructions{border:1px solid var(--line);padding:22px;margin-top:18px}
+.pm-detail{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.pm-detail span{color:var(--ink-faint)}
+.pm-detail b{font-family:var(--display);font-weight:400;text-align:end}
+.pm-detail-amount{border-bottom:0}
+.pm-detail-amount b{color:var(--emerald);font-size:16px}
+
+.receipt-drop{display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);
+  padding:22px;cursor:pointer;text-align:center;font-size:11.5px;letter-spacing:.04em;color:var(--ink-faint);
+  transition:border-color .25s var(--e),color .25s var(--e)}
+.receipt-drop:hover{border-color:var(--ink-soft);color:var(--ink)}
+.receipt-drop.has-file{border-style:solid;border-color:var(--emerald);color:var(--emerald)}
+.receipt-drop.busy{opacity:.6;pointer-events:none}
+.receipt-drop input{display:none}
+
+.ship-fee-line{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);
+  padding:12px 16px;margin:-4px 0 4px;font-size:12.5px}
+.ship-fee-line span{color:var(--ink-faint)}
+.ship-fee-line b{font-family:var(--display);font-weight:400;color:var(--emerald)}
+
+.pill.ok{border-color:var(--emerald);color:var(--emerald)}
+.pill.bad{border-color:#B75B5B;color:#B75B5B}
+
+/* ============ ORDER TRACKING ============ */
+.track-alert{border:1px solid #B75B5B;padding:22px 24px;margin-top:8px}
+.track-alert b{display:block;color:#B75B5B;font-family:var(--display);font-size:16px;font-weight:400;margin-bottom:8px}
+.track-alert p{font-size:12.5px;line-height:1.8;color:var(--ink-soft);margin-top:6px}
+.track-alert a{color:var(--emerald);text-decoration:underline}
+
+.track-stages{display:flex;flex-direction:column;margin-top:8px}
+.ts-row{display:flex;align-items:center;gap:14px;padding:10px 0;position:relative}
+.ts-row::before{content:'';position:absolute;top:-2px;bottom:-2px;left:5px;width:1px;background:var(--line)}
+.ts-row:first-child::before{top:50%}
+.ts-row:last-child::before{bottom:50%}
+.ts-dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--line);background:var(--bone);flex:0 0 auto;z-index:1}
+.ts-row.done .ts-dot{background:var(--emerald);border-color:var(--emerald)}
+.ts-row.now .ts-dot{background:var(--gold);border-color:var(--gold)}
+.ts-label{font-size:12.5px;color:var(--ink-faint)}
+.ts-row.done .ts-label{color:var(--ink-soft)}
+.ts-row.now .ts-label{color:var(--ink);font-weight:600}
+[dir="rtl"] .ts-row::before{left:auto;right:5px}
+
+@media(max-width:640px){.pm-grid{grid-template-columns:1fr}}
 .sizes{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 8px}
 .sizes button{background:none;border:1px solid var(--line);cursor:pointer;padding:13px 19px;font-size:10px;letter-spacing:.16em;
   transition:all .5s var(--e)}

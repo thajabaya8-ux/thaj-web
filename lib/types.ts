@@ -66,6 +66,28 @@ export interface OrderLineItem {
   withPants?: boolean;
 }
 
+export type PaymentMethod = 'vodafone_cash' | 'instapay';
+export type PaymentStatus = 'under_review' | 'approved' | 'rejected';
+
+export interface Governorate {
+  key: string;
+  name: string;
+  nameAr: string;
+  price: number;
+  active: boolean;
+}
+
+export interface ShippingInfo {
+  name?: string;
+  phone?: string;
+  governorate?: string;
+  governorateName?: string;
+  governorateNameAr?: string;
+  city?: string;
+  address?: string;
+  notes?: string;
+}
+
 export interface Order {
   id?: string | number;
   n: string;
@@ -76,6 +98,17 @@ export interface Order {
   email?: string;
   phone?: string;
   items: OrderLineItem[];
+  // Deposit checkout (EGP) — undefined on pre-existing orders that predate it.
+  subtotal?: number;
+  shippingFee?: number;
+  depositAmount?: number;
+  amountPaid?: number;
+  paymentMethod?: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  rejectionReason?: string | null;
+  approvedAt?: string | null;
+  shipping?: ShippingInfo;
+  hasReceipt?: boolean;
 }
 
 export interface Appointment {
@@ -102,6 +135,13 @@ export interface Settings {
   img_logo_mark?: string;
   img_wordmark_light?: string;
   img_wordmark_dark?: string;
+  deposit_percent?: string;
+  shipping_fee_egp?: string;
+  vodafone_cash_number?: string;
+  vodafone_cash_name?: string;
+  instapay_handle?: string;
+  instapay_name?: string;
+  admin_whatsapp_number?: string;
   [key: string]: string | undefined;
 }
 
@@ -136,10 +176,10 @@ export interface CheckoutDraft {
   ln?: string;
   email?: string;
   phone?: string;
-  address?: string;
+  governorate?: string;
   city?: string;
-  country?: string;
-  delivery?: string;
+  address?: string;
+  notes?: string;
   [key: string]: string | undefined;
 }
 

@@ -188,8 +188,28 @@ const SETTINGS = {
   hero_title_en: 'Where the seam is the only line.', hero_title_ar: 'حيث الدرزة هي الخط الوحيد.',
   contact_email: 'atelier@thaj.house',
   contact_location_en: 'Riyadh · By appointment', contact_location_ar: 'الرياض · بموعد',
-  egp_per_sar: '13.5'
+  egp_per_sar: '13.5',
+  deposit_percent: '50',
+  vodafone_cash_number: '', vodafone_cash_name: '',
+  instapay_handle: '', instapay_name: '',
+  admin_whatsapp_number: ''
 };
+
+// Egypt's 27 governorates. Prices are starting defaults grouped by rough
+// distance tier from Cairo — the admin owns them from here on via
+// /admin/shipping and can change any of them at any time.
+const GOVERNORATES = [
+  ['cairo', 'Cairo', 'القاهرة', 50], ['giza', 'Giza', 'الجيزة', 50], ['qalyubia', 'Qalyubia', 'القليوبية', 50],
+  ['alexandria', 'Alexandria', 'الإسكندرية', 70], ['dakahlia', 'Dakahlia', 'الدقهلية', 70],
+  ['sharqia', 'Sharqia', 'الشرقية', 70], ['kafr-el-sheikh', 'Kafr El Sheikh', 'كفر الشيخ', 70],
+  ['gharbia', 'Gharbia', 'الغربية', 70], ['monufia', 'Monufia', 'المنوفية', 70], ['beheira', 'Beheira', 'البحيرة', 70],
+  ['damietta', 'Damietta', 'دمياط', 70], ['port-said', 'Port Said', 'بورسعيد', 70], ['ismailia', 'Ismailia', 'الإسماعيلية', 70],
+  ['suez', 'Suez', 'السويس', 70], ['north-sinai', 'North Sinai', 'شمال سيناء', 150], ['south-sinai', 'South Sinai', 'جنوب سيناء', 150],
+  ['beni-suef', 'Beni Suef', 'بني سويف', 90], ['fayoum', 'Fayoum', 'الفيوم', 90], ['minya', 'Minya', 'المنيا', 90],
+  ['assiut', 'Assiut', 'أسيوط', 120], ['sohag', 'Sohag', 'سوهاج', 120], ['qena', 'Qena', 'قنا', 120],
+  ['luxor', 'Luxor', 'الأقصر', 120], ['aswan', 'Aswan', 'أسوان', 120],
+  ['red-sea', 'Red Sea', 'البحر الأحمر', 150], ['new-valley', 'New Valley', 'الوادي الجديد', 150], ['matrouh', 'Matrouh', 'مطروح', 150]
+];
 
 async function run() {
   for (const c of COLLECTIONS) {
@@ -223,6 +243,12 @@ async function run() {
 
   for (const [k, v] of Object.entries(SETTINGS)) {
     await sql`INSERT INTO settings (key,value) VALUES (${k},${v}) ON CONFLICT (key) DO NOTHING`;
+  }
+
+  for (const [i, [key, name_en, name_ar, price]] of GOVERNORATES.entries()) {
+    await sql`INSERT INTO governorates (key,sort,name_en,name_ar,price,active)
+      VALUES (${key},${i},${name_en},${name_ar},${price},true)
+      ON CONFLICT (key) DO NOTHING`;
   }
 
   const email = (process.env.ADMIN_EMAIL || 'admin@thaj.house').trim().toLowerCase();

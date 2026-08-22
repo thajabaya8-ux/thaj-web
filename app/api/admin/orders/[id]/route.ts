@@ -3,7 +3,19 @@ import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 import { orderOut } from '@/lib/serverMappers';
 
-const ORDER_STATUSES = ['In atelier', 'Delivered', 'Cancelled'];
+// 'In atelier' is legacy (pre-dates the deposit checkout flow) — kept
+// valid so old seeded orders still display, but new orders never use it.
+const ORDER_STATUSES = ['In atelier', 'Under Review', 'Confirmed', 'Preparing', 'Shipped', 'Delivered', 'Cancelled'];
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
+
+  const { id } = await params;
+  const rows = await sql`SELECT * FROM orders WHERE id = ${id}`;
+  if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json(orderOut(rows[0]));
+}
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireAdmin();

@@ -1,23 +1,22 @@
-/* Files are pushed to R2; app/assets/uploads/[filename]/route.ts proxies
-   them back out under the same 'assets/uploads/...' path the DB has
-   always stored. See lib/imageValidation.ts for the magic-byte check. */
+/* Public: a checkout in progress hasn't created an order yet, so this
+   can't require a session — anyone completing checkout needs to attach
+   a receipt before the order exists. The uploaded key is only ever
+   returned to admins (app/api/admin/orders/[id]/receipt), never proxied
+   publicly like assets/uploads/* — it's payment proof tied to a specific
+   order, not a piece/collection photo. */
 export const runtime = 'nodejs';
 
 import crypto from 'crypto';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/adminAuth';
 import { r2, R2_BUCKET } from '@/lib/r2';
 import { MAX_IMAGE_SIZE, detectImageSignature } from '@/lib/imageValidation';
 
 export async function POST(req: Request) {
-  const session = await requireAdmin();
-  if (session instanceof NextResponse) return session;
-
   const form = await req.formData();
-  const file = form.get('image');
+  const file = form.get('receipt');
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: 'image file required (field name "image")' }, { status: 400 });
+    return NextResponse.json({ error: 'receipt file required (field name "receipt")' }, { status: 400 });
   }
   if (file.size > MAX_IMAGE_SIZE) {
     return NextResponse.json({ error: 'File too large (max 4MB)' }, { status: 400 });
@@ -30,8 +29,8 @@ export async function POST(req: Request) {
   const sig = detectImageSignature(buf);
   if (!sig) return NextResponse.json({ error: 'File is not a recognised image (jpg/png/gif/webp)' }, { status: 400 });
 
-  const filename = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${sig.ext}`;
-  await r2.send(new PutObjectCommand({ Bucket: R2_BUCKET, Key: filename, Body: buf, ContentType: sig.mime }));
+  const key = `receipts/${Date.now()}-${crypto.randomBytes(8).toString('hex')}${sig.ext}`;
+  await r2.send(new PutObjectCommand({ Bucket: R2_BUCKET, Key: key, Body: buf, ContentType: sig.mime }));
 
-  return NextResponse.json({ path: `assets/uploads/${filename}` }, { status: 201 });
+  return NextResponse.json({ receiptKey: key }, { status: 201 });
 }

@@ -3,14 +3,17 @@ import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 import { str } from '@/lib/serverValidators';
 import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
+import { ADMIN_ONLY_SETTINGS_KEYS, PAYMENT_SETTINGS_KEYS } from '@/lib/payment';
 
 // Only known keys can be written — the client sending arbitrary key/value
 // pairs shouldn't be able to grow the settings table without bound.
 const SETTINGS_ALLOWLIST = [
   'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
-  ...IMAGE_SETTINGS_KEYS
+  ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...ADMIN_ONLY_SETTINGS_KEYS
 ];
+
+const PERCENT_KEYS = new Set(['egp_per_sar', 'deposit_percent']);
 
 async function readSettings() {
   const rows = await sql`SELECT key, value FROM settings`;
@@ -33,9 +36,9 @@ export async function PUT(req: Request) {
   for (const key of SETTINGS_ALLOWLIST) {
     if (Object.prototype.hasOwnProperty.call(b, key)) {
       let value: string;
-      if (key === 'egp_per_sar') {
+      if (PERCENT_KEYS.has(key)) {
         const n = parseFloat(b[key]);
-        if (!Number.isFinite(n) || n <= 0) continue; // ignore garbage, keep the previous rate
+        if (!Number.isFinite(n) || n <= 0) continue; // ignore garbage, keep the previous value
         value = String(n);
       } else {
         value = key === 'contact_email' ? str(b[key], 254) : str(b[key], 500);
