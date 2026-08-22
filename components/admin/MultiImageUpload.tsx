@@ -39,6 +39,7 @@ export default function MultiImageUpload({ value, onChange, label, max = MAX }: 
   };
 
   const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+  const removeAll = () => onChange([]);
   const move = (i: number, d: -1 | 1) => {
     const j = i + d;
     if (j < 0 || j >= value.length) return;
@@ -49,7 +50,14 @@ export default function MultiImageUpload({ value, onChange, label, max = MAX }: 
 
   return (
     <div className="field">
-      <label>{fieldLabel} <span style={{ opacity: 0.6 }}>({value.length}/{max})</span></label>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <label style={{ margin: 0 }}>{fieldLabel} <span style={{ opacity: 0.6 }}>({value.length}/{max})</span></label>
+        {value.length > 0 && (
+          <button type="button" className="link" onClick={removeAll} style={{ marginBottom: 9 }}>
+            {L('Remove all', 'مسح الكل')}
+          </button>
+        )}
+      </div>
       <div className="adm-gallery">
         {value.map((path, i) => (
           <div className="adm-gallery-tile" key={path + i}>
