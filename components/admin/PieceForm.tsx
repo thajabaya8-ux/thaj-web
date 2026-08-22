@@ -12,8 +12,8 @@ const AVAIL_AR: Record<string, string> = {
   'Archive only': 'أرشيف فقط', 'Sold Out': 'نفدت الكمية'
 };
 
-export default function PieceForm({ piece, collections, onSaved }: {
-  piece?: Piece; collections: Collection[]; onSaved?: () => void;
+export default function PieceForm({ piece, collections, defaultCollKey, onSaved }: {
+  piece?: Piece; collections: Collection[]; defaultCollKey?: string; onSaved?: () => void;
 }) {
   const isNew = !piece;
   const { call, toast, L, AR } = useAdmin();
@@ -22,6 +22,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
   const [hasPants, setHasPants] = useState(!!piece?.pantsImg);
   const [pantsImg, setPantsImg] = useState(piece?.pantsImg || '');
   const [currency, setCurrency] = useState<'SAR' | 'EGP'>(piece?.currency || 'SAR');
+  const [coll, setColl] = useState(piece?.coll || defaultCollKey || '');
   const [saving, setSaving] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,7 +35,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
 
     const body = {
       id: val('id'), ed: val('ed'), n: val('n'), ar: val('ar'),
-      price: parseInt(val('price'), 10) || 0, currency, coll: val('coll'),
+      price: parseInt(val('price'), 10) || 0, currency, coll,
       fabric: val('fabric'), sil: val('sil'), colour: val('colour'), occ: val('occ'), av: val('av'),
       mat: val('mat'), matAr: val('matAr'), silf: val('silf'), silfAr: val('silfAr'),
       pal: val('pal'), palAr: val('palAr'), d: val('d'), dAr: val('dAr'),
@@ -50,7 +51,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
       if (isNew) await call('/pieces', { method: 'POST', body: JSON.stringify(body) });
       else await call(`/pieces/${piece.id}`, { method: 'PUT', body: JSON.stringify(body) });
       toast(L('Saved', 'اتحفظت'));
-      if (onSaved) onSaved(); else router.push('/admin/pieces');
+      if (onSaved) onSaved(); else router.push(coll ? `/admin/collections/${coll}` : '/admin/collections');
     } catch (err) { toast(err instanceof Error ? err.message : String(err)); }
     finally { setSaving(false); }
   };
@@ -76,8 +77,9 @@ export default function PieceForm({ piece, collections, onSaved }: {
           </select>
         </div>
       </div>
-      <div className="field"><label>{L('Collection', 'المجموعة')}</label>
-        <select name="coll" defaultValue={v('coll')}>
+      <div className="field"><label>{L('Category', 'الفئة')}</label>
+        <select name="coll" value={coll} onChange={(e) => setColl(e.target.value)} required>
+          <option value="" disabled>{L('Choose a category', 'اختاري فئة')}</option>
           {collections.map((c) => <option key={c.key} value={c.key}>{AR() ? c.nameAr : c.name}</option>)}
         </select>
       </div>

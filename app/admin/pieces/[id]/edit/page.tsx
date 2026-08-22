@@ -13,9 +13,11 @@ export default function EditPiecePage() {
   const piece = pieces?.find((p) => p.id === id);
   const { L } = useAdmin();
 
+  const backHref = piece?.coll ? `/admin/collections/${piece.coll}` : '/admin/collections';
+
   return (
     <>
-      <div className="adm-head"><h1>{L('Edit piece', 'تعديل القطعة')}</h1><Link className="link" href="/admin/pieces">{L('Back to pieces', 'العودة للقطع')}</Link></div>
+      <div className="adm-head"><h1>{L('Edit piece', 'تعديل القطعة')}</h1><Link className="link" href={backHref}>{L('Back', 'رجوع')}</Link></div>
       {!loadingPieces && !loadingColls && piece && <PieceForm piece={piece} collections={collections || []} />}
       {!loadingPieces && !piece && <p className="body" style={{ padding: '26px 0' }}>{L('Piece not found.', 'القطعة مش موجودة.')}</p>}
     </>
