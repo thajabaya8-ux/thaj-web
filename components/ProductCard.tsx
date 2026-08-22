@@ -16,7 +16,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
     <article className={`card rv ${className || ''}`.trim()}>
       <Link href={`/product/${piece.id}`} className="frame" style={{ display: 'block', position: 'relative' }}>
         <div className="veil" />
-        <div className="ed">{esc(piece.ed)}</div>
+        {piece.ed && <div className="ed">{esc(piece.ed)}</div>}
         {soldOut ? <div className="sold-badge">{L('Sold Out', 'نفدت الكمية')}</div>
           : onSale ? <div className="sale-badge">−{pct}%</div>
           : piece.pantsImg ? <div className="pants-badge">{L('+ Trousers available', '+ بنطلون متاح')}</div> : null}

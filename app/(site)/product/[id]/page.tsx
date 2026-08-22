@@ -60,7 +60,7 @@ export default function ProductPage() {
           )}
         </div>
         <div className="info">
-          <div className="lbl ed rv">{esc(p.ed)} · {collName(p.coll)}</div>
+          <div className="lbl ed rv">{p.ed ? `${esc(p.ed)} · ` : ''}{collName(p.coll)}</div>
           <h1 className="h-l rv"><span className="clip">{pName(p)}</span></h1>
           {AR() ? null : <div className="arn rv">{esc(p.ar)}</div>}
 
@@ -118,13 +118,14 @@ export default function ProductPage() {
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>
           <div className="spec rv">
-            {specs.map(([k, v]) => (
+            {specs.filter(([, v]) => v).map(([k, v]) => (
               <div className="r" key={k}><span className="k">{k}</span><span className="v">{v}</span></div>
             ))}
           </div>
         </div>
       </section>
 
+      {L(p.story, p.storyAr).length > 0 && (
       <section className="tone pad">
         <div className="wrap story">
           <div style={{ gridColumn: '1/6' }}>
@@ -138,6 +139,7 @@ export default function ProductPage() {
           </div>
         </div>
       </section>
+      )}
 
       <section className="pad wrap-n">
         <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('A note to the atelier', 'رسالة للأتيليه')}</div>

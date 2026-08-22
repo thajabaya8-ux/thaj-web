@@ -26,7 +26,7 @@ export default function ArchivePage() {
             <img className="thumb" src={`/${p.img}`} loading="lazy" alt="" />
             <div>
               <div className="nm">{pName(p)}{AR() ? '' : <i>{esc(p.ar)}</i>}</div>
-              <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 6 }}>{esc(p.ed)}</div>
+              {p.ed && <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 6 }}>{esc(p.ed)}</div>}
             </div>
             <div className="body hide-m" style={{ fontSize: 12, lineHeight: 1.7 }}>{esc(L(p.mat, p.matAr))}</div>
             <div className="body hide-m" style={{ fontSize: 12, lineHeight: 1.7 }}>{esc(L(p.silf, p.silfAr))}</div>

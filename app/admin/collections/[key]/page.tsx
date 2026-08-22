@@ -45,7 +45,7 @@ export default function CategoryPiecesPage() {
       {inCategory.length ? inCategory.map((p) => (
         <div className="adm-row" style={{ gridTemplateColumns: '50px 2fr 1fr 1fr auto' }} key={p.id}>
           {p.img ? <img className="thumb" src={abs(p.img)} alt="" /> : <span className="thumb" style={{ display: 'block', background: 'var(--sand)' }} />}
-          <div><div className="h-s" style={{ fontSize: 15 }}>{p.n}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed} · {p.ar}{p.pantsImg ? ` · ${L('+ trousers', '+ بنطلون')}` : ''}</div></div>
+          <div><div className="h-s" style={{ fontSize: 15 }}>{p.n}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed ? `${p.ed} · ` : ''}{p.ar}{p.pantsImg ? ` · ${L('+ trousers', '+ بنطلون')}` : ''}</div></div>
           <span>
             {p.salePrice != null ? (<><span className="price-strike">{p.price.toLocaleString('en-US')}</span> {p.salePrice.toLocaleString('en-US')}</>) : p.price.toLocaleString('en-US')} {p.currency}
           </span>

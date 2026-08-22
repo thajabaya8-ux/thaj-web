@@ -32,7 +32,7 @@ export default function CartPage() {
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>
-                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
+                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
               </div>
               <div style={{ gridColumn: '8/11' }}>
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>

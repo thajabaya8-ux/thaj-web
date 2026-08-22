@@ -12,6 +12,10 @@ const AVAIL_AR: Record<string, string> = {
   'Archive only': 'أرشيف فقط', 'Sold Out': 'نفدت الكمية'
 };
 
+function slugify(s: string): string {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'piece';
+}
+
 export default function PieceForm({ piece, collections, defaultCollKey, onSaved }: {
   piece?: Piece; collections: Collection[]; defaultCollKey?: string; onSaved?: () => void;
 }) {
@@ -33,14 +37,12 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
     if (!images.length) { toast(L('At least one photo of the piece is required', 'لازم صورة واحدة على الأقل للقطعة')); return; }
     if (hasPants && !pantsImg) { toast(L('Add a trouser photo, or turn the trousers toggle off', 'ضيفي صورة البنطلون، أو ألغي خيار البنطلون')); return; }
 
+    const n = val('n');
     const body = {
-      id: val('id'), ed: val('ed'), n: val('n'), ar: val('ar'),
+      id: isNew ? slugify(n) : piece.id, n, ar: val('ar'),
       price: parseInt(val('price'), 10) || 0, currency, coll,
       fabric: val('fabric'), sil: val('sil'), colour: val('colour'), occ: val('occ'), av: val('av'),
-      mat: val('mat'), matAr: val('matAr'), silf: val('silf'), silfAr: val('silfAr'),
-      pal: val('pal'), palAr: val('palAr'), d: val('d'), dAr: val('dAr'),
-      story: val('story').split('\n').map((s) => s.trim()).filter(Boolean),
-      storyAr: val('storyAr').split('\n').map((s) => s.trim()).filter(Boolean),
+      d: val('d'), dAr: val('dAr'),
       images,
       pantsImg: hasPants ? pantsImg : '',
       pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null,
@@ -59,11 +61,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
   const v = (k: keyof Piece, d: string | number = '') => piece?.[k] ?? d;
 
   return (
-    <form className="form" style={{ maxWidth: 760 }} onSubmit={onSubmit}>
-      <div className="f2">
-        <div className="field"><label>{L('ID (slug)', 'المعرّف (slug)')}</label><input name="id" defaultValue={v('id')} readOnly={!isNew} required pattern="[a-z0-9]+(-[a-z0-9]+)*" title="lowercase letters, numbers, hyphens" placeholder="e.g. najma" /></div>
-        <div className="field"><label>{L('Edition', 'الإصدار')}</label><input name="ed" defaultValue={v('ed')} placeholder="ED. 001" /></div>
-      </div>
+    <form className="form" style={{ maxWidth: 600 }} onSubmit={onSubmit}>
       <div className="f2">
         <div className="field"><label>{L('Name (EN)', 'الاسم (إنجليزي)')}</label><input name="n" defaultValue={v('n')} required /></div>
         <div className="field"><label>{L('Name (AR)', 'الاسم (عربي)')}</label><input name="ar" defaultValue={v('ar')} required /></div>
@@ -84,14 +82,6 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         </select>
       </div>
       <div className="f2">
-        <div className="field"><label>{L('Fabric (facet)', 'القماش (فلتر)')}</label><input name="fabric" defaultValue={v('fabric')} /></div>
-        <div className="field"><label>{L('Silhouette (facet)', 'السيلويت (فلتر)')}</label><input name="sil" defaultValue={v('sil')} /></div>
-      </div>
-      <div className="f2">
-        <div className="field"><label>{L('Colour (facet)', 'اللون (فلتر)')}</label><input name="colour" defaultValue={v('colour')} /></div>
-        <div className="field"><label>{L('Occasion (facet)', 'المناسبة (فلتر)')}</label><input name="occ" defaultValue={v('occ')} /></div>
-      </div>
-      <div className="f2">
         <div className="field"><label>{L('Availability', 'التوفر')}</label>
           <select name="av" defaultValue={v('av', 'Available')}>{AVAIL_OPTS.map((o) => <option key={o} value={o}>{AR() ? AVAIL_AR[o] : o}</option>)}</select>
         </div>
@@ -100,24 +90,16 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         </div>
       </div>
       <div className="f2">
-        <div className="field"><label>{L('Material (EN)', 'الخامة (إنجليزي)')}</label><input name="mat" defaultValue={v('mat')} /></div>
-        <div className="field"><label>{L('Material (AR)', 'الخامة (عربي)')}</label><input name="matAr" defaultValue={v('matAr')} /></div>
+        <div className="field"><label>{L('Fabric (shop filter)', 'القماش (فلتر المتجر)')}</label><input name="fabric" defaultValue={v('fabric')} placeholder="Silk" /></div>
+        <div className="field"><label>{L('Silhouette (shop filter)', 'السيلويت (فلتر المتجر)')}</label><input name="sil" defaultValue={v('sil')} placeholder="Column" /></div>
       </div>
       <div className="f2">
-        <div className="field"><label>{L('Silhouette detail (EN)', 'تفاصيل السيلويت (إنجليزي)')}</label><input name="silf" defaultValue={v('silf')} /></div>
-        <div className="field"><label>{L('Silhouette detail (AR)', 'تفاصيل السيلويت (عربي)')}</label><input name="silfAr" defaultValue={v('silfAr')} /></div>
-      </div>
-      <div className="f2">
-        <div className="field"><label>{L('Palette (EN)', 'الألوان (إنجليزي)')}</label><input name="pal" defaultValue={v('pal')} /></div>
-        <div className="field"><label>{L('Palette (AR)', 'الألوان (عربي)')}</label><input name="palAr" defaultValue={v('palAr')} /></div>
+        <div className="field"><label>{L('Colour (shop filter)', 'اللون (فلتر المتجر)')}</label><input name="colour" defaultValue={v('colour')} placeholder="Black" /></div>
+        <div className="field"><label>{L('Occasion (shop filter)', 'المناسبة (فلتر المتجر)')}</label><input name="occ" defaultValue={v('occ')} placeholder="Evening" /></div>
       </div>
       <div className="f2">
         <div className="field"><label>{L('Description (EN)', 'الوصف (إنجليزي)')}</label><textarea name="d" defaultValue={v('d')} /></div>
         <div className="field"><label>{L('Description (AR)', 'الوصف (عربي)')}</label><textarea name="dAr" defaultValue={v('dAr')} /></div>
-      </div>
-      <div className="f2">
-        <div className="field"><label>{L('Story paragraphs (EN, one per line)', 'فقرات القصة (إنجليزي، سطر لكل فقرة)')}</label><textarea name="story" style={{ minHeight: 110 }} defaultValue={(piece?.story || []).join('\n')} /></div>
-        <div className="field"><label>{L('Story paragraphs (AR, one per line)', 'فقرات القصة (عربي، سطر لكل فقرة)')}</label><textarea name="storyAr" style={{ minHeight: 110 }} defaultValue={(piece?.storyAr || []).join('\n')} /></div>
       </div>
       <MultiImageUpload value={images} onChange={setImages} label={L('Piece photos (up to 5 — first is the cover)', 'صور القطعة (لغاية 5 — أول صورة هي الغلاف)')} />
 
