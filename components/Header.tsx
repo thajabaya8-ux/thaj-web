@@ -14,12 +14,10 @@ export const NAVLINKS: [string, string, string][] = [
 ];
 
 export default function Header() {
-  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, authRole } = useSite();
+  const { L, setMenuOpen } = useSite();
   const pathname = usePathname();
   const [solid, setSolid] = useState(false);
   const [onDark, setOnDark] = useState(false);
-
-  const cartCount = cart.reduce((s, c) => s + c.q, 0);
 
   useEffect(() => {
     const top = document.querySelector<HTMLElement>('main .hero-m, main .hero, main .masthead, main .dark.bleed');
@@ -45,24 +43,7 @@ export default function Header() {
         ))}
       </nav>
       <div className="util">
-        <button id="u-search" onClick={() => setSearchOpen(true)}>{L('Search', 'بحث')}</button>
-        <Link className="u-hide" id="u-arch" href="/archive">{L('Archive', 'الأرشيف')}</Link>
-        <Link id="u-wish" href="/wishlist"><span className="t">{L('Saved', 'المحفوظ')}</span><span className="n">{wish.length}</span></Link>
-        <button id="u-cart" onClick={() => setDrawerOpen(true)}><span className="t">{L('Selection', 'اختيارك')}</span><span className="n">{cartCount}</span></button>
-        <Link className="u-hide" id="u-acct" href="/account">{L('My THAJ', 'حسابي')}</Link>
-        {authRole === 'admin' ? (
-          <Link id="u-login" href="/admin">{L('Admin Panel', 'لوحة التحكم')}</Link>
-        ) : authRole === 'customer' ? (
-          <Link id="u-login" href="/account">{L('My Account', 'حسابي')}</Link>
-        ) : (
-          <Link id="u-login" href="/login">{L('Login', 'تسجيل الدخول')}</Link>
-        )}
-        <div className="lang">
-          <button id="lg-en" className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
-          <i>/</i>
-          <button id="lg-ar" className={AR() ? 'on' : ''} onClick={() => setLang('ar')}>ع</button>
-        </div>
-        <button className="burger" onClick={() => setMenuOpen(true)}><i></i><i></i><i></i></button>
+        <button className="burger" onClick={() => setMenuOpen(true)} aria-label={L('Menu', 'القائمة')}><i></i><i></i><i></i></button>
       </div>
     </header>
   );
