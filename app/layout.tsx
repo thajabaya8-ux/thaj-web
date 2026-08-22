@@ -2,6 +2,7 @@ import './globals.css';
 import { Cairo } from 'next/font/google';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import MetaPixel from '@/components/MetaPixel';
 
 // Self-hosted Arabic web font (see --ar in globals.css) — without this,
 // [dir="rtl"] text fell back to whatever Arabic serif the visitor's OS
@@ -22,7 +23,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" dir="ltr" className={cairoAr.variable}>
-      <body>{children}</body>
+      <body>
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }

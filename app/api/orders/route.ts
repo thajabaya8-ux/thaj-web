@@ -7,6 +7,7 @@ import { sql } from '@/lib/db';
 import { orderPublicOut } from '@/lib/serverMappers';
 import { isEmail, str } from '@/lib/serverValidators';
 import { computeOrderTotals } from '@/lib/payment';
+import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
 import type { Settings } from '@/lib/types';
 
 export async function GET() {
@@ -104,6 +105,19 @@ export async function POST(req: Request) {
       ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
       ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson})
     RETURNING *`;
+
+  // Fire-and-forget server-side mirror of the browser Purchase event — never
+  // block or slow the order response on Meta's API being slow or down.
+  // No-ops on its own until META_CONVERSIONS_API_TOKEN is configured.
+  sendPurchaseToCapi({
+    eventId: orderNumber,
+    value: total,
+    currency: 'EGP',
+    contentIds: cleanItems.map((i) => i.id),
+    numItems: cleanItems.reduce((s, i) => s + i.qty, 0),
+    eventSourceUrl: req.headers.get('referer') || 'https://thaj-web.vercel.app/checkout',
+    ...capiSignalsFromRequest(req)
+  });
 
   return NextResponse.json(orderPublicOut(rows[0]), { status: 201 });
 }

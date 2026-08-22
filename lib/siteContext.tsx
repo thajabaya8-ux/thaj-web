@@ -14,6 +14,7 @@ import {
 import type {
   CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, PaymentMethod, Piece, PieceCurrency, Settings
 } from '@/lib/types';
+import { trackPixel, trackPurchase } from '@/lib/pixel';
 
 type Lang = 'en' | 'ar';
 type AuthRole = 'admin' | 'customer' | null | undefined; // undefined = still checking
@@ -243,6 +244,13 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     setDrawerOpen(true);
     const p = byId(id);
     toast(p ? `${pName(p)}${L(' added', ' اتضافت')}` : L('Added', 'اتضافت'));
+    if (p) {
+      const value = p.price + (withPants && p.pantsPrice ? p.pantsPrice : 0);
+      trackPixel('AddToCart', {
+        content_ids: [p.id], content_name: L(p.n, p.ar), content_type: 'product',
+        contents: [{ id: p.id, quantity: 1 }], value, currency: p.currency
+      });
+    }
   }, [byId, pName, L, toast]);
 
   const quickAdd = useCallback((id: string) => {
@@ -255,6 +263,12 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     setDrawerOpen(true);
     const p = byId(id);
     toast(p ? `${pName(p)}${L(' added · size 54', ' اتضافت · مقاس ٥٤')}` : L('Added', 'اتضافت'));
+    if (p) {
+      trackPixel('AddToCart', {
+        content_ids: [p.id], content_name: L(p.n, p.ar), content_type: 'product',
+        contents: [{ id: p.id, quantity: 1 }], value: p.price, currency: p.currency
+      });
+    }
   }, [byId, pName, L, toast]);
 
   const qty = useCallback((i: number, d: number) => {
@@ -306,6 +320,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
       if (!r.ok) throw new Error(body.error || 'order failed');
       created = body as Order;
       setOrders((cur) => [created!, ...cur]);
+      trackPurchase(created);
     } catch (err) {
       toast(err instanceof Error && err.message !== 'order failed' ? err.message : L('Could not reach the server — order not saved.', 'معرفناش نوصل للسيرفر — الطلب ما اتسجّلش.'));
     }
@@ -320,6 +335,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
       });
       if (!r.ok) throw new Error('appointment failed');
       toast(L('Request received', 'وصلنا طلبك'));
+      trackPixel('Lead', { content_name: 'Private Room appointment' });
       return true;
     } catch {
       toast(L('Could not reach the server — try again.', 'معرفناش نوصل للسيرفر — جرّبي تاني.'));
@@ -335,6 +351,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
       });
       if (!r.ok) throw new Error('review failed');
       toast(L('Thank you — your note has reached the atelier.', 'شكرًا — رسالتك وصلت للأتيليه.'));
+      trackPixel('Contact', { content_ids: [pieceId], content_type: 'product' });
       return true;
     } catch {
       toast(L('Could not reach the server — try again.', 'معرفناش نوصل للسيرفر — جرّبي تاني.'));

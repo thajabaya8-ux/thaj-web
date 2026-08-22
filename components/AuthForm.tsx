@@ -10,6 +10,7 @@
    ========================================================== */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackPixel } from '@/lib/pixel';
 
 type Mode = 'login' | 'signup';
 type Lang = 'en' | 'ar';
@@ -55,6 +56,7 @@ export default function AuthForm() {
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || L('Something went wrong', 'حصل خطأ'));
+      if (mode === 'signup' && body.role !== 'admin') trackPixel('CompleteRegistration', { content_name: 'THAJ account' });
       router.replace(body.role === 'admin' ? '/admin' : '/account');
       router.refresh();
     } catch (err) {

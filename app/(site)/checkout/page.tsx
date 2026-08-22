@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { computeOrderTotals } from '@/lib/payment';
+import { trackPixel } from '@/lib/pixel';
 import Mast from '@/components/Mast';
 import GovernorateSelect from '@/components/GovernorateSelect';
 import type { Governorate, PaymentMethod } from '@/lib/types';
@@ -63,6 +64,20 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!cart.length && !submitting) router.replace('/cart');
   }, [cart.length, submitting, router]);
+
+  const initiatedRef = useRef(false);
+  useEffect(() => {
+    if (!cart.length || initiatedRef.current) return;
+    initiatedRef.current = true;
+    trackPixel('InitiateCheckout', {
+      content_ids: cart.map((c) => c.pid),
+      content_type: 'product',
+      contents: cart.map((c) => ({ id: c.pid, quantity: c.q })),
+      value: cartTotalEgp, currency: 'EGP',
+      num_items: cart.reduce((s, c) => s + c.q, 0)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart.length]);
 
   const selectedGov = useMemo(() => govs?.find((g) => g.key === govKey) || null, [govs, govKey]);
   const totals = useMemo(

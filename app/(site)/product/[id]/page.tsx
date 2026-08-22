@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
+import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 import ReviewForm from '@/components/ReviewForm';
@@ -15,6 +16,13 @@ export default function ProductPage() {
   const [active, setActive] = useState(0);
 
   const p = byId(id) || pieces[0];
+
+  useEffect(() => {
+    if (!p) return;
+    trackPixel('ViewContent', { content_ids: [p.id], content_name: p.n, content_type: 'product', value: p.price, currency: p.currency });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p?.id]);
+
   if (!p) return null;
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
