@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/adminAuth';
 import { pieceOut } from '@/lib/serverMappers';
 import { nonNegativeInt, str, strArray } from '@/lib/serverValidators';
 
-const AVAILABILITY = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only'];
+const AVAILABILITY = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only', 'Sold Out'];
 const CURRENCIES = ['SAR', 'EGP'];
 
 async function collectionExists(key: string | undefined | null) {
@@ -69,13 +69,21 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     pants_price: nextPantsPrice
   };
 
+  // A sale price only counts as a discount if it's actually lower than the
+  // (possibly just-updated) full price — otherwise it's dropped to null.
+  const nextSalePrice = b.salePrice !== undefined
+    ? (b.salePrice === null || b.salePrice === ''
+      ? null
+      : (() => { const n = nonNegativeInt(b.salePrice, -1); return n >= 0 && n < next.price ? n : null; })())
+    : (existing.sale_price != null && existing.sale_price < next.price ? existing.sale_price : null);
+
   await sql`UPDATE pieces SET ed=${next.ed}, name_en=${next.name_en}, name_ar=${next.name_ar}, price=${next.price}, currency=${next.currency},
     coll_key=${next.coll_key}, fabric=${next.fabric}, sil=${next.sil}, colour=${next.colour}, occ=${next.occ},
     mat_en=${next.mat_en}, mat_ar=${next.mat_ar}, silf_en=${next.silf_en}, silf_ar=${next.silf_ar},
     pal_en=${next.pal_en}, pal_ar=${next.pal_ar}, availability=${next.availability},
     desc_en=${next.desc_en}, desc_ar=${next.desc_ar}, story_en=${next.story_en}, story_ar=${next.story_ar},
     image=${next.image}, images=${next.images}, pants_image=${next.pants_image}, pants_price=${next.pants_price},
-    updated_at=now() WHERE id=${id}`;
+    sale_price=${nextSalePrice}, updated_at=now() WHERE id=${id}`;
 
   const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
   return NextResponse.json(pieceOut(rows[0]));

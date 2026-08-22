@@ -6,9 +6,10 @@ import ImageUpload from './ImageUpload';
 import MultiImageUpload from './MultiImageUpload';
 import type { Collection, Piece } from '@/lib/types';
 
-const AVAIL_OPTS = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only'];
+const AVAIL_OPTS = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only', 'Sold Out'];
 const AVAIL_AR: Record<string, string> = {
-  Available: 'متوفرة', 'Two remaining': 'باقي قطعتان', 'By request': 'حسب الطلب', 'Pre-order': 'حجز مسبق', 'Archive only': 'أرشيف فقط'
+  Available: 'متوفرة', 'Two remaining': 'باقي قطعتان', 'By request': 'حسب الطلب', 'Pre-order': 'حجز مسبق',
+  'Archive only': 'أرشيف فقط', 'Sold Out': 'نفدت الكمية'
 };
 
 export default function PieceForm({ piece, collections, onSaved }: {
@@ -41,7 +42,8 @@ export default function PieceForm({ piece, collections, onSaved }: {
       storyAr: val('storyAr').split('\n').map((s) => s.trim()).filter(Boolean),
       images,
       pantsImg: hasPants ? pantsImg : '',
-      pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null
+      pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null,
+      salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null
     };
     setSaving(true);
     try {
@@ -87,8 +89,13 @@ export default function PieceForm({ piece, collections, onSaved }: {
         <div className="field"><label>{L('Colour (facet)', 'اللون (فلتر)')}</label><input name="colour" defaultValue={v('colour')} /></div>
         <div className="field"><label>{L('Occasion (facet)', 'المناسبة (فلتر)')}</label><input name="occ" defaultValue={v('occ')} /></div>
       </div>
-      <div className="field"><label>{L('Availability', 'التوفر')}</label>
-        <select name="av" defaultValue={v('av', 'Available')}>{AVAIL_OPTS.map((o) => <option key={o} value={o}>{AR() ? AVAIL_AR[o] : o}</option>)}</select>
+      <div className="f2">
+        <div className="field"><label>{L('Availability', 'التوفر')}</label>
+          <select name="av" defaultValue={v('av', 'Available')}>{AVAIL_OPTS.map((o) => <option key={o} value={o}>{AR() ? AVAIL_AR[o] : o}</option>)}</select>
+        </div>
+        <div className="field"><label>{L(`Sale price (${currency}, optional)`, `سعر العرض (${currency === 'EGP' ? 'جنيه مصري' : 'ريال سعودي'}، اختياري)`)}</label>
+          <input name="salePrice" type="number" min="0" defaultValue={piece?.salePrice ?? ''} placeholder={L('Leave empty for no discount', 'سيبيه فاضي لو مفيش خصم')} />
+        </div>
       </div>
       <div className="f2">
         <div className="field"><label>{L('Material (EN)', 'الخامة (إنجليزي)')}</label><input name="mat" defaultValue={v('mat')} /></div>

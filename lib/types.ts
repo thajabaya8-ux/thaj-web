@@ -34,6 +34,7 @@ export interface Piece {
   images: string[];
   pantsImg: string | null;
   pantsPrice: number | null;
+  salePrice: number | null;
 }
 
 export interface Collection {

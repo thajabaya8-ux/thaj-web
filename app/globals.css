@@ -343,6 +343,12 @@ section{position:relative}
   background:rgba(231,237,199,.86);padding:5px 9px;color:var(--ink)}
 .card .pants-badge{position:absolute;top:40px;left:12px;z-index:4;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;
   background:var(--emerald-deep);color:var(--on-dark);padding:5px 9px}
+.card .sold-badge{position:absolute;top:40px;left:12px;z-index:4;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;
+  background:#B75B5B;color:#fff;padding:5px 9px}
+.card .sale-badge{position:absolute;top:40px;left:12px;z-index:4;font-family:var(--display);font-size:12px;
+  background:var(--gold);color:var(--ink);padding:4px 10px}
+.price-strike{text-decoration:line-through;opacity:.5;margin-inline-end:8px;font-size:.86em}
+.price-sale{color:var(--emerald)}
 .card .save{position:absolute;top:10px;right:10px;z-index:4;background:rgba(231,237,199,.86);border:0;cursor:pointer;
   width:30px;height:30px;font-size:12px;color:var(--ink);opacity:0;transform:translateY(-6px);
   transition:all .6s var(--e);line-height:1}
@@ -704,7 +710,7 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] header .util .n{margin-left:0;margin-right:7px}
 [dir="rtl"] .filters .count,[dir="rtl"] .fopts .count{margin-left:0;margin-right:auto}
 [dir="rtl"] .card .ed{left:auto;right:12px}
-[dir="rtl"] .card .pants-badge{left:auto;right:12px}
+[dir="rtl"] .card .pants-badge,[dir="rtl"] .card .sold-badge,[dir="rtl"] .card .sale-badge{left:auto;right:12px}
 [dir="rtl"] .card .save{right:auto;left:10px}
 [dir="rtl"] .card .meta h3 i{direction:rtl}
 [dir="rtl"] .card .meta span,[dir="rtl"] .card .meta .pr{text-align:left}

@@ -43,6 +43,10 @@ CREATE TABLE IF NOT EXISTS pieces (
   images TEXT DEFAULT '[]',
   pants_image TEXT,
   pants_price INTEGER,
+  -- When set (and lower than price), the piece is "on sale" — the
+  -- storefront shows price struck through, sale_price as the charged
+  -- amount, and a percent-off badge. NULL means no discount.
+  sale_price INTEGER,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -51,6 +55,7 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'SAR'
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]';
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sale_price INTEGER;
 
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,

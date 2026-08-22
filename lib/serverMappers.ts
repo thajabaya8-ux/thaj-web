@@ -38,7 +38,8 @@ export function pieceOut(r: any): Piece {
     img: images[0] || r.image || '',
     images,
     pantsImg: r.pants_image ?? null,
-    pantsPrice: r.pants_price ?? null
+    pantsPrice: r.pants_price ?? null,
+    salePrice: (r.sale_price != null && r.sale_price < r.price) ? r.sale_price : null
   };
 }
 

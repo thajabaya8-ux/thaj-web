@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useSite } from '@/lib/siteContext';
+import { useSite, effectivePrice } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
@@ -19,7 +19,7 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (!p) return;
-    trackPixel('ViewContent', { content_ids: [p.id], content_name: p.n, content_type: 'product', value: p.price, currency: p.currency });
+    trackPixel('ViewContent', { content_ids: [p.id], content_name: p.n, content_type: 'product', value: effectivePrice(p), currency: p.currency });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p?.id]);
 
@@ -29,7 +29,10 @@ export default function ProductPage() {
   const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
   const gallery = p.images.length ? p.images : [p.img];
   const activeImg = gallery[active] || p.img;
-  const total = p.price + (withPants && p.pantsPrice ? p.pantsPrice : 0);
+  const soldOut = p.av === 'Sold Out';
+  const onSale = p.salePrice != null;
+  const pct = onSale ? Math.round((1 - p.salePrice! / p.price) * 100) : 0;
+  const total = effectivePrice(p) + (withPants && p.pantsPrice ? p.pantsPrice : 0);
   const specs: [string, string][] = [
     [L('Material', 'الخامة'), esc(L(p.mat, p.matAr))],
     [L('Silhouette', 'السيلويت'), esc(L(p.silf, p.silfAr))],
@@ -61,14 +64,23 @@ export default function ProductPage() {
           <h1 className="h-l rv"><span className="clip">{pName(p)}</span></h1>
           {AR() ? null : <div className="arn rv">{esc(p.ar)}</div>}
 
+          {soldOut && <div className="lbl rv" style={{ color: '#B75B5B', marginBottom: 10 }}>{L('Sold Out', 'نفدت الكمية')}</div>}
+          {onSale && !p.pantsImg && (
+            <div className="lbl rv" style={{ color: 'var(--emerald)', marginBottom: 6 }}>−{pct}% {L('off', 'خصم')}</div>
+          )}
           {p.pantsImg ? (
             <div className="rv price-breakdown">
-              <div className="pb-row"><span>{L('Abaya', 'العباية')}</span><b>{money(p.price, p.currency)}</b></div>
+              <div className="pb-row">
+                <span>{L('Abaya', 'العباية')}</span>
+                <b>{onSale ? (<><span className="price-strike">{money(p.price, p.currency)}</span> {money(p.salePrice!, p.currency)}</>) : money(p.price, p.currency)}</b>
+              </div>
               {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{money(p.pantsPrice || 0, p.currency)}</b></div>}
               <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{money(total, p.currency)}</b></div>
             </div>
           ) : (
-            <div className="price rv">{money(p.price, p.currency)}</div>
+            <div className="price rv">
+              {onSale ? (<><span className="price-strike">{money(p.price, p.currency)}</span> <span className="price-sale">{money(p.salePrice!, p.currency)}</span></>) : money(p.price, p.currency)}
+            </div>
           )}
 
           <p className="body desc rv">{esc(L(p.d, p.dAr))}</p>
@@ -98,7 +110,11 @@ export default function ProductPage() {
             <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Measurements taken from the shoulder. Made to measure adds three weeks.', 'المقاسات محسوبة من الكتف. التفصيل بيزوّد تلات أسابيع.')}</div>
           </div>
           <div className="acts rv">
-            <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
+            {soldOut ? (
+              <button className="btn fill" disabled style={{ opacity: .5, cursor: 'default' }}>{L('Sold out', 'نفدت الكمية')}</button>
+            ) : (
+              <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
+            )}
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>
           <div className="spec rv">

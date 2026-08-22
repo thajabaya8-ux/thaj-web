@@ -24,7 +24,7 @@ export const esc = (s: unknown): string => String(s ?? '').replace(/[&<>"']/g, (
 
 const AVAIL_AR: Record<string, string> = {
   Available: 'متوفرة', 'Two remaining': 'باقي قطعتان', 'By request': 'حسب الطلب',
-  'Pre-order': 'حجز مسبق', 'Archive only': 'أرشيف فقط'
+  'Pre-order': 'حجز مسبق', 'Archive only': 'أرشيف فقط', 'Sold Out': 'نفدت الكمية'
 };
 const FACET_AR: Record<string, string> = {
   All: 'الكل',
@@ -49,6 +49,11 @@ const AD = '٠١٢٣٤٥٦٧٨٩';
 
 export const SIZES = ['52', '54', '56', '58'];
 export const SIZE_MTM = { en: 'Made to measure', ar: 'تفصيل' };
+
+// The price actually charged — the sale price when the piece is on sale,
+// the regular price otherwise. serverMappers.pieceOut already guarantees
+// salePrice is null unless it's genuinely lower than price.
+export const effectivePrice = (p: Piece): number => p.salePrice ?? p.price;
 
 interface SiteContextValue {
   lang: Lang;
@@ -215,7 +220,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     const p = byId(c.pid);
     if (!p) return 0;
     const pants = c.withPants && p.pantsPrice ? p.pantsPrice : 0;
-    return p.price + pants;
+    return effectivePrice(p) + pants;
   }, [byId]);
 
   // Same line total, converted to EGP — pieces can be individually priced

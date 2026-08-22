@@ -75,15 +75,17 @@ export async function POST(req: Request) {
   const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
   for (const it of items) {
     const pid = String((it && it.id) || '');
-    const rows = await sql`SELECT id, price, pants_price, currency FROM pieces WHERE id = ${pid}`;
+    const rows = await sql`SELECT id, price, pants_price, currency, sale_price FROM pieces WHERE id = ${pid}`;
     if (!rows.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
     const p = rows[0];
     const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
     // Trousers can only be added alongside the piece they belong to, and
     // only when that piece still offers them server-side — never trust
-    // the client's price math.
+    // the client's price math. Same for the sale price: only a genuine
+    // discount (lower than the full price) is ever honoured here.
     const withPants = !!it.withPants && p.pants_price != null;
-    const unitPrice = p.price + (withPants ? p.pants_price : 0);
+    const base = p.sale_price != null && p.sale_price < p.price ? p.sale_price : p.price;
+    const unitPrice = base + (withPants ? p.pants_price : 0);
     const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
     subtotalEgp += unitPriceEgp * qty;
     cleanItems.push({ id: p.id, size: str(it.size, 40), qty, withPants });
