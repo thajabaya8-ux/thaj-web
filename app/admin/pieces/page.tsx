@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useAdminFetch } from '@/lib/useAdminFetch';
-import { useAdmin, SAR, abs } from '@/lib/adminContext';
+import { useAdmin, abs } from '@/lib/adminContext';
 import type { Collection, Piece } from '@/lib/types';
 
 export default function PiecesPage() {
@@ -36,7 +36,7 @@ export default function PiecesPage() {
           {p.img ? <img className="thumb" src={abs(p.img)} alt="" /> : <span className="thumb" style={{ display: 'block', background: 'var(--sand)' }} />}
           <div><div className="h-s" style={{ fontSize: 15 }}>{p.n}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed} · {p.ar}{p.pantsImg ? ` · ${L('+ trousers', '+ بنطلون')}` : ''}</div></div>
           <span>{collName(p.coll)}</span>
-          <span>{SAR(p.price)}</span>
+          <span>{p.price.toLocaleString('en-US')} {p.currency}</span>
           <span className={`pill ${p.av === 'Available' ? '' : 'g'}`}>{p.av}</span>
           <div className="actions"><Link href={`/admin/pieces/${p.id}/edit`}>{L('Edit', 'تعديل')}</Link><span onClick={() => onDelete(p.id)}>{L('Delete', 'حذف')}</span></div>
         </div>

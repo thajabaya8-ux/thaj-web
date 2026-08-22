@@ -29,7 +29,7 @@ export function pieceOut(r: any): Piece {
   const gallery = parseArr<string>(r.images);
   const images = gallery.length ? gallery : (r.image ? [r.image] : []);
   return {
-    id: r.id, ed: r.ed, n: r.name_en, ar: r.name_ar, price: r.price, coll: r.coll_key,
+    id: r.id, ed: r.ed, n: r.name_en, ar: r.name_ar, price: r.price, currency: r.currency === 'EGP' ? 'EGP' : 'SAR', coll: r.coll_key,
     fabric: r.fabric, sil: r.sil, colour: r.colour, occ: r.occ,
     mat: r.mat_en, matAr: r.mat_ar, silf: r.silf_en, silfAr: r.silf_ar,
     pal: r.pal_en, palAr: r.pal_ar, av: r.availability,

@@ -22,7 +22,7 @@ function PaymentMethodCard({ active, onSelect, name, sub }: {
 
 export default function CheckoutPage() {
   const {
-    L, esc, pName, cart, byId, itemPrice, cartTotal, SAR, egpPerSar, coData, setCoData, coStep, setCoStep,
+    L, esc, pName, cart, byId, itemPrice, cartTotalEgp, money, coData, setCoData, coStep, setCoStep,
     uploadReceipt, submitOrder, settings, toast
   } = useSite();
   const router = useRouter();
@@ -54,13 +54,11 @@ export default function CheckoutPage() {
 
   const selectedGov = useMemo(() => govs?.find((g) => g.key === govKey) || null, [govs, govKey]);
   const totals = useMemo(
-    () => computeOrderTotals(cartTotal, egpPerSar, selectedGov?.price || 0, settings),
-    [cartTotal, egpPerSar, selectedGov, settings]
+    () => computeOrderTotals(cartTotalEgp, selectedGov?.price || 0, settings),
+    [cartTotalEgp, selectedGov, settings]
   );
 
   if (!cart.length) return null;
-
-  const money = (n: number) => `${n.toLocaleString('en-US')} ${L('EGP', 'ج.م')}`;
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,11 +140,11 @@ export default function CheckoutPage() {
               {coStep === 2 && (
                 <>
                   <div className="price-breakdown pay-summary rv">
-                    <div className="pb-row"><span>{L('Products', 'المنتجات')}</span><b>{money(totals.subtotal)}</b></div>
-                    <div className="pb-row"><span>{L('Shipping', 'الشحن')} {selectedGov ? `· ${L(selectedGov.name, selectedGov.nameAr)}` : ''}</span><b>{money(totals.shippingFee)}</b></div>
-                    <div className="pb-row pb-total"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{money(totals.total)}</b></div>
-                    <div className="pb-row pb-deposit"><span>{L('Deposit required now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit)}</b></div>
-                    <div className="pb-row"><span>{L('Remaining on delivery', 'الباقي عند التسليم')}</span><b>{money(totals.remaining)}</b></div>
+                    <div className="pb-row"><span>{L('Products', 'المنتجات')}</span><b>{money(totals.subtotal, 'EGP')}</b></div>
+                    <div className="pb-row"><span>{L('Shipping', 'الشحن')} {selectedGov ? `· ${L(selectedGov.name, selectedGov.nameAr)}` : ''}</span><b>{money(totals.shippingFee, 'EGP')}</b></div>
+                    <div className="pb-row pb-total"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{money(totals.total, 'EGP')}</b></div>
+                    <div className="pb-row pb-deposit"><span>{L('Deposit required now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
+                    <div className="pb-row"><span>{L('Remaining on delivery', 'الباقي عند التسليم')}</span><b>{money(totals.remaining, 'EGP')}</b></div>
                   </div>
 
                   <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '28px 0 12px' }}>{L('Pay with', 'الدفع بواسطة')}</div>
@@ -160,7 +158,7 @@ export default function CheckoutPage() {
                       <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 10 }}>{L('Send the deposit to', 'حوّلي العربون على')}</div>
                       <div className="pm-detail"><span>{L('Account name', 'اسم الحساب')}</span><b>{esc(methodInfo[method].account) || '—'}</b></div>
                       <div className="pm-detail"><span>{method === 'vodafone_cash' ? L('Number', 'الرقم') : L('Handle', 'المعرّف')}</span><b>{esc(methodInfo[method].handle) || '—'}</b></div>
-                      <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{money(totals.deposit)}</b></div>
+                      <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
 
                       <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '22px 0 10px' }}>{L('Upload your transfer receipt', 'ارفعي صورة إيصال التحويل')}</div>
                       <label className={`receipt-drop ${receiptKey ? 'has-file' : ''} ${uploading ? 'busy' : ''}`}>
@@ -194,7 +192,7 @@ export default function CheckoutPage() {
                   <div className="ci">
                     <div className="top">
                       <span className="h-s" style={{ fontSize: 16 }}>{pName(p)}</span>
-                      <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(itemPrice(c) * c.q)}</span>
+                      <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{money(itemPrice(c) * c.q, p.currency)}</span>
                     </div>
                     <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   </div>
@@ -202,7 +200,7 @@ export default function CheckoutPage() {
               );
             })}
             {selectedGov ? (
-              <div className="tot" style={{ marginTop: 22 }}><span className="lbl">{L('Deposit due now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit)}</b></div>
+              <div className="tot" style={{ marginTop: 22 }}><span className="lbl">{L('Deposit due now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
             ) : (
               <p className="body" style={{ fontSize: 12, marginTop: 22, color: 'var(--ink-faint)' }}>{L('Choose a governorate to see your deposit amount.', 'اختاري محافظتك عشان تشوفي مبلغ العربون.')}</p>
             )}

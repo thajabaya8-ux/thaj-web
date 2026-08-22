@@ -12,11 +12,10 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode
 } from 'react';
 import type {
-  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, PaymentMethod, Piece, Settings
+  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, JournalArticle, Order, PaymentMethod, Piece, PieceCurrency, Settings
 } from '@/lib/types';
 
 type Lang = 'en' | 'ar';
-type Currency = 'SAR' | 'EGP';
 type AuthRole = 'admin' | 'customer' | null | undefined; // undefined = still checking
 
 const ESC_MAP: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -57,9 +56,7 @@ interface SiteContextValue {
   L: <T = string>(e?: T, a?: T) => T;
   num: (n: number | string) => string;
   ord: (i: number) => string;
-  SAR: (n: number) => string;
-  currency: Currency;
-  setCurrency: (c: Currency) => void;
+  money: (n: number, currency: PieceCurrency) => string;
   authRole: AuthRole;
   fa: (v: string) => string;
   stLabel: (s: string) => string;
@@ -79,8 +76,9 @@ interface SiteContextValue {
   AVAIL_AR: typeof AVAIL_AR;
   cart: CartItem[];
   wish: string[];
-  cartTotal: number;
+  cartTotalEgp: number;
   itemPrice: (c: CartItem) => number;
+  itemPriceEgp: (c: CartItem) => number;
   egpPerSar: number;
   addToCart: (id: string, size?: string, withPants?: boolean) => void;
   quickAdd: (id: string) => void;
@@ -124,7 +122,6 @@ interface SiteProviderProps {
 
 export function SiteProvider({ initialPieces, initialCollections, initialJournal, initialOrders, initialSettings, children }: SiteProviderProps) {
   const [lang, setLangState] = useState<Lang>('en');
-  const [currency, setCurrencyState] = useState<Currency>('SAR');
   const [authRole, setAuthRole] = useState<AuthRole>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wish, setWish] = useState<string[]>([]);
@@ -155,15 +152,15 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, [lang]);
 
   // Admin-editable rate (Settings → "Egyptian pounds per 1 Saudi riyal"),
-  // with a sane fallback if it's never been set.
+  // with a sane fallback if it's never been set. Each piece is priced (and
+  // shown) in its own fixed currency, set by the admin — this rate only
+  // matters for converting SAR-priced pieces into EGP at checkout, since
+  // Vodafone Cash / InstaPay deposits are always collected in EGP.
   const egpPerSar = useMemo(() => {
     const n = parseFloat(settings.egp_per_sar || '');
     return Number.isFinite(n) && n > 0 ? n : 13.5;
   }, [settings.egp_per_sar]);
 
-  // Every price in the DB is entered by the admin in SAR — this only
-  // converts what's shown to the shopper; order totals are always
-  // computed server-side in SAR regardless of the display currency.
   useEffect(() => {
     let cancelled = false;
     fetch('/api/auth/me', { credentials: 'same-origin' }).then(async (r) => {
@@ -179,12 +176,12 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   const L = useCallback(<T,>(e?: T, a?: T) => ((lang === 'ar' ? a : e) as T), [lang]);
   const num = useCallback((n: number | string) => (AR() ? String(n).replace(/[0-9]/g, (d) => AD[+d]) : String(n)), [AR]);
   const ord = useCallback((i: number) => num(String(i).padStart(2, '0')), [num]);
-  const setCurrency = useCallback((c: Currency) => setCurrencyState((cur) => (cur === c ? cur : c)), []);
-  const SAR = useCallback((n: number) => {
-    const converted = currency === 'EGP' ? Math.round((n || 0) * egpPerSar) : (n || 0);
+  // Every piece is priced (and shown) in exactly one fixed currency, set
+  // by the admin — there is no site-wide display conversion any more.
+  const money = useCallback((n: number, currency: PieceCurrency) => {
     const symbol = currency === 'EGP' ? (AR() ? 'ج.م' : 'EGP') : (AR() ? 'ر.س' : 'SAR');
-    return `${converted.toLocaleString('en-US')} ${symbol}`;
-  }, [AR, currency, egpPerSar]);
+    return `${(n || 0).toLocaleString('en-US')} ${symbol}`;
+  }, [AR]);
   const fa = useCallback((v: string) => esc(AR() ? (FACET_AR[v] || v) : v), [AR]);
   const stLabel = useCallback((s: string) => esc(AR() ? (STATUS_AR[s] || s) : s), [AR]);
   const paymentStatusLabel = useCallback((s?: string) => (s ? (AR() ? PAYMENT_STATUS_AR[s] || s : PAYMENT_STATUS_EN[s] || s) : ''), [AR]);
@@ -215,6 +212,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   // Piece price, plus trousers if this line selected them and the piece
   // still has that option (protects against a piece's pants offer being
   // removed after something was already added to a cart held in state).
+  // Returned in the piece's OWN currency — for per-line display only.
   const itemPrice = useCallback((c: CartItem) => {
     const p = byId(c.pid);
     if (!p) return 0;
@@ -222,7 +220,18 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
     return p.price + pants;
   }, [byId]);
 
-  const cartTotal = useMemo(() => cart.reduce((s, c) => s + itemPrice(c) * c.q, 0), [cart, itemPrice]);
+  // Same line total, converted to EGP — pieces can be individually priced
+  // in SAR or EGP, but the deposit/checkout total is always EGP (Vodafone
+  // Cash / InstaPay are Egyptian-only rails), so this is what the cart and
+  // checkout subtotals are built from, never a raw sum of itemPrice().
+  const itemPriceEgp = useCallback((c: CartItem) => {
+    const p = byId(c.pid);
+    if (!p) return 0;
+    const raw = itemPrice(c);
+    return p.currency === 'EGP' ? raw : Math.round(raw * egpPerSar);
+  }, [byId, itemPrice, egpPerSar]);
+
+  const cartTotalEgp = useMemo(() => cart.reduce((s, c) => s + itemPriceEgp(c) * c.q, 0), [cart, itemPriceEgp]);
 
   const addToCart = useCallback((id: string, size?: string, withPants?: boolean) => {
     const useSize = size || '54';
@@ -340,10 +349,10 @@ export function SiteProvider({ initialPieces, initialCollections, initialJournal
   }, []);
 
   const value: SiteContextValue = {
-    lang, setLang, AR, L, num, ord, SAR, currency, setCurrency, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
+    lang, setLang, AR, L, num, ord, money, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
     pieces, collections, journal, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
-    cart, wish, cartTotal, itemPrice, egpPerSar, addToCart, quickAdd, qty, rmItem, toggleWish,
+    cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, quickAdd, qty, rmItem, toggleWish,
     coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitAppointment, submitReview,
     acctTab, setAcctTab, sort, setSort, facets, setFacets,
     drawerOpen, setDrawerOpen, searchOpen, setSearchOpen, menuOpen, setMenuOpen,

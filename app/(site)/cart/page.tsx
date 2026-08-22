@@ -4,7 +4,7 @@ import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
 
 export default function CartPage() {
-  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotal, itemPrice, SAR } = useSite();
+  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotalEgp, itemPrice, money } = useSite();
 
   if (!cart.length) {
     return (
@@ -38,13 +38,13 @@ export default function CartPage() {
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>
                 <button className="rm" style={{ background: 'none', border: 0, cursor: 'pointer', fontSize: 8.5, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--ink-faint)', marginTop: 12 }} onClick={() => rmItem(i)}>{L('Remove', 'إزالة')}</button>
               </div>
-              <div style={{ gridColumn: '11/13', textAlign: 'end', fontFamily: 'var(--display)', fontSize: 17 }}>{SAR(itemPrice(c) * c.q)}</div>
+              <div style={{ gridColumn: '11/13', textAlign: 'end', fontFamily: 'var(--display)', fontSize: 17 }}>{money(itemPrice(c) * c.q, p.currency)}</div>
             </div>
           );
         })}
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 34 }}>
           <div style={{ width: 'min(360px,100%)' }}>
-            <div className="tot"><span className="lbl">{L('Subtotal', 'المجموع')}</span><b>{SAR(cartTotal)}</b></div>
+            <div className="tot"><span className="lbl">{L('Subtotal', 'المجموع')}</span><b>{money(cartTotalEgp, 'EGP')}</b></div>
             <div className="tot"><span className="lbl">{L('Shipping', 'الشحن')}</span><span className="body" style={{ fontSize: 12 }}>{L('Calculated at checkout', 'بيتحسب عند الدفع')}</span></div>
             <Link className="btn fill wide" href="/checkout">{L('Proceed', 'كمّلي')}</Link>
             <div style={{ textAlign: 'center', marginTop: 16 }}><Link className="link" href="/shop">{L('Continue', 'كمّلي تسوّق')}</Link></div>

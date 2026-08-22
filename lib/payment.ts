@@ -19,15 +19,16 @@ export function depositPercent(settings: Settings): number {
 }
 
 // Every amount here is EGP — Vodafone Cash / InstaPay are Egyptian payment
-// rails, so the deposit is always computed in EGP regardless of whether
-// the shopper was browsing in SAR or EGP. `subtotalSar` is the cart total
-// already computed in the store's base currency (see itemPrice/cartTotal
-// in lib/siteContext.tsx); egpPerSar is the same admin-editable rate used
-// for the SAR/EGP display toggle. `shippingFeeEgp` comes from the chosen
-// governorate's price (looked up server-side at order time — see
-// app/api/orders/route.ts — never trusted from the client).
-export function computeOrderTotals(subtotalSar: number, egpPerSar: number, shippingFeeEgp: number, settings: Settings) {
-  const subtotal = Math.round(subtotalSar * egpPerSar);
+// rails, so the deposit is always computed in EGP regardless of which
+// currency each piece is individually priced in. `subtotalEgp` is already
+// converted piece-by-piece before this is called (SAR-priced pieces via
+// the admin-editable egp_per_sar rate, EGP-priced pieces as-is — see
+// itemPriceEgp/cartTotalEgp in lib/siteContext.tsx and the matching
+// per-item loop in app/api/orders/route.ts). `shippingFeeEgp` comes from
+// the chosen governorate's price (looked up server-side at order time —
+// never trusted from the client).
+export function computeOrderTotals(subtotalEgp: number, shippingFeeEgp: number, settings: Settings) {
+  const subtotal = Math.round(subtotalEgp);
   const shippingFee = Math.max(0, Math.round(shippingFeeEgp || 0));
   const total = subtotal + shippingFee;
   const deposit = Math.round(total * (depositPercent(settings) / 100));

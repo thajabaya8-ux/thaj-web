@@ -14,7 +14,7 @@ export const NAVLINKS: [string, string, string][] = [
 ];
 
 export default function Header() {
-  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, currency, setCurrency, authRole } = useSite();
+  const { L, AR, cart, wish, setDrawerOpen, setSearchOpen, setMenuOpen, setLang, authRole } = useSite();
   const pathname = usePathname();
   const [solid, setSolid] = useState(false);
   const [onDark, setOnDark] = useState(false);
@@ -57,11 +57,6 @@ export default function Header() {
         ) : (
           <Link id="u-login" href="/login">{L('Login', 'تسجيل الدخول')}</Link>
         )}
-        <div className="lang u-hide">
-          <button id="cur-sar" className={currency === 'SAR' ? 'on' : ''} onClick={() => setCurrency('SAR')}>SAR</button>
-          <i>/</i>
-          <button id="cur-egp" className={currency === 'EGP' ? 'on' : ''} onClick={() => setCurrency('EGP')}>EGP</button>
-        </div>
         <div className="lang">
           <button id="lg-en" className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
           <i>/</i>

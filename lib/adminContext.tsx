@@ -15,7 +15,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import type { AdminUser } from '@/lib/types';
 
-export const SAR = (n: number) => (n || 0).toLocaleString('en-US') + ' SAR';
 export const abs = (p?: string) => (p ? ('/' + p).replace(/^\/+/, '/') : '');
 
 export async function api(path: string, opts?: RequestInit) {

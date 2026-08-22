@@ -20,6 +20,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
   const [images, setImages] = useState<string[]>(piece?.images || []);
   const [hasPants, setHasPants] = useState(!!piece?.pantsImg);
   const [pantsImg, setPantsImg] = useState(piece?.pantsImg || '');
+  const [currency, setCurrency] = useState<'SAR' | 'EGP'>(piece?.currency || 'SAR');
   const [saving, setSaving] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,7 +33,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
 
     const body = {
       id: val('id'), ed: val('ed'), n: val('n'), ar: val('ar'),
-      price: parseInt(val('price'), 10) || 0, coll: val('coll'),
+      price: parseInt(val('price'), 10) || 0, currency, coll: val('coll'),
       fabric: val('fabric'), sil: val('sil'), colour: val('colour'), occ: val('occ'), av: val('av'),
       mat: val('mat'), matAr: val('matAr'), silf: val('silf'), silfAr: val('silfAr'),
       pal: val('pal'), palAr: val('palAr'), d: val('d'), dAr: val('dAr'),
@@ -65,12 +66,18 @@ export default function PieceForm({ piece, collections, onSaved }: {
         <div className="field"><label>{L('Name (AR)', 'الاسم (عربي)')}</label><input name="ar" defaultValue={v('ar')} required /></div>
       </div>
       <div className="f2">
-        <div className="field"><label>{L('Price (SAR)', 'السعر (ريال سعودي)')}</label><input name="price" type="number" min="0" defaultValue={v('price', 0)} required /></div>
-        <div className="field"><label>{L('Collection', 'المجموعة')}</label>
-          <select name="coll" defaultValue={v('coll')}>
-            {collections.map((c) => <option key={c.key} value={c.key}>{AR() ? c.nameAr : c.name}</option>)}
+        <div className="field"><label>{L('Price', 'السعر')}</label><input name="price" type="number" min="0" defaultValue={v('price', 0)} required /></div>
+        <div className="field"><label>{L('Currency', 'العملة')}</label>
+          <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value as 'SAR' | 'EGP')}>
+            <option value="SAR">{L('Saudi Riyal (SAR)', 'ريال سعودي (SAR)')}</option>
+            <option value="EGP">{L('Egyptian Pound (EGP)', 'جنيه مصري (EGP)')}</option>
           </select>
         </div>
+      </div>
+      <div className="field"><label>{L('Collection', 'المجموعة')}</label>
+        <select name="coll" defaultValue={v('coll')}>
+          {collections.map((c) => <option key={c.key} value={c.key}>{AR() ? c.nameAr : c.name}</option>)}
+        </select>
       </div>
       <div className="f2">
         <div className="field"><label>{L('Fabric (facet)', 'القماش (فلتر)')}</label><input name="fabric" defaultValue={v('fabric')} /></div>
@@ -113,7 +120,7 @@ export default function PieceForm({ piece, collections, onSaved }: {
         {hasPants && (
           <div className="adm-pants-body">
             <ImageUpload value={pantsImg} onChange={setPantsImg} />
-            <div className="field"><label>{L('Trousers price (SAR)', 'سعر البنطلون (ريال سعودي)')}</label><input name="pantsPrice" type="number" min="0" defaultValue={piece?.pantsPrice ?? 0} required /></div>
+            <div className="field"><label>{L(`Trousers price (${currency})`, `سعر البنطلون (${currency === 'EGP' ? 'جنيه مصري' : 'ريال سعودي'})`)}</label><input name="pantsPrice" type="number" min="0" defaultValue={piece?.pantsPrice ?? 0} required /></div>
           </div>
         )}
       </div>

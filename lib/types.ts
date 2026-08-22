@@ -5,12 +5,15 @@
    and admin panel.
    ========================================================== */
 
+export type PieceCurrency = 'SAR' | 'EGP';
+
 export interface Piece {
   id: string;
   n: string;
   ar: string;
   ed: string;
   price: number;
+  currency: PieceCurrency;
   coll: string;
   fabric: string;
   colour: string;
@@ -63,6 +66,7 @@ export interface JournalArticle {
 export interface OrderLineItem {
   id: string;
   size: string;
+  qty?: number;
   withPants?: boolean;
 }
 

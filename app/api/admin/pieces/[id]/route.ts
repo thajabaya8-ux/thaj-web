@@ -5,6 +5,7 @@ import { pieceOut } from '@/lib/serverMappers';
 import { nonNegativeInt, str, strArray } from '@/lib/serverValidators';
 
 const AVAILABILITY = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only'];
+const CURRENCIES = ['SAR', 'EGP'];
 
 async function collectionExists(key: string | undefined | null) {
   if (!key) return true;
@@ -29,6 +30,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const b = await req.json().catch(() => ({}));
   if (b.coll !== undefined && !(await collectionExists(b.coll))) return NextResponse.json({ error: 'Unknown collection' }, { status: 400 });
   if (b.av !== undefined && b.av !== '' && !AVAILABILITY.includes(b.av)) return NextResponse.json({ error: 'Invalid availability value' }, { status: 400 });
+  if (b.currency !== undefined && b.currency !== '' && !CURRENCIES.includes(b.currency)) return NextResponse.json({ error: 'currency must be SAR or EGP' }, { status: 400 });
   if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 5)) {
     return NextResponse.json({ error: 'images must be an array of at most 5 photos' }, { status: 400 });
   }
@@ -44,6 +46,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     name_en: b.n !== undefined ? (str(b.n, 200) || existing.name_en) : existing.name_en,
     name_ar: b.ar !== undefined ? (str(b.ar, 200) || existing.name_ar) : existing.name_ar,
     price: b.price !== undefined ? nonNegativeInt(b.price, existing.price) : existing.price,
+    currency: b.currency || existing.currency,
     coll_key: b.coll !== undefined ? (b.coll || null) : existing.coll_key,
     fabric: b.fabric !== undefined ? str(b.fabric, 60) : existing.fabric,
     sil: b.sil !== undefined ? str(b.sil, 60) : existing.sil,
@@ -66,7 +69,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     pants_price: nextPantsPrice
   };
 
-  await sql`UPDATE pieces SET ed=${next.ed}, name_en=${next.name_en}, name_ar=${next.name_ar}, price=${next.price},
+  await sql`UPDATE pieces SET ed=${next.ed}, name_en=${next.name_en}, name_ar=${next.name_ar}, price=${next.price}, currency=${next.currency},
     coll_key=${next.coll_key}, fabric=${next.fabric}, sil=${next.sil}, colour=${next.colour}, occ=${next.occ},
     mat_en=${next.mat_en}, mat_ar=${next.mat_ar}, silf_en=${next.silf_en}, silf_ar=${next.silf_ar},
     pal_en=${next.pal_en}, pal_ar=${next.pal_ar}, availability=${next.availability},

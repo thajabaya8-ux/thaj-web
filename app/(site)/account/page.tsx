@@ -6,7 +6,7 @@ import ProductCard from '@/components/ProductCard';
 import Mast from '@/components/Mast';
 
 function AccOrders() {
-  const { L, orders, dateLabel, orderItemsLabel, stLabel, SAR, esc } = useSite();
+  const { L, orders, dateLabel, orderItemsLabel, stLabel, money, esc } = useSite();
   if (!orders.length) {
     return (
       <p className="body">{L('No orders yet.', 'مافيش طلبات لسه.')} <Link className="link" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link></p>
@@ -23,7 +23,7 @@ function AccOrders() {
         <div className="orow" key={o.n}>
           <div><div className="on">{o.n.split('-').pop()}</div><div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 5 }}>{esc(o.n)}</div></div>
           <div className="body" style={{ fontSize: 12 }}>{dateLabel(o.d)}</div>
-          <div className="body" style={{ fontSize: 12 }}>{orderItemsLabel(o)}<br /><b style={{ fontFamily: 'var(--display)', fontSize: 14, color: 'var(--ink)' }}>{SAR(o.tot)}</b></div>
+          <div className="body" style={{ fontSize: 12 }}>{orderItemsLabel(o)}<br /><b style={{ fontFamily: 'var(--display)', fontSize: 14, color: 'var(--ink)' }}>{money(o.tot, 'EGP')}</b></div>
           <div><span className={`pill ${o.st === 'Delivered' ? '' : 'g'}`}>{stLabel(o.st)}</span></div>
         </div>
       ))}

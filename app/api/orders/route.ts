@@ -55,23 +55,6 @@ export async function POST(req: Request) {
   // human judgement call the admin makes on Approve/Reject.
   const receiptKeySafe = str(receiptKey, 300);
 
-  let subtotalSar = 0;
-  const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
-  for (const it of items) {
-    const pid = String((it && it.id) || '');
-    const rows = await sql`SELECT id, price, pants_price FROM pieces WHERE id = ${pid}`;
-    if (!rows.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
-    const p = rows[0];
-    const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
-    // Trousers can only be added alongside the piece they belong to, and
-    // only when that piece still offers them server-side — never trust
-    // the client's price math.
-    const withPants = !!it.withPants && p.pants_price != null;
-    const unitPrice = p.price + (withPants ? p.pants_price : 0);
-    subtotalSar += unitPrice * qty;
-    cleanItems.push({ id: p.id, size: str(it.size, 40), qty, withPants });
-  }
-
   const settingsRows = await sql`SELECT key, value FROM settings`;
   const settings: Settings = {};
   for (const r of settingsRows) settings[r.key] = r.value;
@@ -82,7 +65,30 @@ export async function POST(req: Request) {
   const rate = Number.isFinite(parseFloat(egpPerSar)) && parseFloat(egpPerSar) > 0
     ? parseFloat(egpPerSar)
     : parseFloat(settings.egp_per_sar || '13.5');
-  const { subtotal, shippingFee, total, deposit } = computeOrderTotals(subtotalSar, rate, governorate.price, settings);
+
+  // Every piece is priced in exactly one currency (admin-set) — SAR-priced
+  // pieces are converted to EGP here via the rate above, EGP-priced pieces
+  // are added as-is, so the deposit/total math below always works in one
+  // consistent currency regardless of how the cart's pieces are individually priced.
+  let subtotalEgp = 0;
+  const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
+  for (const it of items) {
+    const pid = String((it && it.id) || '');
+    const rows = await sql`SELECT id, price, pants_price, currency FROM pieces WHERE id = ${pid}`;
+    if (!rows.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
+    const p = rows[0];
+    const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
+    // Trousers can only be added alongside the piece they belong to, and
+    // only when that piece still offers them server-side — never trust
+    // the client's price math.
+    const withPants = !!it.withPants && p.pants_price != null;
+    const unitPrice = p.price + (withPants ? p.pants_price : 0);
+    const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
+    subtotalEgp += unitPriceEgp * qty;
+    cleanItems.push({ id: p.id, size: str(it.size, 40), qty, withPants });
+  }
+
+  const { subtotal, shippingFee, total, deposit } = computeOrderTotals(subtotalEgp, governorate.price, settings);
 
   const shippingJson = JSON.stringify({
     name: str(ship.name, 200), phone: str(ship.phone, 40),

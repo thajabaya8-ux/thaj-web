@@ -9,7 +9,7 @@ import ReviewForm from '@/components/ReviewForm';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
-  const { L, AR, esc, num, fa, collName, pName, SAR, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR } = useSite();
+  const { L, AR, esc, num, fa, collName, pName, money, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR } = useSite();
   const [size, setSize] = useState<string | null>(null);
   const [withPants, setWithPants] = useState(false);
   const [active, setActive] = useState(0);
@@ -55,12 +55,12 @@ export default function ProductPage() {
 
           {p.pantsImg ? (
             <div className="rv price-breakdown">
-              <div className="pb-row"><span>{L('Abaya', 'العباية')}</span><b>{SAR(p.price)}</b></div>
-              {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{SAR(p.pantsPrice || 0)}</b></div>}
-              <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{SAR(total)}</b></div>
+              <div className="pb-row"><span>{L('Abaya', 'العباية')}</span><b>{money(p.price, p.currency)}</b></div>
+              {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{money(p.pantsPrice || 0, p.currency)}</b></div>}
+              <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{money(total, p.currency)}</b></div>
             </div>
           ) : (
-            <div className="price rv">{SAR(p.price)}</div>
+            <div className="price rv">{money(p.price, p.currency)}</div>
           )}
 
           <p className="body desc rv">{esc(L(p.d, p.dAr))}</p>
@@ -71,7 +71,7 @@ export default function ProductPage() {
               <div className="pants-select-body">
                 <label>
                   <input type="checkbox" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
-                  <span>{L('Add matching trousers', 'أضيفي البنطلون المطابق')} — {SAR(p.pantsPrice || 0)}</span>
+                  <span>{L('Add matching trousers', 'أضيفي البنطلون المطابق')} — {money(p.pantsPrice || 0, p.currency)}</span>
                 </label>
                 <p className="body" style={{ fontSize: 11, marginTop: 6, color: 'var(--ink-faint)' }}>
                   {L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}

@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS pieces (
   name_en TEXT NOT NULL,
   name_ar TEXT NOT NULL,
   price INTEGER NOT NULL DEFAULT 0,
+  -- Each piece is priced (and displayed) in exactly one currency, set by
+  -- the admin — there is no site-wide SAR/EGP display toggle.
+  currency TEXT NOT NULL DEFAULT 'SAR' CHECK (currency IN ('SAR','EGP')),
   coll_key TEXT REFERENCES collections(key),
   fabric TEXT, sil TEXT, colour TEXT, occ TEXT,
   mat_en TEXT, mat_ar TEXT,
@@ -44,6 +47,7 @@ CREATE TABLE IF NOT EXISTS pieces (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'SAR' CHECK (currency IN ('SAR','EGP'));
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]';
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 
 export default function CartDrawer() {
-  const { L, esc, cart, byId, qty, rmItem, cartTotal, itemPrice, SAR, drawerOpen, setDrawerOpen } = useSite();
+  const { L, esc, cart, byId, qty, rmItem, cartTotalEgp, itemPrice, money, drawerOpen, setDrawerOpen } = useSite();
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function CartDrawer() {
                 <div className="ci">
                   <div className="top">
                     <span className="h-s" style={{ fontSize: 17 }}>{esc(p.n)}</span>
-                    <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{SAR(itemPrice(c) * c.q)}</span>
+                    <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{money(itemPrice(c) * c.q, p.currency)}</span>
                   </div>
                   <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{esc(p.ed)} · {L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   <div className="qty" style={{ marginTop: 8 }}>
@@ -42,7 +42,7 @@ export default function CartDrawer() {
             <Link className="btn wide" href="/shop" onClick={() => setDrawerOpen(false)}>{L('Enter the shop', 'ادخلي المتجر')}</Link>
           ) : (
             <>
-              <div className="tot"><span className="lbl">{L('Subtotal', 'المجموع')}</span><b>{SAR(cartTotal)}</b></div>
+              <div className="tot"><span className="lbl">{L('Subtotal', 'المجموع')}</span><b>{money(cartTotalEgp, 'EGP')}</b></div>
               <Link className="btn fill wide" href="/checkout" onClick={() => setDrawerOpen(false)}>{L('Checkout', 'الدفع')}</Link>
               <div style={{ textAlign: 'center', marginTop: 14 }}>
                 <Link className="link" href="/cart" onClick={() => setDrawerOpen(false)}>{L('View selection', 'شوفي اختيارك')}</Link>

@@ -2,8 +2,12 @@
 import { useLayoutEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useAdminFetch } from '@/lib/useAdminFetch';
-import { SAR, useAdmin } from '@/lib/adminContext';
+import { useAdmin } from '@/lib/adminContext';
 import type { DashboardData } from '@/lib/types';
+
+// Order totals are always EGP (Vodafone Cash / InstaPay deposits), regardless
+// of which currency each piece in the order was individually priced in.
+const egp = (n: number) => `${(n || 0).toLocaleString('en-US')} EGP`;
 
 function FigTile({ label, val, sub }: { label: ReactNode; val: ReactNode; sub: ReactNode }) {
   return (
@@ -51,7 +55,7 @@ export default function DashboardPage() {
         <div className="adm-chart">
           {d.revenueByMonth.length ? d.revenueByMonth.map((m) => (
             <div className="bar" key={m.month}>
-              <b style={{ height: `${Math.max(4, Math.round((m.total / maxRev) * 100))}%` }} title={SAR(m.total)}></b>
+              <b style={{ height: `${Math.max(4, Math.round((m.total / maxRev) * 100))}%` }} title={egp(m.total)}></b>
               <span>{m.month}</span>
             </div>
           )) : <p className="body">{L('No orders yet.', 'مافيش طلبات لسه.')}</p>}
@@ -62,7 +66,7 @@ export default function DashboardPage() {
           <div className="lbl" style={{ color: 'var(--ink-faint)', marginBottom: 14 }}>{L('Recent orders', 'أحدث الطلبات')}</div>
           {d.recentOrders.length ? d.recentOrders.map((o) => (
             <div className="adm-row" style={{ gridTemplateColumns: '1fr auto auto' }} key={o.n}>
-              <span>{o.n}</span><span>{SAR(o.tot)}</span>
+              <span>{o.n}</span><span>{egp(o.tot)}</span>
               <span className={`pill ${o.st === 'Delivered' ? '' : 'g'}`}>{o.st}</span>
             </div>
           )) : <p className="body">{L('None yet.', 'ولا واحد لسه.')}</p>}
