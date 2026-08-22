@@ -1,14 +1,25 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { stockImg } from '@/lib/img';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
+import type { Piece } from '@/lib/types';
 
 export default function HomePage() {
   const { L, AR, esc, pName, byId, pieces, collections, settings } = useSite();
   const feat = ['najma', 'harir', 'warda', 'fahm'].map(byId).filter(Boolean);
-  const strip = [...pieces, ...pieces];
+
+  // Curated by the admin at /admin/marquee — not every piece in the
+  // catalogue, and empty (so the strip stays hidden) until they pick some.
+  const [marquee, setMarquee] = useState<Piece[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/marquee').then((r) => (r.ok ? r.json() : [])).then((p: Piece[]) => { if (!cancelled) setMarquee(p); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  const strip = [...marquee, ...marquee];
 
   return (
     <>
@@ -27,13 +38,15 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="hm-strip"><div className="hm-track">
-            {strip.map((p, i) => (
-              <Link key={`${p.id}-${i}`} className="hm-th" href={`/product/${p.id}`} title={pName(p)}>
-                <img src={`/${p.img}`} alt={pName(p)} loading="lazy" /><span>{pName(p)}</span>
-              </Link>
-            ))}
-          </div></div>
+          {marquee.length > 0 && (
+            <div className="hm-strip"><div className="hm-track">
+              {strip.map((p, i) => (
+                <Link key={`${p.id}-${i}`} className="hm-th" href={`/product/${p.id}`} title={pName(p)}>
+                  <img src={`/${p.img}`} alt={pName(p)} loading="lazy" /><span>{pName(p)}</span>
+                </Link>
+              ))}
+            </div></div>
+          )}
         </div>
         <div className="hm-scroll">{L('Scroll', 'انزلي')}<i></i></div>
       </section>

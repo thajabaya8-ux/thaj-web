@@ -146,3 +146,13 @@ CREATE TABLE IF NOT EXISTS social_links (
   url TEXT NOT NULL DEFAULT '',
   active BOOLEAN NOT NULL DEFAULT false
 );
+
+-- Curated, ordered pick-list for the scrolling piece strip on the homepage
+-- hero (see components/... the "hm-strip"). Starts empty on purpose — the
+-- admin explicitly chooses what shows there from /admin/marquee, instead
+-- of it defaulting to every piece in the catalogue. Removing a piece from
+-- the catalogue removes it from here too.
+CREATE TABLE IF NOT EXISTS marquee_pieces (
+  piece_id TEXT PRIMARY KEY REFERENCES pieces(id) ON DELETE CASCADE,
+  sort INTEGER NOT NULL DEFAULT 0
+);
