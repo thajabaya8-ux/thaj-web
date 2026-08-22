@@ -157,10 +157,15 @@ header .util .n{font-family:var(--display);font-size:16px;letter-spacing:.04em;m
   opacity:0;transform:translateX(28px);visibility:hidden;
   transition:transform .55s var(--e),opacity .5s var(--e),visibility .55s}
 #menu.open{opacity:1;transform:none;visibility:visible}
-#menu .m-search{align-self:flex-start;background:none;border:0;color:inherit;cursor:pointer;
-  font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--on-dark-soft);padding:0 0 22px;
+#menu .m-util{display:flex;flex-wrap:wrap;align-items:center;gap:16px 20px;padding-bottom:24px;
+  margin-bottom:6px;border-bottom:1px solid var(--on-dark-line);
   opacity:0;transform:translateY(10px);transition:opacity .5s var(--e) .05s,transform .5s var(--e) .05s}
-#menu.open .m-search{opacity:1;transform:none}
+#menu.open .m-util{opacity:1;transform:none}
+#menu .m-util button,#menu .m-util>a{background:none;border:0;color:var(--on-dark-soft);cursor:pointer;
+  font-family:var(--sans);font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:0;
+  display:flex;align-items:center;opacity:1;transform:none;transition:color .3s var(--e)}
+#menu .m-util button:hover,#menu .m-util>a:hover{color:var(--on-dark)}
+#menu .m-util .n{font-family:var(--display);font-size:14px;letter-spacing:.02em;margin-left:6px;color:var(--champagne)}
 #menu .m-nav{display:flex;flex-direction:column}
 #menu a{font-family:var(--display);font-size:clamp(22px,4.6vw,28px);padding:13px 0;border-bottom:1px solid var(--on-dark-line);
   opacity:0;transform:translateY(10px);transition:opacity .5s var(--e),transform .5s var(--e)}
@@ -655,7 +660,8 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] #menu{right:auto;left:0;transform:translateX(-28px);box-shadow:30px 0 70px rgba(0,0,0,.28)}
 [dir="rtl"] #menu.open{transform:none}
 [dir="rtl"] #menu a{font-size:clamp(20px,4.6vw,26px);font-family:var(--ar-display)}
-[dir="rtl"] #menu .m-search,[dir="rtl"] #menu .m-foot a,[dir="rtl"] #menu .close{letter-spacing:0}
+[dir="rtl"] #menu .m-util button,[dir="rtl"] #menu .m-util>a,[dir="rtl"] #menu .m-foot a,[dir="rtl"] #menu .close{letter-spacing:0}
+[dir="rtl"] #menu .m-util .n{margin-left:0;margin-right:6px}
 [dir="rtl"] #search input{font-size:clamp(30px,6vw,74px);font-family:var(--ar-display)}
 [dir="rtl"] #search .sugg button{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] #search .close,[dir="rtl"] #s-lbl{font-size:12.5px;letter-spacing:0}
