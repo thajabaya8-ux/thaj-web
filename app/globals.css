@@ -114,12 +114,31 @@ a{color:inherit;text-decoration:none}
 
 /* ============ OPENING CURTAIN ============ */
 #curtain{position:fixed;inset:0;z-index:200;background:var(--emerald-deep);display:flex;align-items:center;justify-content:center;
-  transition:opacity 1s var(--e),visibility 1s}
-#curtain .c-mark{width:min(420px,58vw);clip-path:inset(0 0 110% 0);transition:clip-path 1.5s var(--e) .25s}
-#curtain.go .c-mark{clip-path:inset(0 0 -10% 0)}
-#curtain .c-sub{position:absolute;bottom:12%;left:0;right:0;text-align:center;opacity:0;transition:opacity 1s var(--e) 1s}
-#curtain.go .c-sub{opacity:1}
+  overflow:hidden;transition:opacity 1s var(--e),visibility 1s}
+#curtain .c-glow{position:absolute;inset:-20%;background:radial-gradient(circle at 50% 45%,rgba(242,238,228,.16),transparent 60%);
+  opacity:0;transform:scale(.7);transition:opacity 1.8s var(--e) .1s,transform 2.4s var(--e) .1s}
+#curtain.go .c-glow{opacity:1;transform:scale(1);animation:c-breathe 3.4s ease-in-out .8s infinite}
+#curtain .c-mark-wrap{position:relative;width:min(420px,58vw)}
+#curtain .c-mark{display:block;width:100%;clip-path:inset(0 0 110% 0);opacity:0;filter:blur(10px);
+  transform:scale(1.14) translateY(16px);
+  transition:clip-path 1.4s var(--e) .25s,opacity 1s var(--e) .25s,filter 1.3s var(--e) .25s,transform 1.4s var(--e) .25s}
+#curtain.go .c-mark{clip-path:inset(0 0 -10% 0);opacity:1;filter:blur(0);transform:scale(1) translateY(0)}
+#curtain .c-shimmer{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+  background-size:260% 100%;background-position:150% 0;
+  -webkit-mask-image:url(/assets/logo/logo-beige.png);mask-image:url(/assets/logo/logo-beige.png);
+  -webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;opacity:0;transition:opacity .2s}
+#curtain.go .c-shimmer{opacity:1;transition:opacity .2s,background-position 1.1s var(--e) 1.5s;background-position:-50% 0}
+#curtain .c-sub{position:absolute;bottom:12%;left:0;right:0;text-align:center;opacity:0;letter-spacing:.5em;
+  transition:opacity 1.1s var(--e) 1.1s,letter-spacing 1.1s var(--e) 1.1s}
+#curtain.go .c-sub{opacity:1;letter-spacing:.32em}
 #curtain.out{opacity:0;visibility:hidden}
+@keyframes c-breathe{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){
+  #curtain .c-glow{animation:none}
+  #curtain .c-mark,#curtain .c-shimmer,#curtain .c-sub,#curtain .c-glow{transition-duration:.4s}
+}
 
 /* ============ NAV ============ */
 header{position:fixed;top:0;left:0;right:0;z-index:120;height:var(--nav-h);
