@@ -22,7 +22,8 @@ export function stockImgKey(i: number): string {
 // Every settings key that holds a site image path — admin-editable from
 // /admin/media, and readable by any visitor, so this list is shared by
 // both the public and admin settings allowlists.
+// The logo/wordmark are deliberately NOT here — the house mark is fixed
+// and never editable through settings, even by an admin.
 export const IMAGE_SETTINGS_KEYS = [
-  'img_logo_mark', 'img_wordmark_light', 'img_wordmark_dark',
   ...IMG.map((_, i) => stockImgKey(i))
 ];

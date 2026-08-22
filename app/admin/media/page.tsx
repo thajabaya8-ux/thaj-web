@@ -38,26 +38,7 @@ export default function MediaPage() {
         </span>
       </div>
 
-      <div className="lbl" style={{ color: 'var(--gold)', margin: '30px 0 14px' }}>{L('Logo & wordmark', 'اللوجو والاسم')}</div>
-      <div className="adm-media-grid">
-        <MediaSlot
-          label={L('Full mark (footer, opening curtain, homepage hero)', 'العلامة الكاملة (الفوتر، شاشة البداية، الصفحة الرئيسية)')}
-          value={settings.img_logo_mark || ''} fallback="assets/logo/logo-beige.png"
-          onSaved={(p) => save('img_logo_mark', p)}
-        />
-        <MediaSlot
-          label={L('Header wordmark — light background', 'اسم الهيدر — خلفية فاتحة')}
-          value={settings.img_wordmark_light || ''} fallback="assets/logo/wordmark-emerald.png"
-          onSaved={(p) => save('img_wordmark_light', p)}
-        />
-        <MediaSlot
-          label={L('Header wordmark — dark background', 'اسم الهيدر — خلفية غامقة')}
-          value={settings.img_wordmark_dark || ''} fallback="assets/logo/wordmark-beige.png"
-          onSaved={(p) => save('img_wordmark_dark', p)}
-        />
-      </div>
-
-      <div className="lbl" style={{ color: 'var(--gold)', margin: '38px 0 14px' }}>
+      <div className="lbl" style={{ color: 'var(--gold)', margin: '30px 0 14px' }}>
         {L('Decorative photos (hero backdrops, atelier steps)', 'صور زخرفية (خلفيات، خطوات الأتيليه)')}
       </div>
       <div className="adm-media-grid">
