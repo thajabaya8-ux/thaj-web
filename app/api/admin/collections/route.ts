@@ -25,10 +25,17 @@ export async function POST(req: Request) {
 
   const [{ m: maxSort }] = await sql`SELECT COALESCE(MAX(sort),-1) AS m FROM collections`;
 
+  // The admin form only ever collects name + image now — line/mood default
+  // to the name itself (they're just a stylistic subtitle/chapter label on
+  // the public collection page) so a freshly created category never shows
+  // blank text there; concept has no such stand-in, so it's fine empty.
+  const name = str(b.name, 100);
+  const nameAr = str(b.nameAr, 100);
+
   await sql`INSERT INTO collections (key,sort,name_en,name_ar,ar,line_en,line_ar,concept_en,concept_ar,mood_en,mood_ar,image)
-    VALUES (${b.key}, ${maxSort + 1}, ${str(b.name, 100)}, ${str(b.nameAr, 100)}, ${str(b.ar, 100) || str(b.nameAr, 100)},
-      ${str(b.line, 150)}, ${str(b.lineAr, 150)}, ${str(b.concept, 2000)}, ${str(b.conceptAr, 2000)},
-      ${str(b.mood, 150)}, ${str(b.moodAr, 150)}, ${str(b.img, 300)})`;
+    VALUES (${b.key}, ${maxSort + 1}, ${name}, ${nameAr}, ${str(b.ar, 100) || nameAr},
+      ${str(b.line, 150) || name}, ${str(b.lineAr, 150) || nameAr}, ${str(b.concept, 2000)}, ${str(b.conceptAr, 2000)},
+      ${str(b.mood, 150) || name}, ${str(b.moodAr, 150) || nameAr}, ${str(b.img, 300)})`;
 
   const rows = await sql`SELECT * FROM collections WHERE key = ${b.key}`;
   return NextResponse.json(collectionOut(rows[0]), { status: 201 });
