@@ -7,7 +7,7 @@
    Collapsed by default; tapping the toggle expands the active
    platforms stacked above it, in admin-set order.
    ========================================================== */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { SocialLink, SocialPlatform } from '@/lib/types';
 
 const ICONS: Record<SocialPlatform, React.ReactNode> = {
@@ -40,6 +40,7 @@ const ICONS: Record<SocialPlatform, React.ReactNode> = {
 export default function SocialFab() {
   const [links, setLinks] = useState<SocialLink[]>([]);
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,10 +48,19 @@ export default function SocialFab() {
     return () => { cancelled = true; };
   }, []);
 
+  // Closes on any tap/click outside the bubble — picking a platform or
+  // reopening it later is still just a tap on the toggle.
+  useEffect(() => {
+    if (!open) return;
+    const onOutside = (e: PointerEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('pointerdown', onOutside);
+    return () => document.removeEventListener('pointerdown', onOutside);
+  }, [open]);
+
   if (!links.length) return null;
 
   return (
-    <div className="social-fab">
+    <div className="social-fab" ref={ref}>
       {links.map((s, i) => (
         <a
           key={s.platform} href={s.url} target="_blank" rel="noopener noreferrer"
