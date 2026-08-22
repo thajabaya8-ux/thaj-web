@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin, abs } from '@/lib/adminContext';
 import type { Collection, Piece } from '@/lib/types';
@@ -10,6 +10,7 @@ export default function CategoryPiecesPage() {
   const { data: collections, loading: loadingColls } = useAdminFetch<Collection[]>('/collections');
   const { data: pieces, loading: loadingPieces, reload } = useAdminFetch<Piece[]>('/pieces');
   const { call, toast, L, AR } = useAdmin();
+  const router = useRouter();
 
   const collection = collections?.find((c) => c.key === key);
   const inCategory = (pieces || []).filter((p) => p.coll === key);
@@ -17,6 +18,12 @@ export default function CategoryPiecesPage() {
   const onDelete = async (id: string) => {
     if (!confirm(L('Delete this piece? This cannot be undone.', 'تحذفي القطعة دي؟ الخطوة دي ما بترجعش.'))) return;
     try { await call(`/pieces/${id}`, { method: 'DELETE' }); toast(L('Deleted', 'اتمسحت')); reload(); }
+    catch (e) { toast(e instanceof Error ? e.message : String(e)); }
+  };
+
+  const onDeleteCategory = async () => {
+    if (!confirm(L('Delete this category? It must have no pieces assigned.', 'تحذفي الفئة دي؟ لازم متكونش فيها قطع.'))) return;
+    try { await call(`/collections/${key}`, { method: 'DELETE' }); toast(L('Deleted', 'اتمسحت')); router.push('/admin/collections'); }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
   };
 
@@ -35,6 +42,7 @@ export default function CategoryPiecesPage() {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <Link className="btn" href={`/admin/collections/${key}/edit`}>{L('Edit category', 'تعديل الفئة')}</Link>
+          <button className="btn" onClick={onDeleteCategory}>{L('Delete category', 'حذف الفئة')}</button>
           <Link className="btn fill" href={`/admin/pieces/new?coll=${key}`}>{L('Add piece', 'إضافة قطعة')}</Link>
         </div>
       </div>
