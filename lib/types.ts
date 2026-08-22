@@ -81,6 +81,14 @@ export interface Governorate {
   active: boolean;
 }
 
+export type SocialPlatform = 'instagram' | 'whatsapp' | 'facebook' | 'tiktok' | 'twitter' | 'snapchat' | 'youtube' | 'pinterest';
+
+export interface SocialLink {
+  platform: SocialPlatform;
+  url: string;
+  active: boolean;
+}
+
 export interface ShippingInfo {
   name?: string;
   phone?: string;

@@ -136,3 +136,13 @@ CREATE TABLE IF NOT EXISTS governorates (
   price INTEGER NOT NULL DEFAULT 0,
   active BOOLEAN NOT NULL DEFAULT true
 );
+
+-- Floating social-links bubble (see components/SocialFab.tsx) — one row
+-- per platform, admin-managed: paste the profile/chat URL and flip it
+-- active or not. Inactive or empty-URL rows never render on the site.
+CREATE TABLE IF NOT EXISTS social_links (
+  platform TEXT PRIMARY KEY,
+  sort INTEGER NOT NULL DEFAULT 0,
+  url TEXT NOT NULL DEFAULT '',
+  active BOOLEAN NOT NULL DEFAULT false
+);

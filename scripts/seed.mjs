@@ -211,6 +211,13 @@ const GOVERNORATES = [
   ['red-sea', 'Red Sea', 'البحر الأحمر', 150], ['new-valley', 'New Valley', 'الوادي الجديد', 150], ['matrouh', 'Matrouh', 'مطروح', 150]
 ];
 
+// The floating social bubble (components/SocialFab.tsx) — every row
+// starts empty and inactive; the admin pastes a URL and flips it on
+// from /admin/social.
+const SOCIAL_LINKS = [
+  'instagram', 'whatsapp', 'facebook', 'tiktok', 'twitter', 'snapchat', 'youtube', 'pinterest'
+];
+
 async function run() {
   for (const c of COLLECTIONS) {
     await sql`INSERT INTO collections (key,sort,name_en,name_ar,ar,line_en,line_ar,concept_en,concept_ar,mood_en,mood_ar,image)
@@ -249,6 +256,12 @@ async function run() {
     await sql`INSERT INTO governorates (key,sort,name_en,name_ar,price,active)
       VALUES (${key},${i},${name_en},${name_ar},${price},true)
       ON CONFLICT (key) DO NOTHING`;
+  }
+
+  for (const [i, platform] of SOCIAL_LINKS.entries()) {
+    await sql`INSERT INTO social_links (platform,sort,url,active)
+      VALUES (${platform},${i},'',false)
+      ON CONFLICT (platform) DO NOTHING`;
   }
 
   const email = (process.env.ADMIN_EMAIL || 'admin@thaj.house').trim().toLowerCase();

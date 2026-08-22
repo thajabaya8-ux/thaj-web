@@ -611,6 +611,23 @@ footer .fmark{margin:clamp(40px,6vw,80px) auto 0;display:block;width:min(420px,6
 footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--on-dark-line);
   margin-top:34px;padding-top:22px;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--on-dark-soft)}
 
+/* ============ SOCIAL BUBBLE ============ */
+.social-fab{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;align-items:center}
+.social-fab-item{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;
+  background:var(--emerald-deep);color:var(--on-dark);opacity:0;transform:scale(.3);pointer-events:none;
+  margin-bottom:-46px;transition:opacity .3s var(--e),transform .35s var(--e),margin-bottom .35s var(--e);
+  box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.social-fab-item.open{opacity:1;transform:scale(1);pointer-events:auto;margin-bottom:12px}
+.social-fab-item svg{width:20px;height:20px;flex:0 0 auto}
+.social-fab-toggle{width:52px;height:52px;border-radius:50%;background:var(--gold);border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;position:relative;flex:0 0 auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);-webkit-tap-highlight-color:transparent}
+.social-fab-toggle i{position:absolute;width:20px;height:1.6px;background:var(--ink);transition:transform .3s var(--e)}
+.social-fab-toggle i:last-child{transform:rotate(90deg)}
+.social-fab-toggle.open i:first-child{transform:rotate(45deg)}
+.social-fab-toggle.open i:last-child{transform:rotate(-45deg)}
+@media(max-width:640px){.social-fab{bottom:18px;right:16px}}
+
 /* ============ TOAST ============ */
 #toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);z-index:180;
   background:var(--emerald-deep);color:var(--on-dark);padding:15px 26px;font-size:9.5px;letter-spacing:.28em;
@@ -665,6 +682,8 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] #menu a{font-size:clamp(20px,4.6vw,26px);font-family:var(--ar-display)}
 [dir="rtl"] #menu .m-util button,[dir="rtl"] #menu .m-util>a,[dir="rtl"] #menu .m-foot a,[dir="rtl"] #menu .close{letter-spacing:0}
 [dir="rtl"] #menu .m-util .n{margin-left:0;margin-right:6px}
+[dir="rtl"] .social-fab{right:auto;left:24px}
+@media(max-width:640px){[dir="rtl"] .social-fab{left:16px}}
 [dir="rtl"] #search input{font-size:clamp(30px,6vw,74px);font-family:var(--ar-display)}
 [dir="rtl"] #search .sugg button{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] #search .close,[dir="rtl"] #s-lbl{font-size:12.5px;letter-spacing:0}

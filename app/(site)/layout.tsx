@@ -8,6 +8,7 @@ import MobileMenu from '@/components/MobileMenu';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import SearchOverlay from '@/components/SearchOverlay';
+import SocialFab from '@/components/SocialFab';
 import Toast from '@/components/Toast';
 import RouteEffects from '@/components/RouteEffects';
 
@@ -35,6 +36,7 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
       <Footer />
       <CartDrawer />
       <SearchOverlay />
+      <SocialFab />
       <Toast />
     </SiteProvider>
   );
