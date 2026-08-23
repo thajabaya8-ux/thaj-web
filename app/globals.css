@@ -355,15 +355,26 @@ section{position:relative}
   .hm-th span{font-size:8.5px}
 
   /* Only takes over when there are curated pieces with photos to show —
-     .has-film is added in app/(site)/page.tsx precisely when that's
-     true, so the section falls back to the plain panel above otherwise.
-     This block comes after the .hf-root base rule above on purpose: same
-     specificity, so being later is what lets display:flex win here. */
-  .has-film{height:100dvh !important;min-height:600px !important}
-  @supports not (height:1dvh){.has-film{height:100vh !important}}
-  .has-film .hm-in{display:none}
-  .has-film .hm-glow,.has-film .hm-rules{display:none}
-  .has-film .hf-root{display:flex}
+     .hm-film-active is added to .hm-in (never to #hero itself) in
+     app/(site)/page.tsx precisely when that's true, so the section
+     falls back to the plain panel above otherwise. It's kept off the
+     #hero section on purpose: RouteEffects adds the scroll-reveal "in"
+     class to #hero imperatively via classList, and React only leaves a
+     manually-added class alone when the className string it renders for
+     that exact element never changes — putting a data-dependent class
+     on #hero itself would make React overwrite that attribute the
+     moment the marquee finishes loading, silently wiping "in" back out
+     and leaving the whole hero invisible (on any screen width, not just
+     mobile). :has() reaches the section from the untouched marker below
+     instead. This block comes after the .hf-root base rule above on
+     purpose: same specificity, so being later is what lets
+     display:flex win here. */
+  .hero-m:has(>.hm-in.hm-film-active){height:100dvh !important;min-height:600px !important}
+  @supports not (height:1dvh){.hero-m:has(>.hm-in.hm-film-active){height:100vh !important}}
+  .hm-in.hm-film-active{display:none}
+  .hero-m:has(>.hm-in.hm-film-active) .hm-glow,
+  .hero-m:has(>.hm-in.hm-film-active) .hm-rules{display:none}
+  .hero-m:has(>.hm-in.hm-film-active) .hf-root{display:flex}
 }
 @media(prefers-reduced-motion:reduce){.hm-track{animation:none}.hm-glow{animation:none}
   .rv{transition:none}.clip{transition:none}.veil{transition:none}}

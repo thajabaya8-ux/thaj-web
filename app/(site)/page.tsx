@@ -27,9 +27,16 @@ export default function HomePage() {
 
   return (
     <>
-      <section className={`hero-m bleed rv${filmPieces.length ? ' has-film' : ''}`} id="hero">
+      {/* #hero's className must never change after mount — RouteEffects
+          adds the scroll-reveal "in" class to it imperatively, and React
+          would wipe that back out the moment it re-renders this element
+          with a different className string (which is exactly what a
+          data-dependent class here would do once the marquee finishes
+          loading). The film flag lives on .hm-in below instead, which
+          React is free to re-render normally. */}
+      <section className="hero-m bleed rv" id="hero">
         <div className="hm-glow" /><div className="hm-rules" />
-        <div className="hm-in">
+        <div className={`hm-in${filmPieces.length ? ' hm-film-active' : ''}`}>
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
             <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
