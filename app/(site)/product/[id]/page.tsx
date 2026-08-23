@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSite, effectivePrice } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
@@ -14,6 +14,7 @@ export default function ProductPage() {
   const [size, setSize] = useState<string | null>(null);
   const [withPants, setWithPants] = useState(false);
   const [active, setActive] = useState(0);
+  const galGesture = useRef<{ x: number; y: number } | null>(null);
 
   const p = byId(id) || pieces[0];
 
@@ -44,11 +45,34 @@ export default function ProductPage() {
     [L('Availability', 'التوفر'), esc(AR() ? (AVAIL_AR[p.av] || p.av) : p.av)]
   ];
 
+  const goGal = (dir: 1 | -1) => setActive((cur) => (cur + dir + gallery.length) % gallery.length);
+  const onGalPointerDown = (e: React.PointerEvent) => {
+    const t = e.target as HTMLElement;
+    if (t.closest('button')) { galGesture.current = null; return; }
+    galGesture.current = { x: e.clientX, y: e.clientY };
+  };
+  const onGalPointerUp = (e: React.PointerEvent) => {
+    const g = galGesture.current;
+    galGesture.current = null;
+    if (!g || gallery.length < 2) return;
+    const dx = e.clientX - g.x;
+    const dy = e.clientY - g.y;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) goGal(dx < 0 ? 1 : -1);
+  };
+
   return (
     <>
       <section className="pdp">
         <div className="gal">
-          <img src={`/${activeImg}`} alt={pName(p)} />
+          <div className="gal-main" onPointerDown={onGalPointerDown} onPointerUp={onGalPointerUp}>
+            <img src={`/${activeImg}`} alt={pName(p)} />
+            {gallery.length > 1 && (
+              <>
+                <button type="button" className="gal-arrow prev" onClick={() => goGal(-1)} aria-label={L('Previous photo', 'الصورة السابقة')}>‹</button>
+                <button type="button" className="gal-arrow next" onClick={() => goGal(1)} aria-label={L('Next photo', 'الصورة التالية')}>›</button>
+              </>
+            )}
+          </div>
           {gallery.length > 1 && (
             <div className="gal-thumbs">
               {gallery.map((img, i) => (
@@ -86,16 +110,21 @@ export default function ProductPage() {
           <p className="body desc rv">{esc(L(p.d, p.dAr))}</p>
 
           {p.pantsImg && (
-            <div className="rv pants-select">
-              <img src={`/${p.pantsImg}`} alt="" />
+            <div className={`rv pants-select${withPants ? ' on' : ''}`}>
+              <div className="ps-img">
+                <img src={`/${p.pantsImg}`} alt="" />
+                <span className="ps-check">
+                  <svg viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </span>
+              </div>
               <div className="pants-select-body">
-                <label>
-                  <input type="checkbox" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
-                  <span>{L('Add matching trousers', 'أضيفي البنطلون المطابق')} — {money(p.pantsPrice || 0, p.currency)}</span>
+                <label className="ps-row">
+                  <span className="ps-label">{L('Add matching trousers', 'أضيفي البنطلون المطابق')}</span>
+                  <input type="checkbox" className="ps-input" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
+                  <span className="ps-switch" />
                 </label>
-                <p className="body" style={{ fontSize: 11, marginTop: 6, color: 'var(--ink-faint)' }}>
-                  {L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}
-                </p>
+                <div className="ps-price">{money(p.pantsPrice || 0, p.currency)}</div>
+                <p className="ps-note">{L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}</p>
               </div>
             </div>
           )}

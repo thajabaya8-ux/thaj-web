@@ -478,7 +478,23 @@ section{position:relative}
 /* ============ PRODUCT ============ */
 .pdp{display:grid;grid-template-columns:1fr 1fr}
 .pdp .gal{background:var(--sand);position:sticky;top:var(--nav-h);height:100vh;display:flex;flex-direction:column}
-.pdp .gal img{width:100%;flex:1;min-height:0;object-fit:cover}
+/* object-fit:contain (not cover) so the whole photo shows on desktop instead
+   of being cropped to fill the box — the sand background behind it reads as
+   a deliberate mat, not empty space. Mobile keeps the old cropped behaviour
+   below, since that's not what was reported as broken. */
+.pdp .gal-main{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:pan-y}
+.pdp .gal-main img{width:100%;height:100%;object-fit:contain;display:block;background:var(--sand)}
+.gal-arrow{position:absolute;top:50%;translate:0 -50%;z-index:5;width:46px;height:46px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(231,237,199,.86);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--display);
+  font-size:22px;line-height:1;color:var(--ink);opacity:0;
+  transition:opacity .4s var(--e),background .3s var(--e),border-color .3s var(--e)}
+.gal-main:hover .gal-arrow,.gal-arrow:focus-visible{opacity:1}
+.gal-arrow:hover{background:var(--bone);border-color:var(--ink-soft)}
+.gal-arrow.prev{left:16px}
+.gal-arrow.next{right:16px}
+[dir="rtl"] .gal-arrow.prev{left:auto;right:16px}
+[dir="rtl"] .gal-arrow.next{right:auto;left:16px}
 .pdp .gal-thumbs{display:flex;gap:8px;padding:12px;flex:0 0 auto}
 .pdp .gal-thumbs button{width:52px;height:66px;flex:0 0 52px;border:1px solid transparent;padding:0;cursor:pointer;
   opacity:.5;transition:opacity .25s var(--e),border-color .25s var(--e);background:none}
@@ -500,10 +516,35 @@ section{position:relative}
 .price-breakdown .pb-total span{color:var(--ink);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 .price-breakdown .pb-total b{font-size:22px}
 
-.pants-select{display:flex;gap:18px;align-items:center;border:1px solid var(--line);padding:18px;margin-bottom:32px;max-width:460px}
-.pants-select img{width:64px;aspect-ratio:3/4;object-fit:cover;background:var(--sand);flex:0 0 64px}
-.pants-select-body label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px}
-.pants-select-body input{width:16px;height:16px;margin-top:2px;accent-color:var(--emerald);flex:0 0 auto}
+.pants-select{position:relative;display:flex;align-items:stretch;border:1px solid var(--line);
+  margin-bottom:32px;max-width:460px;overflow:hidden;transition:border-color .5s var(--e)}
+.pants-select.on{border-color:var(--emerald)}
+.pants-select .ps-img{position:relative;flex:0 0 96px;aspect-ratio:3/4;overflow:hidden;background:var(--sand)}
+.pants-select .ps-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.82);
+  transform:scale(1);transition:transform 1.3s var(--e),filter .6s var(--e)}
+.pants-select.on .ps-img img{transform:scale(1.06);filter:saturate(1)}
+.pants-select .ps-check{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;
+  background:var(--emerald);color:var(--on-dark);display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(.35);transition:opacity .4s var(--e),transform .4s var(--e)}
+[dir="rtl"] .pants-select .ps-check{left:auto;right:8px}
+.pants-select.on .ps-check{opacity:1;transform:scale(1)}
+.pants-select .ps-check svg{width:11px;height:11px}
+.pants-select-body{flex:1;min-width:0;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:7px}
+.ps-row{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
+.ps-label{font-size:13px;letter-spacing:.01em}
+.ps-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.ps-switch{position:relative;flex:0 0 auto;width:38px;height:21px;border-radius:11px;background:var(--line);
+  transition:background .4s var(--e)}
+.ps-switch::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;
+  background:var(--bone);box-shadow:0 1px 3px rgba(0,0,0,.22);transition:transform .4s var(--e)}
+.pants-select.on .ps-switch{background:var(--emerald)}
+.pants-select.on .ps-switch::after{transform:translateX(17px)}
+[dir="rtl"] .ps-switch::after{left:auto;right:2px}
+[dir="rtl"] .pants-select.on .ps-switch::after{transform:translateX(-17px)}
+.ps-price{font-family:var(--display);font-size:14px;letter-spacing:.02em;color:var(--ink-faint);
+  transition:color .4s var(--e)}
+.pants-select.on .ps-price{color:var(--emerald)}
+.ps-note{font-size:10.5px;color:var(--ink-faint);letter-spacing:.01em}
 
 /* ============ DEPOSIT CHECKOUT (Vodafone Cash / InstaPay) ============ */
 .pay-summary{max-width:none}
@@ -757,6 +798,9 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] .spec .r .k{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] .spec .r .v{font-size:17.5px}
 [dir="rtl"] .pdp .desc{font-size:16.5px !important}
+[dir="rtl"] .ps-label{font-size:16px}
+[dir="rtl"] .ps-price{font-size:17px}
+[dir="rtl"] .ps-note{font-size:13px;letter-spacing:0}
 [dir="rtl"] .arch-row .th{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] .arch-row .nm i{font-size:16px}
 [dir="rtl"] .pill{font-size:13px;letter-spacing:0;padding:7px 12px}
@@ -860,7 +904,9 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static;height:auto}
-  .pdp .gal img{height:auto;aspect-ratio:3/4}
+  .pdp .gal-main{height:auto;aspect-ratio:3/4}
+  .pdp .gal-main img{height:100%;object-fit:cover}
+  .gal-arrow{display:none}
   .pdp .info{min-height:auto;padding:34px 22px 60px}
   .frow{grid-template-columns:1fr;gap:10px}
   .ftoggle{display:block}
