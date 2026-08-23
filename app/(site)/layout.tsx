@@ -17,6 +17,14 @@ export const metadata: Metadata = {
   description: 'THAJ — an abaya fashion house in Riyadh. Eleven pieces, catalogued and editioned.'
 };
 
+// Most pages under this layout have no dynamic segment or cookie/header
+// read, so Next would otherwise prerender them once at build time and
+// serve that same snapshot until the next deploy — a piece added (or
+// hidden) through the live admin panel wouldn't show up on the site
+// until someone redeployed. Forcing this layout dynamic makes every page
+// under it read the database fresh on each request instead.
+export const dynamic = 'force-dynamic';
+
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   const { pieces, collections, orders, settings } = await getSiteData();
 
