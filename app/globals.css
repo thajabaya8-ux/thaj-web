@@ -309,12 +309,21 @@ section{position:relative}
 .hf-img.on{opacity:1;transform:scale(1.06);transition:opacity var(--fade-ms) ease,transform var(--slide-ms) linear}
 .hf-root.reduced .hf-img{transition:none}
 .hf-root.reduced .hf-img.on{transform:scale(1)}
+/* The fixed header lays its own dark gradient over roughly the top
+   ~10% of the screen (fading to fully transparent by its own height)
+   whenever it's over a dark section. Stacking a second, independently
+   dark scrim on top of just that same band double-darkens it and then
+   drops off a cliff right where the header's box ends — a visible seam
+   at the header/photo boundary. Starting this gradient almost clear and
+   only ramping up past that band lets the header's own fade be the only
+   thing doing the work there, so the two hand off smoothly instead. */
 .hf-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,
-    color-mix(in srgb,var(--emerald-deep) 60%,transparent) 0%,
-    color-mix(in srgb,var(--emerald-deep) 20%,transparent) 30%,
-    color-mix(in srgb,var(--emerald-deep) 16%,transparent) 54%,
-    color-mix(in srgb,var(--emerald-deep) 48%,transparent) 78%,
+    color-mix(in srgb,var(--emerald-deep) 8%,transparent) 0%,
+    color-mix(in srgb,var(--emerald-deep) 30%,transparent) 12%,
+    color-mix(in srgb,var(--emerald-deep) 16%,transparent) 34%,
+    color-mix(in srgb,var(--emerald-deep) 14%,transparent) 58%,
+    color-mix(in srgb,var(--emerald-deep) 46%,transparent) 82%,
     color-mix(in srgb,var(--emerald-deep) 88%,transparent) 100%)}
 .hf-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
   background:radial-gradient(48% 32% at 50% 44%,color-mix(in srgb,var(--emerald-deep) 55%,transparent),transparent 72%)}
