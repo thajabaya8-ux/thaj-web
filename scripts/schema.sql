@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS pieces (
   -- storefront shows price struck through, sale_price as the charged
   -- amount, and a percent-off badge. NULL means no discount.
   sale_price INTEGER,
+  -- Whether the piece shows anywhere on the public site at all — separate
+  -- from availability, which is about stock, not whether it's published.
+  visible BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -61,6 +64,7 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS images TEXT DEFAULT '[]';
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sale_price INTEGER;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS visible BOOLEAN NOT NULL DEFAULT true;
 
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,

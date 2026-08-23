@@ -39,7 +39,8 @@ export function pieceOut(r: any): Piece {
     images,
     pantsImg: r.pants_image ?? null,
     pantsPrice: r.pants_price ?? null,
-    salePrice: (r.sale_price != null && r.sale_price < r.price) ? r.sale_price : null
+    salePrice: (r.sale_price != null && r.sale_price < r.price) ? r.sale_price : null,
+    visible: r.visible !== false
   };
 }
 

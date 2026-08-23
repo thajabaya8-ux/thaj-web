@@ -13,12 +13,12 @@ import { META_SETTINGS_KEYS } from '@/lib/marketing';
 import type { Collection, Order, Piece, Settings } from '@/lib/types';
 
 export async function getPieces(): Promise<Piece[]> {
-  const rows = await sql`SELECT * FROM pieces ORDER BY created_at`;
+  const rows = await sql`SELECT * FROM pieces WHERE visible ORDER BY created_at`;
   return rows.map(pieceOut);
 }
 
 export async function getPiece(id: string): Promise<Piece | null> {
-  const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
+  const rows = await sql`SELECT * FROM pieces WHERE id = ${id} AND visible`;
   return rows.length ? pieceOut(rows[0]) : null;
 }
 

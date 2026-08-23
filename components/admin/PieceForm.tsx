@@ -27,6 +27,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
   const [pantsImg, setPantsImg] = useState(piece?.pantsImg || '');
   const [currency, setCurrency] = useState<'SAR' | 'EGP'>(piece?.currency || 'SAR');
   const [coll, setColl] = useState(piece?.coll || defaultCollKey || '');
+  const [visible, setVisible] = useState(piece?.visible ?? true);
   const [saving, setSaving] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,7 +47,8 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       images,
       pantsImg: hasPants ? pantsImg : '',
       pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null,
-      salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null
+      salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null,
+      visible
     };
     setSaving(true);
     try {
@@ -58,7 +60,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
     finally { setSaving(false); }
   };
 
-  const v = (k: keyof Piece, d: string | number = '') => piece?.[k] ?? d;
+  const v = (k: keyof Piece, d: string | number = '') => (piece?.[k] as string | number | undefined) ?? d;
 
   return (
     <form className="form" style={{ maxWidth: 600 }} onSubmit={onSubmit}>
@@ -81,6 +83,10 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
           {collections.map((c) => <option key={c.key} value={c.key}>{AR() ? c.nameAr : c.name}</option>)}
         </select>
       </div>
+      <label className="adm-pants-toggle">
+        <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />
+        <span>{L('Show this piece on the site', 'اعرضي القطعة دي في الموقع')}</span>
+      </label>
       <div className="f2">
         <div className="field"><label>{L('Availability', 'التوفر')}</label>
           <select name="av" defaultValue={v('av', 'Available')}>{AVAIL_OPTS.map((o) => <option key={o} value={o}>{AR() ? AVAIL_AR[o] : o}</option>)}</select>

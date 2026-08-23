@@ -66,7 +66,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     image: nextImages[0] || null,
     images: JSON.stringify(nextImages),
     pants_image: nextPantsImg,
-    pants_price: nextPantsPrice
+    pants_price: nextPantsPrice,
+    visible: b.visible === undefined ? existing.visible : !!b.visible
   };
 
   // A sale price only counts as a discount if it's actually lower than the
@@ -83,7 +84,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     pal_en=${next.pal_en}, pal_ar=${next.pal_ar}, availability=${next.availability},
     desc_en=${next.desc_en}, desc_ar=${next.desc_ar}, story_en=${next.story_en}, story_ar=${next.story_ar},
     image=${next.image}, images=${next.images}, pants_image=${next.pants_image}, pants_price=${next.pants_price},
-    sale_price=${nextSalePrice}, updated_at=now() WHERE id=${id}`;
+    sale_price=${nextSalePrice}, visible=${next.visible}, updated_at=now() WHERE id=${id}`;
 
   const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
   return NextResponse.json(pieceOut(rows[0]));

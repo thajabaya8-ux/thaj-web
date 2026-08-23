@@ -4,7 +4,7 @@ import { pieceOut } from '@/lib/serverMappers';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
+  const rows = await sql`SELECT * FROM pieces WHERE id = ${id} AND visible`;
   if (!rows.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(pieceOut(rows[0]));
 }

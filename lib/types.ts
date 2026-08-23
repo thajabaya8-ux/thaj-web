@@ -35,6 +35,7 @@ export interface Piece {
   pantsImg: string | null;
   pantsPrice: number | null;
   salePrice: number | null;
+  visible: boolean;
 }
 
 export interface Collection {
