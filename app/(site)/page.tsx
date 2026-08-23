@@ -9,8 +9,11 @@ import HeroFilm from '@/components/HeroFilm';
 import type { Piece } from '@/lib/types';
 
 export default function HomePage() {
-  const { L, AR, esc, pName, byId, pieces, collections, settings } = useSite();
-  const feat = ['najma', 'harir', 'warda', 'fahm'].map(byId).filter(Boolean);
+  const { L, AR, esc, num, pName, pieces, collections, settings } = useSite();
+  // The featured composition below is built for exactly four pieces —
+  // just the newest four in the catalogue, not a hand-picked list, since
+  // there's no "featured" flag on a piece.
+  const feat = pieces.slice(-4).reverse();
 
   // Curated by the admin at /admin/marquee — not every piece in the
   // catalogue, and empty (so the strip stays hidden) until they pick some.
@@ -42,7 +45,7 @@ export default function HomePage() {
             <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
             <h1 className="hm-h">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
             <div className="hm-row">
-              <p>{L('Eleven pieces, catalogued and editioned. Cut in Riyadh, washed three times, and finished by hand before they are named.', 'إحدى عشرة قطعة، مفهرسة ومرقّمة. تُقص في الرياض، وتُغسل ثلاث مرات، وتُنهى باليد قبل أن تُسمّى.')}</p>
+              <p>{L(`${num(pieces.length)} pieces, catalogued and editioned. Cut in Riyadh, washed three times, and finished by hand before they are named.`, `${num(pieces.length)} قطعة، مفهرسة ومرقّمة. تُقص في الرياض، وتُغسل ثلاث مرات، وتُنهى باليد قبل أن تُسمّى.`)}</p>
               <div className="hm-cta">
                 <Link className="btn" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link>
                 <Link className="btn" href="/collections/signature">{L('See the chapter', 'شوفي الفصل')}</Link>
@@ -72,7 +75,7 @@ export default function HomePage() {
           {feat[3] && <ProductCard piece={feat[3]} className="c-4 wide" />}
         </div>
         <div style={{ textAlign: 'center', marginTop: 'clamp(40px,6vw,80px)' }}>
-          <Link className="link rv" href="/shop">{L('All eleven pieces', 'كل الإحدى عشرة قطعة')}</Link>
+          <Link className="link rv" href="/shop">{L(`All ${num(pieces.length)} pieces`, `كل ${num(pieces.length)} قطعة`)}</Link>
         </div>
       </section>
 
@@ -82,7 +85,7 @@ export default function HomePage() {
             <div className="lbl rv" style={{ color: 'var(--champagne)', marginBottom: 20 }}>{L('02 · The Silhouette', '٠٢ · السيلويت')}</div>
             <h2 className="h-l rv"><span className="clip" dangerouslySetInnerHTML={{ __html: L('Fabric first.<br>The garment after.', 'القماش أولًا.<br>القطعة بعدين.') }} /></h2>
             <p className="body rv" style={{ marginTop: 26, maxWidth: '40ch' }}>{L('A piece is discovered here the way it is discovered in the atelier — texture, then fall, then movement, then the whole.', 'القطعة بتتكشف هنا زي ما بتتكشف في الأتيليه — الملمس، بعده السقوط، بعده الحركة، وبعدين الكل.')}</p>
-            <div className="rv" style={{ marginTop: 32 }}><Link className="btn" href="/product/harir">{L('Discover a piece', 'اكتشفي قطعة')}</Link></div>
+            <div className="rv" style={{ marginTop: 32 }}><Link className="btn" href={feat[0] ? `/product/${feat[0].id}` : '/shop'}>{L('Discover a piece', 'اكتشفي قطعة')}</Link></div>
           </div>
           <div style={{ gridColumn: '7/13', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(14px,2vw,28px)' }}>
             <div className="rv" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--emerald)' }}>
