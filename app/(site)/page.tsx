@@ -5,6 +5,7 @@ import { useSite } from '@/lib/siteContext';
 import { stockImg } from '@/lib/img';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
+import HeroFilm from '@/components/HeroFilm';
 import type { Piece } from '@/lib/types';
 
 export default function HomePage() {
@@ -20,10 +21,13 @@ export default function HomePage() {
     return () => { cancelled = true; };
   }, []);
   const strip = [...marquee, ...marquee];
+  // Same curated list powers the mobile film below — pieces without a
+  // photo can't appear in an image carousel.
+  const filmPieces = marquee.filter((p) => p.img);
 
   return (
     <>
-      <section className="hero-m bleed rv" id="hero">
+      <section className={`hero-m bleed rv${filmPieces.length ? ' has-film' : ''}`} id="hero">
         <div className="hm-glow" /><div className="hm-rules" />
         <div className="hm-in">
           <div className="hm-copy">
@@ -48,6 +52,7 @@ export default function HomePage() {
             </div></div>
           )}
         </div>
+        {filmPieces.length > 0 && <HeroFilm pieces={filmPieces} />}
         <div className="hm-scroll">{L('Scroll', 'انزلي')}<i></i></div>
       </section>
 

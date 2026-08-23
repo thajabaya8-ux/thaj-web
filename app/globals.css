@@ -296,12 +296,74 @@ section{position:relative}
 .hm-th:hover{opacity:1;transform:translateY(-5px)}
 .hm-th:hover span{opacity:1;background:rgba(4,45,41,.72)}
 .hm-th:hover img{filter:saturate(1)}
+/* ---- mobile hero film (see components/HeroFilm.tsx) ----
+   Base rules first, always display:none — the @media(max-width:900px)
+   block far below is what actually turns it on, and being the later,
+   overriding rule at equal specificity is what makes that win instead
+   of silently losing to this default. */
+.hf-root{display:none;position:absolute;inset:0;z-index:2;flex-direction:column;overflow:hidden;
+  touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+.hf-stage{position:absolute;inset:0}
+.hf-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;
+  opacity:0;transform:scale(1);transition:opacity var(--fade-ms) ease;filter:saturate(.96) contrast(1.02)}
+.hf-img.on{opacity:1;transform:scale(1.06);transition:opacity var(--fade-ms) ease,transform var(--slide-ms) linear}
+.hf-root.reduced .hf-img{transition:none}
+.hf-root.reduced .hf-img.on{transform:scale(1)}
+.hf-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--emerald-deep) 60%,transparent) 0%,
+    color-mix(in srgb,var(--emerald-deep) 20%,transparent) 30%,
+    color-mix(in srgb,var(--emerald-deep) 16%,transparent) 54%,
+    color-mix(in srgb,var(--emerald-deep) 48%,transparent) 78%,
+    color-mix(in srgb,var(--emerald-deep) 88%,transparent) 100%)}
+.hf-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(48% 32% at 50% 44%,color-mix(in srgb,var(--emerald-deep) 55%,transparent),transparent 72%)}
+.hf-copy{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:0 22px;gap:clamp(12px,3vw,18px)}
+.hf-eyebrow{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--champagne)}
+[dir="rtl"] .hf-eyebrow{font-size:13px;letter-spacing:.14em}
+.hf-logo{width:min(280px,58vw);filter:drop-shadow(0 3px 20px color-mix(in srgb,var(--emerald-deep) 75%,transparent))}
+.hf-title{font-family:var(--display);font-weight:400;font-size:clamp(24px,7.4vw,34px);line-height:1.15;
+  color:var(--on-dark);max-width:16ch;text-shadow:0 2px 22px color-mix(in srgb,var(--emerald-deep) 85%,transparent)}
+[dir="rtl"] .hf-title{font-family:var(--ar-display);line-height:1.4}
+.hf-cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.hf-btn{border-color:color-mix(in srgb,var(--on-dark) 42%,transparent);color:var(--on-dark);
+  background:color-mix(in srgb,var(--emerald-deep) 36%,transparent);
+  backdrop-filter:blur(10px) saturate(1.3);-webkit-backdrop-filter:blur(10px) saturate(1.3);
+  white-space:nowrap}
+.hf-btn:hover{border-color:var(--on-dark)}
+.hf-bar{position:relative;z-index:3;display:flex;flex-direction:column;gap:10px;
+  padding:0 20px calc(18px + env(safe-area-inset-bottom,0px));flex:0 0 auto}
+.hf-progress{display:flex;gap:5px}
+.hf-seg{flex:1;height:2px;border-radius:2px;overflow:hidden;background:color-mix(in srgb,var(--on-dark) 26%,transparent)}
+.hf-seg-fill{display:block;width:100%;height:100%;background:var(--on-dark);transform-origin:left;transform:scaleX(0)}
+[dir="rtl"] .hf-seg-fill{transform-origin:right}
+.hf-seg-fill.done{transform:scaleX(1)}
+.hf-seg-fill.fill{transform:scaleX(1);transition:transform var(--slide-ms) linear}
+.hf-meta{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.hf-meta .hf-name{font-family:var(--display);font-size:13.5px;letter-spacing:.02em;color:var(--on-dark);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+[dir="rtl"] .hf-meta .hf-name{font-family:var(--ar-display);font-size:16px}
+.hf-meta .hf-price{font-family:var(--display);font-size:12px;letter-spacing:.02em;color:var(--champagne);white-space:nowrap}
+[dir="rtl"] .hf-meta .hf-price{font-family:var(--ar-display);font-size:14.5px}
+
 @media(max-width:900px){
   .hm-in{grid-template-columns:1fr;gap:clamp(26px,5vw,44px)}
   .hm-logo{width:min(420px,72vw)}
   .hm-strip{height:clamp(240px,34vh,320px);order:2}
   .hm-copy{order:1}
   .hm-th span{font-size:8.5px}
+
+  /* Only takes over when there are curated pieces with photos to show —
+     .has-film is added in app/(site)/page.tsx precisely when that's
+     true, so the section falls back to the plain panel above otherwise.
+     This block comes after the .hf-root base rule above on purpose: same
+     specificity, so being later is what lets display:flex win here. */
+  .has-film{height:100dvh !important;min-height:600px !important}
+  @supports not (height:1dvh){.has-film{height:100vh !important}}
+  .has-film .hm-in{display:none}
+  .has-film .hm-glow,.has-film .hm-rules{display:none}
+  .has-film .hf-root{display:flex}
 }
 @media(prefers-reduced-motion:reduce){.hm-track{animation:none}.hm-glow{animation:none}
   .rv{transition:none}.clip{transition:none}.veil{transition:none}}
