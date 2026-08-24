@@ -46,8 +46,8 @@ export default function Footer() {
             <span className="fl">{L(settings.contact_location_en, settings.contact_location_ar)}</span>
             {settings.contact_email && <a className="fl" href={`mailto:${settings.contact_email}`}>{settings.contact_email}</a>}
             {whatsapp && <a className="fl" href={whatsapp.url} target="_blank" rel="noopener noreferrer">{L('Message us on WhatsApp', 'راسلنا على واتساب')}</a>}
-            <span className="fl">{L('Shipping & returns', 'الشحن والإرجاع')}</span>
-            <span className="fl">{L('Care & repair', 'العناية والإصلاح')}</span>
+            <Link className="fl" href="/shipping">{L('Shipping & returns', 'الشحن والإرجاع')}</Link>
+            <Link className="fl" href="/care">{L('Care & repair', 'العناية والإصلاح')}</Link>
             {otherSocial.length > 0 && (
               <div className="f-social">
                 {otherSocial.map((s) => (
@@ -63,7 +63,9 @@ export default function Footer() {
         <div className="fbot">
           <span>© 2026 THAJ · {L('Kingdom of Saudi Arabia', 'المملكة العربية السعودية')}</span>
           <span className="arabic" style={{ letterSpacing: 0 }}>الأناقة صمت</span>
-          <span>{L('Privacy · Terms', 'الخصوصية · الشروط')}</span>
+          <span style={{ display: 'flex', gap: 14 }}>
+            <Link href="/privacy">{L('Privacy', 'الخصوصية')}</Link> · <Link href="/terms">{L('Terms', 'الشروط')}</Link>
+          </span>
         </div>
       </div>
     </footer>
