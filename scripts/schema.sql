@@ -55,6 +55,15 @@ CREATE TABLE IF NOT EXISTS pieces (
   -- Whether the piece shows anywhere on the public site at all — separate
   -- from availability, which is about stock, not whether it's published.
   visible BOOLEAN NOT NULL DEFAULT true,
+  -- Real, owned quantity. Defaults to 999 (not 0) specifically so this
+  -- migration doesn't flip every already-live, already-selling piece to
+  -- "out of stock" the moment it runs — the admin sets real numbers per
+  -- piece at their own pace afterward.
+  stock INTEGER NOT NULL DEFAULT 999,
+  -- Units tied up in orders still "Under Review" — counted against
+  -- availability (available = stock - reserved) but not yet subtracted
+  -- from stock itself, since that only happens for real on Approve.
+  reserved INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -65,6 +74,8 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sale_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS visible BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS stock INTEGER NOT NULL DEFAULT 999;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS reserved INTEGER NOT NULL DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,
@@ -89,7 +100,17 @@ CREATE TABLE IF NOT EXISTS orders (
   rejection_reason TEXT,
   approved_at TIMESTAMPTZ,
   shipping_json TEXT,
-  user_id INTEGER REFERENCES users(id)
+  user_id INTEGER REFERENCES users(id),
+  -- Inventory bookkeeping for this order, both default false so pre-existing
+  -- orders (created before stock tracking existed) are inert — they never
+  -- reserved or deducted anything real, so cancelling/approving one now
+  -- must not touch stock. New orders explicitly set reservation_active =
+  -- true in their own INSERT. reservation_active: this order currently
+  -- holds a `reserved` claim not yet resolved via approve/reject/cancel.
+  -- stock_deducted: this order's items have been permanently subtracted
+  -- from stock (via Approve) and not yet restored (via Cancel-after-approve).
+  reservation_active BOOLEAN NOT NULL DEFAULT false,
+  stock_deducted BOOLEAN NOT NULL DEFAULT false
 );
 
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS subtotal INTEGER;
@@ -103,6 +124,8 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_json TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS reservation_active BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS stock_deducted BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS appointments (
   id SERIAL PRIMARY KEY,

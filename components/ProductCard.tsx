@@ -1,14 +1,17 @@
 'use client';
 import Link from 'next/link';
-import { useSite, effectivePrice } from '@/lib/siteContext';
+import { useSite, effectivePrice, availableStock } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
 
 export default function ProductCard({ piece, className }: { piece?: Piece | null; className?: string }) {
   const { L, AR, esc, pName, money, wish, toggleWish, quickAdd, AVAIL_AR } = useSite();
   if (!piece) return null;
   const saved = wish.includes(piece.id);
-  const av = AR() ? (AVAIL_AR[piece.av] || piece.av) : piece.av;
-  const soldOut = piece.av === 'Sold Out';
+  // Out of real stock overrides whatever the admin last set availability
+  // to, without touching that stored value — the moment stock is topped
+  // up again it's back to whatever it said before, automatically.
+  const soldOut = piece.av === 'Sold Out' || availableStock(piece) <= 0;
+  const av = soldOut ? L('Sold Out', 'نفدت الكمية') : (AR() ? (AVAIL_AR[piece.av] || piece.av) : piece.av);
   const onSale = piece.salePrice != null;
   const pct = onSale ? Math.round((1 - piece.salePrice! / piece.price) * 100) : 0;
 

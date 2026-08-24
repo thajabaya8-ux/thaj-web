@@ -48,7 +48,8 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       pantsImg: hasPants ? pantsImg : '',
       pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null,
       salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null,
-      visible
+      visible,
+      stock: parseInt(val('stock'), 10) || 0
     };
     setSaving(true);
     try {
@@ -91,9 +92,12 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         <div className="field"><label>{L('Availability', 'التوفر')}</label>
           <select name="av" defaultValue={v('av', 'Available')}>{AVAIL_OPTS.map((o) => <option key={o} value={o}>{AR() ? AVAIL_AR[o] : o}</option>)}</select>
         </div>
-        <div className="field"><label>{L(`Sale price (${currency}, optional)`, `سعر العرض (${currency === 'EGP' ? 'جنيه مصري' : 'ريال سعودي'}، اختياري)`)}</label>
-          <input name="salePrice" type="number" min="0" defaultValue={piece?.salePrice ?? ''} placeholder={L('Leave empty for no discount', 'سيبيه فاضي لو مفيش خصم')} />
+        <div className="field"><label>{L('Stock (pieces available)', 'المخزون (عدد القطع المتاحة)')}</label>
+          <input name="stock" type="number" min="0" defaultValue={v('stock', 999)} required />
         </div>
+      </div>
+      <div className="field"><label>{L(`Sale price (${currency}, optional)`, `سعر العرض (${currency === 'EGP' ? 'جنيه مصري' : 'ريال سعودي'}، اختياري)`)}</label>
+        <input name="salePrice" type="number" min="0" defaultValue={piece?.salePrice ?? ''} placeholder={L('Leave empty for no discount', 'سيبيه فاضي لو مفيش خصم')} />
       </div>
       <div className="f2">
         <div className="field"><label>{L('Fabric (shop filter)', 'القماش (فلتر المتجر)')}</label><input name="fabric" defaultValue={v('fabric')} placeholder="Silk" /></div>

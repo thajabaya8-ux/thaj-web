@@ -50,15 +50,16 @@ export async function POST(req: Request) {
     : null;
 
   const visible = b.visible === undefined ? true : !!b.visible;
+  const stock = b.stock !== undefined ? nonNegativeInt(b.stock, 0) : 999;
 
   await sql`INSERT INTO pieces
-    (id,ed,name_en,name_ar,price,currency,coll_key,fabric,sil,colour,occ,mat_en,mat_ar,silf_en,silf_ar,pal_en,pal_ar,availability,desc_en,desc_ar,story_en,story_ar,image,images,pants_image,pants_price,sale_price,visible)
+    (id,ed,name_en,name_ar,price,currency,coll_key,fabric,sil,colour,occ,mat_en,mat_ar,silf_en,silf_ar,pal_en,pal_ar,availability,desc_en,desc_ar,story_en,story_ar,image,images,pants_image,pants_price,sale_price,visible,stock)
     VALUES (${b.id}, ${str(b.ed, 40)}, ${str(b.n, 200)}, ${str(b.ar, 200)}, ${price}, ${b.currency || 'SAR'}, ${b.coll || null},
       ${str(b.fabric, 60)}, ${str(b.sil, 60)}, ${str(b.colour, 60)}, ${str(b.occ, 60)},
       ${str(b.mat, 300)}, ${str(b.matAr, 300)}, ${str(b.silf, 300)}, ${str(b.silfAr, 300)}, ${str(b.pal, 150)}, ${str(b.palAr, 150)},
       ${b.av || 'Available'}, ${str(b.d, 4000)}, ${str(b.dAr, 4000)},
       ${JSON.stringify(strArray(b.story))}, ${JSON.stringify(strArray(b.storyAr))}, ${images[0] || null},
-      ${JSON.stringify(images)}, ${pantsImg}, ${pantsPrice}, ${salePrice}, ${visible})`;
+      ${JSON.stringify(images)}, ${pantsImg}, ${pantsPrice}, ${salePrice}, ${visible}, ${stock})`;
 
   const rows = await sql`SELECT * FROM pieces WHERE id = ${b.id}`;
   return NextResponse.json(pieceOut(rows[0]), { status: 201 });

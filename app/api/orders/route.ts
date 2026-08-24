@@ -73,12 +73,39 @@ export async function POST(req: Request) {
   // consistent currency regardless of how the cart's pieces are individually priced.
   let subtotalEgp = 0;
   const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
+
+  // Stock is reserved (not yet permanently deducted — that only happens
+  // when the admin approves the payment) right here, atomically per item,
+  // so two customers can't both claim the last piece at once: the UPDATE
+  // only succeeds if (stock - reserved) still covers this qty at the exact
+  // moment it runs. If any item in the cart can't be reserved, everything
+  // already reserved for this same attempt is released before failing.
+  const reservedSoFar: { id: string; qty: number }[] = [];
+  const releaseReserved = async () => {
+    for (const r of reservedSoFar) {
+      await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${r.qty}) WHERE id = ${r.id}`;
+    }
+  };
+
   for (const it of items) {
     const pid = String((it && it.id) || '');
-    const rows = await sql`SELECT id, price, pants_price, currency, sale_price FROM pieces WHERE id = ${pid}`;
-    if (!rows.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
-    const p = rows[0];
     const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
+
+    const rows = await sql`
+      UPDATE pieces SET reserved = reserved + ${qty}
+      WHERE id = ${pid} AND (stock - reserved) >= ${qty}
+      RETURNING id, price, pants_price, currency, sale_price, name_en`;
+
+    if (!rows.length) {
+      await releaseReserved();
+      const cur = await sql`SELECT name_en, stock, reserved FROM pieces WHERE id = ${pid}`;
+      if (!cur.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
+      const available = Math.max(0, cur[0].stock - cur[0].reserved);
+      return NextResponse.json({ error: `Only ${available} of "${cur[0].name_en}" left in stock` }, { status: 409 });
+    }
+    reservedSoFar.push({ id: pid, qty });
+    const p = rows[0];
+
     // Trousers can only be added alongside the piece they belong to, and
     // only when that piece still offers them server-side — never trust
     // the client's price math. Same for the sale price: only a genuine
@@ -100,13 +127,21 @@ export async function POST(req: Request) {
   });
 
   const orderNumber = await nextOrderNumber();
-  const rows = await sql`INSERT INTO orders
-    (order_number, customer_name, email, phone, items, total, status,
-     subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json)
-    VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
-      ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
-      ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson})
-    RETURNING *`;
+  let rows;
+  try {
+    rows = await sql`INSERT INTO orders
+      (order_number, customer_name, email, phone, items, total, status,
+       subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active)
+      VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
+        ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
+        ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true)
+      RETURNING *`;
+  } catch (err) {
+    // The order row itself failed to write — the stock reserved above for
+    // this attempt would otherwise leak forever with nothing to release it.
+    await releaseReserved();
+    throw err;
+  }
 
   // Fire-and-forget server-side mirror of the browser Purchase event — never
   // block or slow the order response on Meta's API being slow or down.

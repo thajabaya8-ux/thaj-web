@@ -36,6 +36,10 @@ export interface Piece {
   pantsPrice: number | null;
   salePrice: number | null;
   visible: boolean;
+  stock: number;
+  // Units tied up in orders still under review — not yet a permanent
+  // deduction. available = stock - reserved is what's actually purchasable.
+  reserved: number;
 }
 
 export interface Collection {

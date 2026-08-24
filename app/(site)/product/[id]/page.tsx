@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useSite, effectivePrice } from '@/lib/siteContext';
+import { useSite, effectivePrice, availableStock } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
@@ -30,7 +30,9 @@ export default function ProductPage() {
   const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
   const gallery = p.images.length ? p.images : [p.img];
   const activeImg = gallery[active] || p.img;
-  const soldOut = p.av === 'Sold Out';
+  // Out of real stock overrides whatever the admin last set availability
+  // to, without touching that stored value — restocking brings it back.
+  const soldOut = p.av === 'Sold Out' || availableStock(p) <= 0;
   const onSale = p.salePrice != null;
   const pct = onSale ? Math.round((1 - p.salePrice! / p.price) * 100) : 0;
   const total = effectivePrice(p) + (withPants && p.pantsPrice ? p.pantsPrice : 0);
@@ -42,7 +44,7 @@ export default function ProductPage() {
     [L('Occasion', 'المناسبة'), fa(p.occ)],
     [L('Year', 'السنة'), num(2026)],
     [L('Edition', 'الإصدار'), esc(p.ed)],
-    [L('Availability', 'التوفر'), esc(AR() ? (AVAIL_AR[p.av] || p.av) : p.av)]
+    [L('Availability', 'التوفر'), soldOut ? L('Sold Out', 'نفدت الكمية') : esc(AR() ? (AVAIL_AR[p.av] || p.av) : p.av)]
   ];
 
   const goGal = (dir: 1 | -1) => setActive((cur) => (cur + dir + gallery.length) % gallery.length);
