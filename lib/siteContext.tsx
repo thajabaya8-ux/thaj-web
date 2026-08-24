@@ -23,6 +23,8 @@ type Lang = 'en' | 'ar';
 // state, so this is how one's choice reaches the other: whichever was
 // changed most recently, written here, is what the other reads on mount.
 const LANG_KEY = 'thaj-lang';
+const CART_KEY = 'thaj-cart';
+const WISH_KEY = 'thaj-wish';
 type AuthRole = 'admin' | 'customer' | null | undefined; // undefined = still checking
 
 const ESC_MAP: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -176,6 +178,26 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
       if (saved === 'ar' || saved === 'en') setLangState(saved);
     } catch { /* localStorage unavailable — keep the default */ }
   }, []);
+
+  // Cart and wishlist previously lived in plain useState with nothing
+  // backing it — a refresh (or just closing the tab) silently emptied
+  // both. Same deferred-read pattern as language above, so the server's
+  // first render (always empty) isn't mismatched by the client's.
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (savedCart) setCart(JSON.parse(savedCart));
+      const savedWish = localStorage.getItem(WISH_KEY);
+      if (savedWish) setWish(JSON.parse(savedWish));
+    } catch { /* localStorage unavailable, or saved JSON was malformed — keep empty */ }
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* best-effort */ }
+  }, [cart]);
+  useEffect(() => {
+    try { localStorage.setItem(WISH_KEY, JSON.stringify(wish)); } catch { /* best-effort */ }
+  }, [wish]);
 
   // Admin-editable rate (Settings → "Egyptian pounds per 1 Saudi riyal"),
   // with a sane fallback if it's never been set. Each piece is priced (and
