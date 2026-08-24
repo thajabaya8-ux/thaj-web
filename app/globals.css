@@ -154,7 +154,7 @@ header.on-dark .brand .lg-lt{display:none}
 header.on-dark .brand .lg-dk{display:block}
 header nav{display:flex;gap:clamp(12px,1.6vw,30px);margin-right:auto;align-items:center;min-width:0}
 header nav a{font-size:clamp(11.5px,.85vw,14px);letter-spacing:.12em;text-transform:uppercase;color:inherit;opacity:.82;
-  white-space:nowrap;padding:10px 0;border-bottom:1px solid transparent;transition:opacity .5s var(--e),border-color .5s var(--e);cursor:pointer}
+  white-space:nowrap;padding:10px 0;border-bottom:2.5px solid transparent;transition:opacity .5s var(--e),border-color .5s var(--e);cursor:pointer}
 header nav a:hover,header nav a.act{opacity:1;border-color:var(--champagne)}
 /* champagne reads fine on the header's dark (.on-dark) mode, but not
    against its default translucent-bone background — same low-contrast
@@ -232,7 +232,7 @@ section{position:relative}
    against the equally pale --bone page background these mostly sit
    on. --gold reads clearly there; --champagne already had enough
    contrast on dark sections, so that context keeps it below. */
-.link{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;border-bottom:1.5px solid var(--gold);
+.link{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;border-bottom:2.5px solid var(--gold);
   padding-bottom:4px;color:var(--ink);transition:letter-spacing .6s var(--e),color .4s var(--e)}
 .link:hover{letter-spacing:.38em;color:var(--gold)}
 .dark .link{border-color:var(--champagne)}
@@ -726,7 +726,7 @@ section{position:relative}
 #drawer .d-body{flex:1;overflow-y:auto;padding:22px 26px}
 #drawer .d-foot{border-top:1px solid var(--line-soft);padding:22px 26px}
 .citem{display:grid;grid-template-columns:84px 1fr;gap:16px;padding:16px 0;border-bottom:1px solid var(--line-soft)}
-.citem img{aspect-ratio:3/4;object-fit:cover;background:var(--sand)}
+.citem img{aspect-ratio:3/4;object-fit:contain;background:var(--sand)}
 .citem .ci{display:flex;flex-direction:column;gap:5px}
 .citem .ci .top{display:flex;justify-content:space-between;gap:10px}
 .citem .rm{background:none;border:0;cursor:pointer;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
