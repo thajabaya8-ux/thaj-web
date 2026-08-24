@@ -49,7 +49,11 @@ export default function ShopPage() {
       />
       <section className="wrap" style={{ paddingBottom: 'clamp(70px,11vh,140px)' }}>
         <button className="ftoggle rv" onClick={() => setFiltersOpen((o) => !o)}>{L('Filter & refine', 'فلترة وتحديد')}</button>
-        <div className={`filters rv ${filtersOpen ? 'open' : ''}`}>
+        {/* className stays a static string — .rv's scroll-reveal "in" class
+            is added imperatively by RouteEffects, and a state-dependent
+            className here would make React overwrite that attribute the
+            first time this is toggled, silently hiding the whole panel. */}
+        <div className="filters rv" data-open={filtersOpen || undefined}>
           {frow(L('Collection', 'المجموعة'), 'coll', ['All', ...Object.keys(collections)], (k) => (k === 'All' ? fa('All') : collName(k)))}
           {frow(L('Silhouette', 'السيلويت'), 'sil', uniq('sil'))}
           {frow(L('Fabric', 'الخامة'), 'fabric', uniq('fabric'))}

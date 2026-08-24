@@ -498,11 +498,19 @@ section{position:relative}
 /* overflow-x:auto so a full set of up to 10 thumbnails scrolls
    horizontally instead of overflowing the gallery column/viewport */
 .pdp .gal-thumbs{display:flex;gap:8px;padding:12px;flex:0 0 auto;overflow-x:auto}
-.pdp .gal-thumbs button{width:52px;height:66px;flex:0 0 52px;border:1px solid transparent;padding:0;cursor:pointer;
+.pdp .gal-thumbs button{position:relative;width:52px;height:66px;flex:0 0 52px;border:1px solid transparent;padding:0;cursor:pointer;
   opacity:.5;transition:opacity .25s var(--e),border-color .25s var(--e);background:none}
 .pdp .gal-thumbs button:hover{opacity:.85}
 .pdp .gal-thumbs button.on{opacity:1;border-color:var(--ink)}
 .pdp .gal-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+/* Marks the trousers photo wherever it shows — a small tag on its
+   thumbnail, and a larger one on the main image when it's the one
+   currently displayed — so it's never mistaken for another abaya shot. */
+.gal-pants-tag{position:absolute;left:10px;bottom:10px;z-index:2;font-size:9px;letter-spacing:.2em;
+  text-transform:uppercase;background:var(--emerald-deep);color:var(--on-dark);padding:6px 10px;pointer-events:none}
+[dir="rtl"] .gal-pants-tag{left:auto;right:10px;letter-spacing:.06em}
+.gal-thumbs .gal-pants-tag{left:2px;right:2px;bottom:2px;padding:3px 2px;font-size:6.5px;letter-spacing:.06em;text-align:center}
+[dir="rtl"] .gal-thumbs .gal-pants-tag{right:2px}
 .pdp .info{padding:clamp(34px,5vw,86px);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
 .pdp .info .ed{color:var(--gold);margin-bottom:22px}
 .pdp .info h1{margin-bottom:6px}
@@ -520,16 +528,16 @@ section{position:relative}
 
 .pants-select{position:relative;display:flex;align-items:stretch;border:1px solid var(--line);
   margin-bottom:32px;max-width:460px;overflow:hidden;transition:border-color .5s var(--e)}
-.pants-select.on{border-color:var(--emerald)}
+.pants-select[data-on]{border-color:var(--emerald)}
 .pants-select .ps-img{position:relative;flex:0 0 96px;aspect-ratio:3/4;overflow:hidden;background:var(--sand)}
 .pants-select .ps-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.82);
   transform:scale(1);transition:transform 1.3s var(--e),filter .6s var(--e)}
-.pants-select.on .ps-img img{transform:scale(1.06);filter:saturate(1)}
+.pants-select[data-on] .ps-img img{transform:scale(1.06);filter:saturate(1)}
 .pants-select .ps-check{position:absolute;top:8px;left:8px;width:22px;height:22px;border-radius:50%;
   background:var(--emerald);color:var(--on-dark);display:flex;align-items:center;justify-content:center;
   opacity:0;transform:scale(.35);transition:opacity .4s var(--e),transform .4s var(--e)}
 [dir="rtl"] .pants-select .ps-check{left:auto;right:8px}
-.pants-select.on .ps-check{opacity:1;transform:scale(1)}
+.pants-select[data-on] .ps-check{opacity:1;transform:scale(1)}
 .pants-select .ps-check svg{width:11px;height:11px}
 .pants-select-body{flex:1;min-width:0;padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:7px}
 .ps-row{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
@@ -539,13 +547,13 @@ section{position:relative}
   transition:background .4s var(--e)}
 .ps-switch::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;
   background:var(--bone);box-shadow:0 1px 3px rgba(0,0,0,.22);transition:transform .4s var(--e)}
-.pants-select.on .ps-switch{background:var(--emerald)}
-.pants-select.on .ps-switch::after{transform:translateX(17px)}
+.pants-select[data-on] .ps-switch{background:var(--emerald)}
+.pants-select[data-on] .ps-switch::after{transform:translateX(17px)}
 [dir="rtl"] .ps-switch::after{left:auto;right:2px}
-[dir="rtl"] .pants-select.on .ps-switch::after{transform:translateX(-17px)}
+[dir="rtl"] .pants-select[data-on] .ps-switch::after{transform:translateX(-17px)}
 .ps-price{font-family:var(--display);font-size:14px;letter-spacing:.02em;color:var(--ink-faint);
   transition:color .4s var(--e)}
-.pants-select.on .ps-price{color:var(--emerald)}
+.pants-select[data-on] .ps-price{color:var(--emerald)}
 .ps-note{font-size:10.5px;color:var(--ink-faint);letter-spacing:.01em}
 
 /* ============ DEPOSIT CHECKOUT (Vodafone Cash / InstaPay) ============ */
@@ -913,7 +921,7 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   .frow{grid-template-columns:1fr;gap:10px}
   .ftoggle{display:block}
   .filters{display:none;border-top:0}
-  .filters.open{display:block}
+  .filters[data-open]{display:block}
   .arch-row{grid-template-columns:52px 1fr auto;gap:14px}
   .arch-row .hide-m{display:none}
   .acct{grid-template-columns:1fr}

@@ -28,8 +28,19 @@ export default function ProductPage() {
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
   const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
-  const gallery = p.images.length ? p.images : [p.img];
-  const activeImg = gallery[active] || p.img;
+  // The trousers photo (if any) rides along at the end of the same
+  // gallery, tagged, instead of only ever living inside the small
+  // pants-select thumbnail — so it's browsable/swipeable like any other
+  // product shot, but always clearly labelled as trousers, not confused
+  // for another abaya photo.
+  const galleryImgs = p.images.length ? p.images : [p.img];
+  const gallery = [
+    ...galleryImgs.map((img) => ({ img, isPants: false })),
+    ...(p.pantsImg ? [{ img: p.pantsImg, isPants: true }] : [])
+  ];
+  const activeItem = gallery[active] || gallery[0];
+  const activeImg = activeItem?.img || p.img;
+  const activeIsPants = !!activeItem?.isPants;
   // Out of real stock overrides whatever the admin last set availability
   // to, without touching that stored value — restocking brings it back.
   const soldOut = p.av === 'Sold Out' || availableStock(p) <= 0;
@@ -67,7 +78,8 @@ export default function ProductPage() {
       <section className="pdp">
         <div className="gal">
           <div className="gal-main" onPointerDown={onGalPointerDown} onPointerUp={onGalPointerUp}>
-            <img src={`/${activeImg}`} alt={pName(p)} />
+            <img src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} />
+            {activeIsPants && <span className="gal-pants-tag">{L('Trousers', 'البنطلون')}</span>}
             {gallery.length > 1 && (
               <>
                 <button type="button" className="gal-arrow prev" onClick={() => goGal(-1)} aria-label={L('Previous photo', 'الصورة السابقة')}>‹</button>
@@ -77,9 +89,10 @@ export default function ProductPage() {
           </div>
           {gallery.length > 1 && (
             <div className="gal-thumbs">
-              {gallery.map((img, i) => (
-                <button key={img + i} type="button" className={i === active ? 'on' : ''} onClick={() => setActive(i)}>
-                  <img src={`/${img}`} alt="" />
+              {gallery.map((g, i) => (
+                <button key={g.img + i} type="button" className={i === active ? 'on' : ''} onClick={() => setActive(i)}>
+                  <img src={`/${g.img}`} alt="" />
+                  {g.isPants && <span className="gal-pants-tag">{L('Trousers', 'بنطلون')}</span>}
                 </button>
               ))}
             </div>
@@ -108,7 +121,13 @@ export default function ProductPage() {
               moment this is tapped. */}
           {p.pantsImg && (
             <>
-              <div className={`rv pants-select${withPants ? ' on' : ''}`}>
+              {/* className stays a static string on purpose — see the
+                  .filters fix in app/(site)/shop/page.tsx for why: .rv's
+                  reveal "in" class is added imperatively by RouteEffects,
+                  and a state-dependent className here made React overwrite
+                  that attribute the moment this was toggled, so the whole
+                  card snapped back to invisible right as it was tapped. */}
+              <div className="rv pants-select" data-on={withPants || undefined}>
                 <div className="ps-img">
                   <img src={`/${p.pantsImg}`} alt="" />
                   <span className="ps-check">
