@@ -75,7 +75,13 @@ export async function destroySession() {
 
 export async function getSession(): Promise<SessionPayload | null> {
   const store = await cookies();
-  const token = store.get(SESSION_COOKIE)?.value;
+  return verifySessionToken(store.get(SESSION_COOKIE)?.value);
+}
+
+// Same verification, exposed directly for proxy.ts — it reads the cookie
+// off the NextRequest itself (request.cookies), not next/headers' cookies()
+// which is scoped to Server Components/Route Handlers/Server Actions.
+export function verifySessionToken(token: string | undefined): SessionPayload | null {
   if (!token) return null;
   return decode(token);
 }

@@ -38,7 +38,6 @@ export default function MobileMenu() {
           <Link href="/archive" onClick={closeMenu}>{L('Archive', 'الأرشيف')}</Link>
           <Link href="/account" onClick={closeMenu}>{L('My THAJ', 'حسابي')}</Link>
           <Link href="/wishlist" onClick={closeMenu}>{L('My Archive', 'أرشيفي')}</Link>
-          <Link href="/room" onClick={closeMenu}>{L('Control Room', 'غرفة التحكم')}</Link>
         </div>
       </div>
     </>

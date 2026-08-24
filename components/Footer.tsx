@@ -40,7 +40,6 @@ export default function Footer() {
             <Link className="fl" href="/private">{L('Private appointment', 'موعد خاص')}</Link>
             <Link className="fl" href="/account">{L('My THAJ', 'حسابي')}</Link>
             <Link className="fl" href="/wishlist">{L('My archive', 'أرشيفي')}</Link>
-            <Link className="fl" href="/room">{L('Control room', 'غرفة التحكم')}</Link>
           </div>
           <div className="fcol">
             <h5>{L('Contact', 'تواصل')}</h5>
