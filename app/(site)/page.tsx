@@ -48,7 +48,7 @@ export default function HomePage() {
               <p>{L(`${num(pieces.length)} pieces, catalogued and editioned. Cut in Riyadh, washed three times, and finished by hand before they are named.`, `${num(pieces.length)} قطعة، مفهرسة ومرقّمة. تُقص في الرياض، وتُغسل ثلاث مرات، وتُنهى باليد قبل أن تُسمّى.`)}</p>
               <div className="hm-cta">
                 <Link className="btn" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link>
-                <Link className="btn" href="/collections/signature">{L('See the chapter', 'شوفي الفصل')}</Link>
+                <Link className="btn" href={Object.keys(collections)[0] ? `/collections/${Object.keys(collections)[0]}` : '/collections'}>{L('See the chapter', 'شوفي الفصل')}</Link>
               </div>
             </div>
           </div>

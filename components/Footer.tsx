@@ -34,8 +34,6 @@ export default function Footer() {
             <h5>{L('Shop', 'المتجر')}</h5>
             <Link className="fl" href="/shop">{L('All pieces', 'كل القطع')}</Link>
             <Link className="fl" href="/collections">{L('Collections', 'المجموعات')}</Link>
-            <Link className="fl" href="/collections/signature">{L('Signature', 'التوقيع')}</Link>
-            <Link className="fl" href="/collections/resort">{L('Resort 26', 'مصيف ٢٦')}</Link>
           </div>
           <div className="fcol">
             <h5>{L('Client', 'العميلة')}</h5>

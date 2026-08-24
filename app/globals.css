@@ -473,11 +473,12 @@ section{position:relative}
 .fopts button:hover{color:var(--ink-soft)}
 .fopts button.on{color:var(--ink);border-color:var(--gold)}
 .shopbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;flex-wrap:wrap;margin-bottom:20px}
-.grid-shop{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(18px,2.4vw,42px);grid-auto-flow:dense}
-.grid-shop .card{grid-column:span 3}
-.grid-shop .card:nth-child(7n+1){grid-column:span 5}
-.grid-shop .card:nth-child(7n+4){grid-column:span 4;margin-top:clamp(20px,4vw,70px)}
-.grid-shop .card:nth-child(7n+6){grid-column:span 4}
+/* auto-fill/minmax instead of the old fixed-count 12-column positional
+   pattern (span-3 with nth-child overrides every 7th item) — that only
+   ever composed correctly for exactly eleven unfiltered pieces, and fell
+   apart the moment a filter changed the count. This reflows cleanly at
+   any count, with no separate breakpoint overrides needed. */
+.grid-shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(26px,3vw,54px)}
 .empty{grid-column:1/13;padding:80px 0;text-align:center}
 
 /* ============ PRODUCT ============ */
@@ -916,7 +917,6 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   header nav{display:none}
 }
 @media(max-width:1080px){
-  .grid-shop .card,.grid-shop .card:nth-child(7n+1),.grid-shop .card:nth-child(7n+4),.grid-shop .card:nth-child(7n+6){grid-column:span 4;margin-top:0}
   .c-1,.c-2,.c-3,.c-4{grid-column:span 6;margin-top:0}
   .ed-head h2{grid-column:2/13}
   .ed-head .aside{grid-column:1/13;margin-top:16px}
@@ -950,7 +950,6 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   header .util .u-hide{display:none}
   .burger{display:flex}
   header .brand{margin-right:auto}
-  .grid-shop .card,.grid-shop .card:nth-child(7n+1),.grid-shop .card:nth-child(7n+4),.grid-shop .card:nth-child(7n+6){grid-column:span 6}
   .c-1,.c-2,.c-3,.c-4{grid-column:span 12}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}

@@ -9,10 +9,13 @@ const SORT_OPTS: [string, string, string][] = [['featured', 'Featured', 'الم�
   ['price-high', 'Price high', 'السعر تنازلي'], ['name', 'Name', 'الاسم']];
 
 export default function ShopPage() {
-  const { L, fa, collName, pieces, collections, sort, setSort, facets, setFacets, pName } = useSite();
+  const { L, num, fa, collName, pieces, collections, sort, setSort, facets, setFacets, pName } = useSite();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const uniq = (k: keyof Piece) => ['All', ...new Set(pieces.map((p) => p[k]))];
+  // Pieces with that field left blank must not add a blank, unlabelled
+  // filter button — it still renders (padding, hover underline) with
+  // nothing inside it, which is exactly what read as stray "lines".
+  const uniq = (k: keyof Piece) => ['All', ...new Set(pieces.map((p) => p[k]).filter((v) => typeof v === 'string' && v.trim()))];
 
   const filtered = useMemo(() => {
     let r = pieces.filter((p) =>
@@ -44,7 +47,7 @@ export default function ShopPage() {
     <>
       <Mast
         label={L('The Shop', 'المتجر')}
-        title={L('Eleven pieces', 'إحدى عشرة قطعة')}
+        title={L(`${num(pieces.length)} pieces`, `${num(pieces.length)} قطعة`)}
         desc={L('Filter by chapter, silhouette, fabric, colour or occasion. Every piece is editioned and numbered.', 'فلتري حسب الفصل أو السيلويت أو الخامة أو اللون أو المناسبة. كل قطعة مرقّمة بإصدار.')}
       />
       <section className="wrap" style={{ paddingBottom: 'clamp(70px,11vh,140px)' }}>

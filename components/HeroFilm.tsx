@@ -41,7 +41,7 @@ function HfFillCurrent({ reduced }: { reduced: boolean }) {
 }
 
 export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
-  const { L, esc, pName, money, settings } = useSite();
+  const { L, esc, pName, money, settings, collections } = useSite();
   const router = useRouter();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -175,7 +175,7 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
         <h1 className="hf-title">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
         <div className="hf-cta">
           <Link className="btn hf-btn" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link>
-          <Link className="btn hf-btn" href="/collections/signature">{L('See the chapter', 'شوفي الفصل')}</Link>
+          <Link className="btn hf-btn" href={Object.keys(collections)[0] ? `/collections/${Object.keys(collections)[0]}` : '/collections'}>{L('See the chapter', 'شوفي الفصل')}</Link>
         </div>
       </div>
 
