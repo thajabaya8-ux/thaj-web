@@ -483,13 +483,12 @@ section{position:relative}
 
 /* ============ PRODUCT ============ */
 .pdp{display:grid;grid-template-columns:1fr 1fr}
-/* Sized by the photo's own proportions (the same 3/4 every product card
-   already crops to — see .card .frame) instead of forced to fill 100vh,
-   so object-fit:cover never has to letterbox a mismatched box: no empty
-   mat on either side, and no more cropping than the rest of the site
-   already does with the same photos. */
+/* Sized by a fixed portrait ratio (a touch shorter than the 3/4 every
+   product card crops to — see .card .frame — so the box itself reads
+   smaller) instead of forced to fill 100vh, so object-fit:cover never
+   has to letterbox a mismatched box: no empty mat on either side. */
 .pdp .gal{background:var(--sand);position:sticky;top:var(--nav-h);display:flex;flex-direction:column}
-.pdp .gal-main{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;touch-action:pan-y}
+.pdp .gal-main{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;touch-action:pan-y}
 .pdp .gal-main img{width:100%;height:100%;object-fit:cover;display:block}
 .gal-arrow{position:absolute;top:50%;translate:0 -50%;z-index:5;width:46px;height:46px;border-radius:50%;
   border:1px solid var(--line);background:rgba(231,237,199,.86);backdrop-filter:blur(6px);
