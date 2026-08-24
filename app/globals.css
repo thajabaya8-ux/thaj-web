@@ -477,13 +477,14 @@ section{position:relative}
 
 /* ============ PRODUCT ============ */
 .pdp{display:grid;grid-template-columns:1fr 1fr}
-.pdp .gal{background:var(--sand);position:sticky;top:var(--nav-h);height:100vh;display:flex;flex-direction:column}
-/* object-fit:contain (not cover) so the whole photo shows on desktop instead
-   of being cropped to fill the box — the sand background behind it reads as
-   a deliberate mat, not empty space. Mobile keeps the old cropped behaviour
-   below, since that's not what was reported as broken. */
-.pdp .gal-main{position:relative;flex:1;min-height:0;overflow:hidden;touch-action:pan-y}
-.pdp .gal-main img{width:100%;height:100%;object-fit:contain;display:block;background:var(--sand)}
+/* Sized by the photo's own proportions (the same 3/4 every product card
+   already crops to — see .card .frame) instead of forced to fill 100vh,
+   so object-fit:cover never has to letterbox a mismatched box: no empty
+   mat on either side, and no more cropping than the rest of the site
+   already does with the same photos. */
+.pdp .gal{background:var(--sand);position:sticky;top:var(--nav-h);display:flex;flex-direction:column}
+.pdp .gal-main{position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;touch-action:pan-y}
+.pdp .gal-main img{width:100%;height:100%;object-fit:cover;display:block}
 .gal-arrow{position:absolute;top:50%;translate:0 -50%;z-index:5;width:46px;height:46px;border-radius:50%;
   border:1px solid var(--line);background:rgba(231,237,199,.86);backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--display);
@@ -913,9 +914,7 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   .c-1,.c-2,.c-3,.c-4{grid-column:span 12}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
-  .pdp .gal{position:static;height:auto}
-  .pdp .gal-main{height:auto;aspect-ratio:3/4}
-  .pdp .gal-main img{height:100%;object-fit:cover}
+  .pdp .gal{position:static}
   .gal-arrow{display:none}
   .pdp .info{min-height:auto;padding:34px 22px 60px}
   .frow{grid-template-columns:1fr;gap:10px}
