@@ -156,6 +156,10 @@ header nav{display:flex;gap:clamp(12px,1.6vw,30px);margin-right:auto;align-items
 header nav a{font-size:clamp(11.5px,.85vw,14px);letter-spacing:.12em;text-transform:uppercase;color:inherit;opacity:.82;
   white-space:nowrap;padding:10px 0;border-bottom:1px solid transparent;transition:opacity .5s var(--e),border-color .5s var(--e);cursor:pointer}
 header nav a:hover,header nav a.act{opacity:1;border-color:var(--champagne)}
+/* champagne reads fine on the header's dark (.on-dark) mode, but not
+   against its default translucent-bone background — same low-contrast
+   issue as .link above */
+header:not(.on-dark) nav a:hover,header:not(.on-dark) nav a.act{border-color:var(--gold)}
 header .util{display:flex;gap:clamp(10px,1.2vw,20px);align-items:center;flex-shrink:0}
 /* Search, Saved, Selection, Admin Panel/Login and the language toggle all
    live in the menu drawer's own utility row (see #menu .m-util) — the
@@ -224,9 +228,15 @@ section{position:relative}
 .btn.wide{width:100%;text-align:center}
 .dark .btn{border-color:var(--on-dark-line)}
 .dark .btn:hover{border-color:var(--on-dark)}
-.link{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;border-bottom:1px solid var(--champagne);
-  padding-bottom:4px;transition:letter-spacing .6s var(--e)}
-.link:hover{letter-spacing:.38em}
+/* Was var(--champagne) — a pale, low-contrast tan barely readable
+   against the equally pale --bone page background these mostly sit
+   on. --gold reads clearly there; --champagne already had enough
+   contrast on dark sections, so that context keeps it below. */
+.link{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;cursor:pointer;border-bottom:1.5px solid var(--gold);
+  padding-bottom:4px;color:var(--ink);transition:letter-spacing .6s var(--e),color .4s var(--e)}
+.link:hover{letter-spacing:.38em;color:var(--gold)}
+.dark .link{border-color:var(--champagne)}
+.dark .link:hover{color:var(--champagne)}
 
 /* ============ HOME HERO ============ */
 .bleed{margin-top:calc(-1 * var(--nav-h))}
@@ -486,7 +496,13 @@ section{position:relative}
    even 1fr/1fr) — asked twice to make the product photo read smaller;
    narrowing its column shrinks it in both directions at once, since
    .gal-main's height is a ratio of its own width. */
-.pdp{display:grid;grid-template-columns:.8fr 1.2fr}
+/* align-items:start (grid's default is stretch) — the two columns are no
+   longer meant to match a shared 100vh, so each sizes to its own content:
+   .gal to the (now capped, smaller) photo + thumbs, .info to whatever its
+   text actually needs. Without this, grid stretch was forcing .gal's own
+   box to the height of .info's much taller content, leaving a visible gap
+   of empty sand-coloured space below the thumbnails. */
+.pdp{display:grid;grid-template-columns:.8fr 1.2fr;align-items:start}
 /* Sized by a fixed portrait ratio (a touch shorter than the 3/4 every
    product card crops to — see .card .frame — so the box itself reads
    smaller) instead of forced to fill 100vh, so object-fit:cover never
@@ -526,7 +542,7 @@ section{position:relative}
 [dir="rtl"] .gal-pants-tag{left:auto;right:10px;letter-spacing:.06em}
 .gal-thumbs .gal-pants-tag{left:2px;right:2px;bottom:2px;padding:3px 2px;font-size:6.5px;letter-spacing:.06em;text-align:center}
 [dir="rtl"] .gal-thumbs .gal-pants-tag{right:2px}
-.pdp .info{padding:clamp(34px,5vw,86px);display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+.pdp .info{padding:clamp(34px,5vw,86px);display:flex;flex-direction:column;justify-content:center}
 .pdp .info .ed{color:var(--gold);margin-bottom:22px}
 .pdp .info h1{margin-bottom:6px}
 .pdp .info .arn{font-family:var(--ar);font-size:clamp(19px,2.3vw,28px);color:var(--ink-faint);direction:rtl;margin-bottom:26px;width:max-content}
