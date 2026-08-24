@@ -482,7 +482,11 @@ section{position:relative}
 .empty{grid-column:1/13;padding:80px 0;text-align:center}
 
 /* ============ PRODUCT ============ */
-.pdp{display:grid;grid-template-columns:1fr 1fr}
+/* The image column is narrower than the info column on purpose (was an
+   even 1fr/1fr) — asked twice to make the product photo read smaller;
+   narrowing its column shrinks it in both directions at once, since
+   .gal-main's height is a ratio of its own width. */
+.pdp{display:grid;grid-template-columns:.8fr 1.2fr}
 /* Sized by a fixed portrait ratio (a touch shorter than the 3/4 every
    product card crops to — see .card .frame — so the box itself reads
    smaller) instead of forced to fill 100vh, so object-fit:cover never
