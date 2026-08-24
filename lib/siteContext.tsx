@@ -17,6 +17,12 @@ import type {
 import { trackPixel, trackPurchase } from '@/lib/pixel';
 
 type Lang = 'en' | 'ar';
+
+// Shared with lib/adminContext.tsx — the site and the admin panel are
+// separate route trees (never mounted together) with their own language
+// state, so this is how one's choice reaches the other: whichever was
+// changed most recently, written here, is what the other reads on mount.
+const LANG_KEY = 'thaj-lang';
 type AuthRole = 'admin' | 'customer' | null | undefined; // undefined = still checking
 
 const ESC_MAP: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -159,6 +165,18 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
 
+  // Picks up a language choice made in the admin panel (or a previous
+  // visit) on mount. Deferred to an effect rather than read into the
+  // initial state, since the server always renders the 'en' default and
+  // reading localStorage synchronously there would mismatch it.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (saved === 'ar' || saved === 'en') setLangState(saved);
+    } catch { /* localStorage unavailable — keep the default */ }
+  }, []);
+
   // Admin-editable rate (Settings → "Egyptian pounds per 1 Saudi riyal"),
   // with a sane fallback if it's never been set. Each piece is priced (and
   // shown) in its own fixed currency, set by the admin — this rate only
@@ -209,7 +227,10 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     return p ? `${pName(p)} · ${esc(it.size)}` : esc(it.size);
   }).join(L(', ', '، ')), [byId, pName, L]);
 
-  const setLang = useCallback((l: Lang) => setLangState((cur) => (cur === l ? cur : l)), []);
+  const setLang = useCallback((l: Lang) => {
+    setLangState((cur) => (cur === l ? cur : l));
+    try { localStorage.setItem(LANG_KEY, l); } catch { /* best-effort */ }
+  }, []);
 
   const toast = useCallback((m: string) => {
     setToastMsg(m);

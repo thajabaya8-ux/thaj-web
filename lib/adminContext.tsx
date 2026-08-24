@@ -34,6 +34,12 @@ export async function api(path: string, opts?: RequestInit) {
 
 type Lang = 'en' | 'ar';
 
+// Shared with lib/siteContext.tsx — see the comment there. The site and
+// admin are separate route trees with their own language state; this is
+// how the admin panel opens in whatever language the site was last set
+// to (and vice versa).
+const LANG_KEY = 'thaj-lang';
+
 interface AdminContextValue {
   me: AdminUser | null | undefined; // undefined = still checking, null = logged out (or not an admin)
   logout: () => Promise<void>;
@@ -56,12 +62,26 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   const AR = useCallback(() => lang === 'ar', [lang]);
   const L = useCallback(<T,>(e?: T, a?: T) => ((lang === 'ar' ? a : e) as T), [lang]);
-  const setLang = useCallback((l: Lang) => setLangState((cur) => (cur === l ? cur : l)), []);
+  const setLang = useCallback((l: Lang) => {
+    setLangState((cur) => (cur === l ? cur : l));
+    try { localStorage.setItem(LANG_KEY, l); } catch { /* best-effort */ }
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
+
+  // Opens in whatever language the site (or a previous admin visit) was
+  // last set to. Deferred to an effect, not the initial state, since the
+  // server always renders the 'en' default.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (saved === 'ar' || saved === 'en') setLangState(saved);
+    } catch { /* localStorage unavailable — keep the default */ }
+  }, []);
 
   const refreshMe = useCallback(async () => {
     try {

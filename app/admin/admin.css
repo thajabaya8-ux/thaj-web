@@ -34,6 +34,12 @@ body{background:var(--bone-2)}
 .adm-side .logout{margin-top:12px;background:none;border:0;color:var(--champagne);cursor:pointer;
   font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;text-align:left;padding:0}
 
+/* mobile top bar + off-canvas panel — hidden entirely above 820px, where
+   .adm-side already shows in full as the always-visible sidebar */
+.adm-mbar{display:none}
+.adm-menu-scrim{display:none}
+.adm-menu-close{display:none}
+
 .adm-main{flex:1;min-width:0;padding:clamp(28px,4vw,54px);max-width:1240px}
 .adm-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:14px}
 .adm-head h1{font-family:var(--display);font-weight:400;font-size:clamp(24px,2.6vw,36px)}
@@ -92,9 +98,33 @@ body{background:var(--bone-2)}
 
 @media(max-width:820px){
   #shell{flex-direction:column}
-  .adm-side{width:100%;flex:none;height:auto;position:static;padding:20px}
-  .adm-side nav{flex-direction:row;flex-wrap:wrap;gap:14px}
-  .adm-side nav a{border-bottom:0;padding:4px 0}
+
+  .adm-mbar{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;background:var(--emerald-deep);position:sticky;top:0;z-index:130}
+  .adm-mbar .brand img{height:30px}
+  .adm-burger{display:flex;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer;
+    padding:10px 4px;-webkit-tap-highlight-color:transparent}
+  .adm-burger i{display:block;width:22px;height:1.5px;background:var(--on-dark)}
+
+  .adm-menu-scrim{display:block;position:fixed;inset:0;z-index:135;background:rgba(4,45,41,.46);
+    backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .5s var(--e),visibility .5s}
+  .adm-menu-scrim.open{opacity:1;visibility:visible}
+
+  /* off-canvas: fixed, slid out of view, slides in on .open — same
+     mechanics as the site's own #menu panel */
+  .adm-side{position:fixed;top:0;right:0;bottom:0;left:auto;width:min(300px,86vw);height:100vh;
+    flex:none;z-index:140;padding:26px 22px;overflow-y:auto;
+    transform:translateX(102%);transition:transform .5s var(--e);box-shadow:-30px 0 70px rgba(0,0,0,.28)}
+  .adm-side.open{transform:none}
+  [dir="rtl"] .adm-side{right:auto;left:0;transform:translateX(-102%);box-shadow:30px 0 70px rgba(0,0,0,.28)}
+  [dir="rtl"] .adm-side.open{transform:none}
+  .adm-side > .brand{margin-top:8px}
+  .adm-menu-close{display:block;position:absolute;top:24px;right:22px;background:none;border:0;
+    color:var(--champagne);cursor:pointer;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+    padding:0;opacity:.85;transition:opacity .3s}
+  .adm-menu-close:hover{opacity:1}
+  [dir="rtl"] .adm-menu-close{right:auto;left:22px}
+
   .adm-main{max-width:100%}
   .split{grid-template-columns:1fr !important}
 }
