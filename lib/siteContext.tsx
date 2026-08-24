@@ -106,7 +106,7 @@ interface SiteContextValue {
   coStep: number;
   setCoStep: React.Dispatch<React.SetStateAction<number>>;
   uploadReceipt: (file: File) => Promise<string | null>;
-  submitOrder: (paymentMethod: PaymentMethod, receiptKey: string) => Promise<Order | null>;
+  submitOrder: (paymentMethod: PaymentMethod, receiptKey: string, govName?: string, govNameAr?: string) => Promise<Order | null>;
   submitAppointment: (data: Record<string, string>) => Promise<boolean>;
   submitReview: (pieceId: string, data: { name: string; email?: string; message: string }) => Promise<boolean>;
   acctTab: string;
@@ -331,7 +331,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     }
   }, [L, toast]);
 
-  const submitOrder = useCallback(async (paymentMethod: PaymentMethod, receiptKey: string) => {
+  const submitOrder = useCallback(async (paymentMethod: PaymentMethod, receiptKey: string, govName?: string, govNameAr?: string) => {
     const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q, withPants: !!c.withPants }));
     const name = [coData.fn, coData.ln].filter(Boolean).join(' ');
     const shipping = {
@@ -349,6 +349,19 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
       created = body as Order;
       setOrders((cur) => [created!, ...cur]);
       trackPurchase(created);
+      // The order-tracking-by-number API deliberately strips name/phone/
+      // shipping (it's a public bearer-token lookup, not just this
+      // customer's own view) — so the printable waybill on the confirm
+      // page reads its details from here instead: this is the one moment
+      // this browser tab legitimately still has them, right after typing
+      // them in. sessionStorage, not localStorage — gone once the tab
+      // closes, and never touches the server.
+      try {
+        sessionStorage.setItem('thaj-last-order-shipping', JSON.stringify({
+          orderNumber: created.n, name: shipping.name, phone: shipping.phone,
+          govName, govNameAr, city: shipping.city, address: shipping.address, notes: shipping.notes
+        }));
+      } catch { /* best-effort */ }
     } catch (err) {
       toast(err instanceof Error && err.message !== 'order failed' ? err.message : L('Could not reach the server — order not saved.', 'معرفناش نوصل للسيرفر — الطلب ما اتسجّلش.'));
     }

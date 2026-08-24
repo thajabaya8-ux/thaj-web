@@ -649,6 +649,34 @@ section{position:relative}
 .ts-row.now .ts-label{color:var(--ink);font-weight:600}
 [dir="rtl"] .ts-row::before{left:auto;right:5px}
 
+/* ---- WhatsApp confirmation prompt ---- */
+.wa-cta{border:1px solid var(--line);background:var(--bone-2);padding:24px 26px;margin-top:8px}
+.wa-cta > p:first-child{margin-bottom:16px;color:var(--ink)}
+.wa-cta .btn{background:#25D366;border-color:#25D366;color:#fff}
+.wa-cta .btn:hover{background:#1EBE5A;border-color:#1EBE5A}
+
+/* ---- printable shipping waybill ---- */
+.waybill{border:1px solid var(--line);padding:26px 28px;max-width:460px}
+.wb-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);
+  padding-bottom:14px;margin-bottom:16px}
+.wb-brand{font-family:var(--display);font-size:20px;letter-spacing:.04em}
+.wb-num{font-family:var(--display);font-size:13px;color:var(--ink-faint)}
+.wb-row{display:flex;justify-content:space-between;gap:18px;padding:8px 0;border-bottom:1px solid var(--line-soft);
+  font-size:12.5px}
+.wb-row span{color:var(--ink-faint);flex:0 0 auto}
+.wb-row b{font-family:var(--display);font-weight:400;text-align:end}
+.wb-cod{border-bottom:0;padding-top:14px}
+.wb-cod span{color:var(--ink);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.wb-cod b{color:var(--emerald);font-size:17px}
+
+@media print{
+  header,footer,.social-fab,#toast,.wa-cta,.no-print{display:none !important}
+  body{background:#fff}
+  main{padding-top:0 !important}
+  .waybill{border-color:#000;max-width:none}
+  .wb-row,.wb-head{border-color:#ccc}
+}
+
 .sizes{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 8px}
 .sizes button{background:none;border:1px solid var(--line);cursor:pointer;padding:13px 19px;font-size:10px;letter-spacing:.16em;
   transition:all .5s var(--e)}
@@ -821,6 +849,9 @@ footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 [dir="rtl"] .ps-label{font-size:16px}
 [dir="rtl"] .ps-price{font-size:17px}
 [dir="rtl"] .ps-note{font-size:13px;letter-spacing:0}
+[dir="rtl"] .wb-row{font-size:15.5px}
+[dir="rtl"] .wb-cod span{font-size:13.5px;letter-spacing:0}
+[dir="rtl"] .wb-cod b{font-size:19px}
 [dir="rtl"] .arch-row .th{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] .arch-row .nm i{font-size:16px}
 [dir="rtl"] .pill{font-size:13px;letter-spacing:0;padding:7px 12px}

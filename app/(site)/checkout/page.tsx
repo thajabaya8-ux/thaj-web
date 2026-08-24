@@ -111,7 +111,7 @@ export default function CheckoutPage() {
     if (!receiptKey) { toast(L('Upload your transfer receipt to continue', 'ارفعي صورة إيصال التحويل عشان تكمّلي')); return; }
 
     setSubmitting(true);
-    const order = await submitOrder(method, receiptKey);
+    const order = await submitOrder(method, receiptKey, selectedGov?.name, selectedGov?.nameAr);
     setSubmitting(false);
     if (order) router.push(`/checkout/confirm?order=${encodeURIComponent(order.n)}`);
   };
