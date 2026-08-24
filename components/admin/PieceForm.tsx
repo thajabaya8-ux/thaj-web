@@ -107,7 +107,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         <div className="field"><label>{L('Description (EN)', 'الوصف (إنجليزي)')}</label><textarea name="d" defaultValue={v('d')} /></div>
         <div className="field"><label>{L('Description (AR)', 'الوصف (عربي)')}</label><textarea name="dAr" defaultValue={v('dAr')} /></div>
       </div>
-      <MultiImageUpload value={images} onChange={setImages} label={L('Piece photos (up to 5 — first is the cover)', 'صور القطعة (لغاية 5 — أول صورة هي الغلاف)')} />
+      <MultiImageUpload value={images} onChange={setImages} label={L('Piece photos (up to 10 — first is the cover)', 'صور القطعة (لغاية 10 — أول صورة هي الغلاف)')} />
 
       <div className="adm-pants">
         <label className="adm-pants-toggle">

@@ -2,7 +2,7 @@
 import { useRef, useState } from 'react';
 import { abs, useAdmin } from '@/lib/adminContext';
 
-const MAX = 5;
+const MAX = 10;
 
 export default function MultiImageUpload({ value, onChange, label, max = MAX }: {
   value: string[]; onChange: (images: string[]) => void; label?: string; max?: number;

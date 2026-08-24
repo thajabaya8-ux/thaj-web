@@ -32,14 +32,14 @@ export async function POST(req: Request) {
   if (!(await collectionExists(b.coll))) return NextResponse.json({ error: 'Unknown collection' }, { status: 400 });
   if (b.av !== undefined && b.av !== '' && !AVAILABILITY.includes(b.av)) return NextResponse.json({ error: 'Invalid availability value' }, { status: 400 });
   if (b.currency !== undefined && b.currency !== '' && !CURRENCIES.includes(b.currency)) return NextResponse.json({ error: 'currency must be SAR or EGP' }, { status: 400 });
-  if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 5)) {
-    return NextResponse.json({ error: 'images must be an array of at most 5 photos' }, { status: 400 });
+  if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 10)) {
+    return NextResponse.json({ error: 'images must be an array of at most 10 photos' }, { status: 400 });
   }
 
   const existing = await sql`SELECT 1 FROM pieces WHERE id = ${b.id}`;
   if (existing.length) return NextResponse.json({ error: 'A piece with that id already exists' }, { status: 409 });
 
-  const images = strArray(b.images, 5, 300);
+  const images = strArray(b.images, 10, 300);
   const pantsImg = str(b.pantsImg, 300) || null;
   const pantsPrice = pantsImg ? nonNegativeInt(b.pantsPrice) : null;
   const price = nonNegativeInt(b.price);

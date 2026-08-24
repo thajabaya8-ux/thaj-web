@@ -31,11 +31,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (b.coll !== undefined && !(await collectionExists(b.coll))) return NextResponse.json({ error: 'Unknown collection' }, { status: 400 });
   if (b.av !== undefined && b.av !== '' && !AVAILABILITY.includes(b.av)) return NextResponse.json({ error: 'Invalid availability value' }, { status: 400 });
   if (b.currency !== undefined && b.currency !== '' && !CURRENCIES.includes(b.currency)) return NextResponse.json({ error: 'currency must be SAR or EGP' }, { status: 400 });
-  if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 5)) {
-    return NextResponse.json({ error: 'images must be an array of at most 5 photos' }, { status: 400 });
+  if (b.images !== undefined && (!Array.isArray(b.images) || b.images.length > 10)) {
+    return NextResponse.json({ error: 'images must be an array of at most 10 photos' }, { status: 400 });
   }
 
-  const nextImages = b.images !== undefined ? strArray(b.images, 5, 300) : parseArr(existing.images);
+  const nextImages = b.images !== undefined ? strArray(b.images, 10, 300) : parseArr(existing.images);
   const nextPantsImg = b.pantsImg !== undefined ? (str(b.pantsImg, 300) || null) : existing.pants_image;
   const nextPantsPrice = b.pantsImg !== undefined
     ? (nextPantsImg ? nonNegativeInt(b.pantsPrice, existing.pants_price ?? 0) : null)
