@@ -92,16 +92,7 @@ export default function ProductPage() {
           {onSale && !p.pantsImg && (
             <div className="lbl rv" style={{ color: 'var(--emerald)', marginBottom: 6 }}>−{pct}% {L('off', 'خصم')}</div>
           )}
-          {p.pantsImg ? (
-            <div className="rv price-breakdown">
-              <div className="pb-row">
-                <span>{L('Abaya', 'العباية')}</span>
-                <b>{onSale ? (<><span className="price-strike">{money(p.price, p.currency)}</span> {money(p.salePrice!, p.currency)}</>) : money(p.price, p.currency)}</b>
-              </div>
-              {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{money(p.pantsPrice || 0, p.currency)}</b></div>}
-              <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{money(total, p.currency)}</b></div>
-            </div>
-          ) : (
+          {!p.pantsImg && (
             <div className="price rv">
               {onSale ? (<><span className="price-strike">{money(p.price, p.currency)}</span> <span className="price-sale">{money(p.salePrice!, p.currency)}</span></>) : money(p.price, p.currency)}
             </div>
@@ -109,24 +100,38 @@ export default function ProductPage() {
 
           <p className="body desc rv">{esc(L(p.d, p.dAr))}</p>
 
+          {/* Kept together, in this order, on purpose: toggling trousers
+              here immediately changes the price breakdown right below it,
+              not a block further up the page that scrolls out of view the
+              moment this is tapped. */}
           {p.pantsImg && (
-            <div className={`rv pants-select${withPants ? ' on' : ''}`}>
-              <div className="ps-img">
-                <img src={`/${p.pantsImg}`} alt="" />
-                <span className="ps-check">
-                  <svg viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                </span>
+            <>
+              <div className={`rv pants-select${withPants ? ' on' : ''}`}>
+                <div className="ps-img">
+                  <img src={`/${p.pantsImg}`} alt="" />
+                  <span className="ps-check">
+                    <svg viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </span>
+                </div>
+                <div className="pants-select-body">
+                  <label className="ps-row">
+                    <span className="ps-label">{L('Add matching trousers', 'أضيفي البنطلون المطابق')}</span>
+                    <input type="checkbox" className="ps-input" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
+                    <span className="ps-switch" />
+                  </label>
+                  <div className="ps-price">{money(p.pantsPrice || 0, p.currency)}</div>
+                  <p className="ps-note">{L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}</p>
+                </div>
               </div>
-              <div className="pants-select-body">
-                <label className="ps-row">
-                  <span className="ps-label">{L('Add matching trousers', 'أضيفي البنطلون المطابق')}</span>
-                  <input type="checkbox" className="ps-input" checked={withPants} onChange={(e) => setWithPants(e.target.checked)} />
-                  <span className="ps-switch" />
-                </label>
-                <div className="ps-price">{money(p.pantsPrice || 0, p.currency)}</div>
-                <p className="ps-note">{L('Sold only with this piece.', 'بتتباع مع القطعة دي بس.')}</p>
+              <div className="rv price-breakdown">
+                <div className="pb-row">
+                  <span>{L('Abaya', 'العباية')}</span>
+                  <b>{onSale ? (<><span className="price-strike">{money(p.price, p.currency)}</span> {money(p.salePrice!, p.currency)}</>) : money(p.price, p.currency)}</b>
+                </div>
+                {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{money(p.pantsPrice || 0, p.currency)}</b></div>}
+                <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{money(total, p.currency)}</b></div>
               </div>
-            </div>
+            </>
           )}
 
           <div className="rv">
