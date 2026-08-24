@@ -760,6 +760,10 @@ footer .fcol:first-child{grid-column:span 3}
 footer h5{font-size:8.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--on-dark-soft);margin-bottom:18px}
 footer a,footer span.fl{display:block;font-size:12px;line-height:2.3;color:rgba(242,238,228,.78);cursor:pointer;transition:color .4s}
 footer a:hover,footer span.fl:hover{color:var(--on-dark)}
+footer .f-social{display:flex;gap:14px;margin-top:10px}
+footer .f-social a{display:flex;color:rgba(242,238,224,.78);transition:color .4s}
+footer .f-social a:hover{color:var(--champagne)}
+footer .f-social svg{width:16px;height:16px}
 footer .fmark{margin:clamp(40px,6vw,80px) auto 0;display:block;width:min(420px,64vw)}
 footer .fbot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--on-dark-line);
   margin-top:34px;padding-top:22px;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--on-dark-soft)}
