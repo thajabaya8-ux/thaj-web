@@ -86,7 +86,13 @@ export default function CheckoutPage() {
     [cartTotalEgp, selectedGov, settings]
   );
 
-  if (!cart.length) return null;
+  if (!cart.length) {
+    return (
+      <section className="pad wrap-n" style={{ textAlign: 'center', minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 'calc(var(--nav-h) + 60px)' }}>
+        <p className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('One moment…', 'لحظة…')}</p>
+      </section>
+    );
+  }
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
