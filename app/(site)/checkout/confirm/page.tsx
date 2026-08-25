@@ -90,7 +90,13 @@ function ConfirmPageInner() {
     );
   }
 
-  if (order === undefined) return null;
+  if (order === undefined) {
+    return (
+      <section className="pad wrap-n" style={{ textAlign: 'center', minHeight: '70vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 'calc(var(--nav-h) + 60px)' }}>
+        <p className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Loading your order…', 'بنجيب طلبك…')}</p>
+      </section>
+    );
+  }
 
   const idx = stageIndex(order);
   const rejected = order.paymentStatus === 'rejected';
