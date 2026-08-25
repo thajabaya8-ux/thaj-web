@@ -61,8 +61,9 @@ export default function CheckoutPage() {
     return () => { cancelled = true; };
   }, []);
 
+  const orderPlacedRef = useRef(false);
   useEffect(() => {
-    if (!cart.length && !submitting) router.replace('/cart');
+    if (!cart.length && !submitting && !orderPlacedRef.current) router.replace('/cart');
   }, [cart.length, submitting, router]);
 
   const initiatedRef = useRef(false);
@@ -113,7 +114,10 @@ export default function CheckoutPage() {
     setSubmitting(true);
     const order = await submitOrder(method, receiptKey, selectedGov?.name, selectedGov?.nameAr);
     setSubmitting(false);
-    if (order) router.push(`/checkout/confirm?order=${encodeURIComponent(order.n)}`);
+    if (order) {
+      orderPlacedRef.current = true;
+      router.push(`/checkout/confirm?order=${encodeURIComponent(order.n)}`);
+    }
   };
 
   const methodInfo: Record<PaymentMethod, { name: string; sub: string; account: string; handle: string }> = {
