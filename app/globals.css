@@ -503,11 +503,11 @@ section{position:relative}
    box to the height of .info's much taller content, leaving a visible gap
    of empty sand-coloured space below the thumbnails. */
 .pdp{display:grid;grid-template-columns:.8fr 1.2fr;align-items:start}
-/* Sized by a fixed portrait ratio (a touch shorter than the 3/4 every
-   product card crops to — see .card .frame — so the box itself reads
-   smaller) instead of forced to fill 100vh, so object-fit:cover never
-   has to letterbox a mismatched box: no empty mat on either side. */
-.pdp .gal{background:var(--sand);position:sticky;top:var(--nav-h);display:flex;flex-direction:column}
+/* Matches the page's own background (--bone), not --sand — a photo
+   narrower than the column (portrait shot, contain, no crop) leaves
+   this showing down its sides, and it should read as the page itself
+   rather than a visibly different-toned mat around the picture. */
+.pdp .gal{background:var(--bone);position:sticky;top:var(--nav-h);display:flex;flex-direction:column}
 /* No fixed aspect-ratio on the box any more — that was cropping every
    photo to fit a shape it didn't actually have. The box now sizes to
    whatever the photo's own proportions are (capped by max-height so
