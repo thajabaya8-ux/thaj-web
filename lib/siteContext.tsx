@@ -77,6 +77,7 @@ interface SiteContextValue {
   ord: (i: number) => string;
   money: (n: number, currency: PieceCurrency) => string;
   authRole: AuthRole;
+  logout: () => Promise<void>;
   fa: (v: string) => string;
   stLabel: (s: string) => string;
   paymentStatusLabel: (s?: string) => string;
@@ -217,6 +218,15 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
       setAuthRole(body.role === 'admin' ? 'admin' : 'customer');
     }).catch(() => { if (!cancelled) setAuthRole(null); });
     return () => { cancelled = true; };
+  }, []);
+
+  // A hard navigation, not a client-side route change — /account and
+  // /wishlist are server-side gated (proxy.ts), so this has to actually
+  // leave the page rather than just resetting local state, or a stale
+  // client-rendered view of a now-inaccessible page could stick around.
+  const logout = useCallback(async () => {
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }); } catch { /* best-effort */ }
+    window.location.href = '/';
   }, []);
 
   const AR = useCallback(() => lang === 'ar', [lang]);
@@ -410,7 +420,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
   }, []);
 
   const value: SiteContextValue = {
-    lang, setLang, AR, L, num, ord, money, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
+    lang, setLang, AR, L, num, ord, money, authRole, logout, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
     pieces, collections, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
     cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, qty, rmItem, toggleWish,

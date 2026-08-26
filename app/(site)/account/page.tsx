@@ -112,7 +112,7 @@ function AccAppt() {
 type TabKey = 'orders' | 'pieces' | 'saved' | 'appt' | 'info' | 'addr';
 
 export default function AccountPage() {
-  const { L, acctTab, setAcctTab } = useSite();
+  const { L, acctTab, setAcctTab, logout } = useSite();
   const tabs: [TabKey, string, () => React.ReactElement][] = [
     ['orders', L('Orders', 'الطلبات'), AccOrders],
     ['pieces', L('My pieces', 'قطعي'), AccPieces],
@@ -136,6 +136,7 @@ export default function AccountPage() {
             {tabs.map(([k, label]) => (
               <button key={k} className={acctTab === k ? 'on' : ''} onClick={() => setAcctTab(k)}>{label}</button>
             ))}
+            <button onClick={logout} style={{ color: 'var(--ink-faint)' }}>{L('Log out', 'تسجيل الخروج')}</button>
           </div>
           <div className="rv"><Active /></div>
         </div>
