@@ -492,7 +492,14 @@ section{position:relative}
    ever composed correctly for exactly eleven unfiltered pieces, and fell
    apart the moment a filter changed the count. This reflows cleanly at
    any count, with no separate breakpoint overrides needed. */
-.grid-shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(26px,3vw,54px)}
+/* align-items:start — grid's default (stretch) forces every card in a
+   row to match the tallest one, so a piece whose name wraps to a
+   second line stretches its whole row's cards taller than a row
+   without one. Each card now sizes to its own content only, so the
+   photo box (fixed aspect-ratio, unaffected by the stretch itself)
+   isn't sitting inside a taller-than-it-needs cell that reads as an
+   inconsistent gap around it next to a shorter neighbour. */
+.grid-shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:clamp(26px,3vw,54px);align-items:start}
 .empty{grid-column:1/13;padding:80px 0;text-align:center}
 
 /* ============ PRODUCT ============ */
