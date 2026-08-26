@@ -40,6 +40,8 @@ export interface Piece {
   // Units tied up in orders still under review — not yet a permanent
   // deduction. available = stock - reserved is what's actually purchasable.
   reserved: number;
+  // Admin-curated pick for the homepage's featured composition.
+  featured: boolean;
 }
 
 export interface Collection {

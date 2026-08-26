@@ -28,6 +28,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
   const [currency, setCurrency] = useState<'SAR' | 'EGP'>(piece?.currency || 'SAR');
   const [coll, setColl] = useState(piece?.coll || defaultCollKey || '');
   const [visible, setVisible] = useState(piece?.visible ?? true);
+  const [featured, setFeatured] = useState(piece?.featured ?? false);
   const [saving, setSaving] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +50,8 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       pantsPrice: hasPants ? (parseInt(val('pantsPrice'), 10) || 0) : null,
       salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null,
       visible,
-      stock: parseInt(val('stock'), 10) || 0
+      stock: parseInt(val('stock'), 10) || 0,
+      featured
     };
     setSaving(true);
     try {
@@ -87,6 +89,10 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       <label className="adm-pants-toggle">
         <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />
         <span>{L('Show this piece on the site', 'اعرضي القطعة دي في الموقع')}</span>
+      </label>
+      <label className="adm-pants-toggle">
+        <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
+        <span>{L('Feature on the homepage', 'اعرضيها في الصفحة الرئيسية')}</span>
       </label>
       <div className="f2">
         <div className="field"><label>{L('Availability', 'التوفر')}</label>

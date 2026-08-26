@@ -64,6 +64,11 @@ CREATE TABLE IF NOT EXISTS pieces (
   -- availability (available = stock - reserved) but not yet subtracted
   -- from stock itself, since that only happens for real on Approve.
   reserved INTEGER NOT NULL DEFAULT 0,
+  -- Admin-curated pick for the homepage's featured composition. Default
+  -- false on purpose: the homepage falls back to auto-picking recent
+  -- pieces until the admin has actually chosen any, so this migration
+  -- doesn't blank the homepage out for every site that hasn't opted in yet.
+  featured BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -76,6 +81,7 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sale_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS visible BOOLEAN NOT NULL DEFAULT true;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS stock INTEGER NOT NULL DEFAULT 999;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS reserved INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,

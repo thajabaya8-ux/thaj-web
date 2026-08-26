@@ -71,7 +71,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     // Editing stock directly (the admin correcting/topping it up) never
     // touches `reserved` — any orders currently under review keep whatever
     // they've already reserved regardless of this edit.
-    stock: b.stock !== undefined ? nonNegativeInt(b.stock, existing.stock) : existing.stock
+    stock: b.stock !== undefined ? nonNegativeInt(b.stock, existing.stock) : existing.stock,
+    featured: b.featured === undefined ? existing.featured : !!b.featured
   };
 
   // A sale price only counts as a discount if it's actually lower than the
@@ -88,7 +89,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     pal_en=${next.pal_en}, pal_ar=${next.pal_ar}, availability=${next.availability},
     desc_en=${next.desc_en}, desc_ar=${next.desc_ar}, story_en=${next.story_en}, story_ar=${next.story_ar},
     image=${next.image}, images=${next.images}, pants_image=${next.pants_image}, pants_price=${next.pants_price},
-    sale_price=${nextSalePrice}, visible=${next.visible}, stock=${next.stock}, updated_at=now() WHERE id=${id}`;
+    sale_price=${nextSalePrice}, visible=${next.visible}, stock=${next.stock}, featured=${next.featured}, updated_at=now() WHERE id=${id}`;
 
   const rows = await sql`SELECT * FROM pieces WHERE id = ${id}`;
   return NextResponse.json(pieceOut(rows[0]));

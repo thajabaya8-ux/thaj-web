@@ -35,6 +35,14 @@ export default function CategoryPiecesPage() {
     } catch (e) { toast(e instanceof Error ? e.message : String(e)); }
   };
 
+  const onToggleFeatured = async (p: Piece) => {
+    try {
+      await call(`/pieces/${p.id}`, { method: 'PUT', body: JSON.stringify({ featured: !p.featured }) });
+      toast(p.featured ? L('Removed from the homepage', 'اتشالت من الصفحة الرئيسية') : L('Now featured on the homepage', 'بقت ظاهرة في الصفحة الرئيسية'));
+      reload();
+    } catch (e) { toast(e instanceof Error ? e.message : String(e)); }
+  };
+
   const onDeleteCategory = async () => {
     if (!confirm(L('Delete this category? It must have no pieces assigned.', 'تحذفي الفئة دي؟ لازم متكونش فيها قطع.'))) return;
     try { await call(`/collections/${key}`, { method: 'DELETE' }); toast(L('Deleted', 'اتمسحت')); router.push('/admin/collections'); }
@@ -71,7 +79,7 @@ export default function CategoryPiecesPage() {
         return (
         <div className="adm-row" style={{ gridTemplateColumns: '50px 2fr 1fr 1fr 1fr auto', opacity: p.visible ? 1 : .55 }} key={p.id}>
           {p.img ? <img className="thumb" src={abs(p.img)} alt="" /> : <span className="thumb" style={{ display: 'block', background: 'var(--sand)' }} />}
-          <div><div className="h-s" style={{ fontSize: 15 }}>{p.n}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed ? `${p.ed} · ` : ''}{p.ar}{p.pantsImg ? ` · ${L('+ trousers', '+ بنطلون')}` : ''}{!p.visible ? ` · ${L('hidden', 'مخفية')}` : ''}</div></div>
+          <div><div className="h-s" style={{ fontSize: 15 }}>{p.n}</div><div className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed ? `${p.ed} · ` : ''}{p.ar}{p.pantsImg ? ` · ${L('+ trousers', '+ بنطلون')}` : ''}{!p.visible ? ` · ${L('hidden', 'مخفية')}` : ''}{p.featured ? ` · ${L('featured', 'مميزة')}` : ''}</div></div>
           <span>
             {p.salePrice != null ? (<><span className="price-strike">{p.price.toLocaleString('en-US')}</span> {p.salePrice.toLocaleString('en-US')}</>) : p.price.toLocaleString('en-US')} {p.currency}
           </span>
@@ -81,6 +89,7 @@ export default function CategoryPiecesPage() {
           </span>
           <div className="actions">
             <span onClick={() => onToggleVisible(p)}>{p.visible ? L('Hide', 'إخفاء') : L('Show', 'إظهار')}</span>
+            <span onClick={() => onToggleFeatured(p)}>{p.featured ? L('Unfeature', 'إلغاء التمييز') : L('Feature', 'تمييز')}</span>
             <Link href={`/admin/pieces/${p.id}/edit`}>{L('Edit', 'تعديل')}</Link>
             <span onClick={() => onDelete(p.id)}>{L('Delete', 'حذف')}</span>
           </div>

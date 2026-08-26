@@ -984,7 +984,14 @@ footer .fbot a:hover{color:var(--on-dark)}
   header .util .u-hide{display:none}
   .burger{display:flex}
   header .brand{margin-right:auto}
-  .c-1,.c-2,.c-3,.c-4{grid-column:span 12}
+  /* The desktop composition deliberately varies scale ("some dominate,
+     some are found") — collapsing everything to one uniform column on
+     mobile lost that entirely. c-1/c-4 (already the tall/wide "hero"
+     shots) stay full-width; c-2/c-3 pair up half-width on one row
+     between them, so the rhythm reads as big / small+small / big
+     instead of four identical stacked cards. */
+  .c-1,.c-4{grid-column:span 12}
+  .c-2,.c-3{grid-column:span 6}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static}

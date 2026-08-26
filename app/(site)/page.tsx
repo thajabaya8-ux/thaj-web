@@ -11,9 +11,11 @@ import type { Piece } from '@/lib/types';
 export default function HomePage() {
   const { L, AR, esc, num, pName, pieces, collections, settings } = useSite();
   // The featured composition below is built for exactly four pieces —
-  // just the newest four in the catalogue, not a hand-picked list, since
-  // there's no "featured" flag on a piece.
-  const feat = pieces.slice(-4).reverse();
+  // whichever the admin has picked at /admin/collections (the "Feature"
+  // action per piece), in catalogue order. Falls back to the newest four
+  // so the homepage isn't empty before the admin has curated anything.
+  const featuredPicks = pieces.filter((p) => p.featured);
+  const feat = (featuredPicks.length ? featuredPicks : pieces.slice(-4).reverse()).slice(0, 4);
 
   // Curated by the admin at /admin/marquee — not every piece in the
   // catalogue, and empty (so the strip stays hidden) until they pick some.

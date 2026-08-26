@@ -42,7 +42,8 @@ export function pieceOut(r: any): Piece {
     salePrice: (r.sale_price != null && r.sale_price < r.price) ? r.sale_price : null,
     visible: r.visible !== false,
     stock: r.stock ?? 0,
-    reserved: r.reserved ?? 0
+    reserved: r.reserved ?? 0,
+    featured: r.featured === true
   };
 }
 
