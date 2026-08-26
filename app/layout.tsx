@@ -3,6 +3,7 @@ import { Cairo } from 'next/font/google';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import MetaPixel from '@/components/MetaPixel';
+import PwaInstall from '@/components/PwaInstall';
 
 // Self-hosted Arabic web font (see --ar in globals.css) — without this,
 // [dir="rtl"] text fell back to whatever Arabic serif the visitor's OS
@@ -12,7 +13,9 @@ const cairoAr = Cairo({ subsets: ['arabic'], variable: '--font-cairo', display: 
 
 export const metadata: Metadata = {
   title: 'THAJ',
-  description: 'THAJ — an abaya fashion house in Riyadh.'
+  description: 'THAJ — an abaya fashion house in Riyadh.',
+  icons: { apple: '/assets/logo/apple-touch-icon.png' },
+  appleWebApp: { title: 'THAJ', statusBarStyle: 'black-translucent' }
 };
 
 // Intentionally minimal — the public site's chrome (header/footer/drawer/
@@ -26,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <MetaPixel />
         {children}
+        <PwaInstall />
       </body>
     </html>
   );

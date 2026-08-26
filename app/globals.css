@@ -858,6 +858,22 @@ footer .fbot a:hover{color:var(--on-dark)}
 .social-fab-toggle.open .icon-social{opacity:0;transform:rotate(45deg) scale(.6)}
 .social-fab-toggle.open .icon-close{opacity:1;transform:rotate(0) scale(1)}
 @media(max-width:640px){.social-fab{bottom:18px;right:16px}}
+/* Sits just under the fixed header rather than the bottom of the
+   screen on purpose — every other floating control in the app
+   (.social-fab, #toast, the cart drawer) already lives at the bottom,
+   and this is meant to be occasional and dismissible, not fight them
+   for the same corner. */
+.pwa-banner{position:fixed;top:var(--nav-h);left:0;right:0;z-index:150;display:flex;align-items:center;gap:14px;
+  padding:14px clamp(18px,3.5vw,44px);background:var(--emerald-deep);color:var(--on-dark);
+  box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.pwa-banner img{border-radius:9px;flex:0 0 auto}
+.pwa-banner-body{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.pwa-banner-body b{font-family:var(--display);font-size:14px;font-weight:400}
+.pwa-banner-body span{font-size:12px;color:var(--on-dark-soft)}
+.pwa-banner-close{background:none;border:0;color:var(--on-dark-soft);font-size:22px;line-height:1;cursor:pointer;
+  padding:4px 2px;flex:0 0 auto}
+.pwa-banner-close:hover{color:var(--on-dark)}
+@media(max-width:640px){.pwa-banner{padding:12px 16px}.pwa-banner-body span{display:none}}
 
 /* ============ TOAST ============ */
 #toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);z-index:180;
