@@ -334,8 +334,8 @@ section{position:relative}
    thing doing the work there, so the two hand off smoothly instead. */
 .hf-scrim{position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,
-    color-mix(in srgb,var(--emerald-deep) 8%,transparent) 0%,
-    color-mix(in srgb,var(--emerald-deep) 30%,transparent) 12%,
+    transparent 0%,
+    transparent 12%,
     color-mix(in srgb,var(--emerald-deep) 16%,transparent) 34%,
     color-mix(in srgb,var(--emerald-deep) 14%,transparent) 58%,
     color-mix(in srgb,var(--emerald-deep) 46%,transparent) 82%,
@@ -446,15 +446,21 @@ section{position:relative}
   background:var(--gold);color:var(--ink);padding:4px 10px}
 .price-strike{text-decoration:line-through;opacity:.5;margin-inline-end:8px;font-size:.86em}
 .price-sale{color:var(--emerald)}
+/* pointer-events:none while invisible — opacity:0 alone still leaves an
+   element clickable, and on a touch device these never really get a
+   :hover to reveal them first. Without this, tapping a card (especially
+   a small one, where this bottom-third overlay is a big share of the
+   whole frame) could silently hit the "Add" button underneath instead
+   of the Link navigating to the product page. */
 .card .save{position:absolute;top:10px;right:10px;z-index:4;background:rgba(231,237,199,.86);border:0;cursor:pointer;
-  width:30px;height:30px;font-size:12px;color:var(--ink);opacity:0;transform:translateY(-6px);
+  width:30px;height:30px;font-size:12px;color:var(--ink);opacity:0;transform:translateY(-6px);pointer-events:none;
   transition:all .6s var(--e);line-height:1}
-.card:hover .save,.card .save.on{opacity:1;transform:none}
+.card:hover .save,.card .save.on{opacity:1;transform:none;pointer-events:auto}
 .card .save.on{color:var(--gold)}
 .card .quick{position:absolute;left:10px;right:10px;bottom:10px;z-index:4;background:rgba(231,237,199,.92);
   border:0;cursor:pointer;padding:13px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);
-  opacity:0;transform:translateY(10px);transition:all .6s var(--e)}
-.card:hover .quick{opacity:1;transform:none}
+  opacity:0;transform:translateY(10px);pointer-events:none;transition:all .6s var(--e)}
+.card:hover .quick{opacity:1;transform:none;pointer-events:auto}
 .card .meta{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-top:14px;
   border-top:1px solid var(--line-soft);padding-top:11px}
 .card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em}
