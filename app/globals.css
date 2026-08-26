@@ -951,15 +951,14 @@ footer .fbot a:hover{color:var(--on-dark)}
   header nav{display:none}
 }
 @media(max-width:1080px){
-  /* Was a uniform 2x2 (every card span 6) below the desktop width — the
-     same "everything identical" flattening the 820px rule below used to
-     do, just one breakpoint earlier. c-1/c-4 (the tall/wide hero shots)
-     now stay full-width the whole way down from here, with c-2/c-3
-     paired half-width between them, so the alternating big/small rhythm
-     holds at any narrower-than-desktop width, not only true phone
-     widths. */
-  .c-1,.c-4{grid-column:span 12;margin-top:0}
-  .c-2,.c-3{grid-column:span 6;margin-top:0}
+  /* No override for .c-1/.c-2/.c-3/.c-4 here any more, on purpose — the
+     desktop composition (.compose{grid-template-columns:repeat(12,1fr)}
+     plus each card's own fractional column range) is already fluid: it
+     scales proportionally at any width instead of needing a rewritten
+     layout per breakpoint, so the exact same paired, staggered
+     arrangement carries down to phone width unchanged, matching the
+     desktop screenshot exactly rather than a mobile-specific redesign
+     of it. */
   .ed-head h2{grid-column:2/13}
   .ed-head .aside{grid-column:1/13;margin-top:16px}
 }
