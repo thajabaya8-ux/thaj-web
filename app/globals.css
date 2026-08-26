@@ -492,30 +492,34 @@ section{position:relative}
 .empty{grid-column:1/13;padding:80px 0;text-align:center}
 
 /* ============ PRODUCT ============ */
-/* The image column is narrower than the info column on purpose (was an
-   even 1fr/1fr) — asked twice to make the product photo read smaller;
-   narrowing its column shrinks it in both directions at once, since
-   .gal-main's height is a ratio of its own width. */
+/* The gallery is the larger of the two columns on purpose — it's meant
+   to read as the dominant element on the page, not a small photo next
+   to a big text block. 4fr:3fr ~= 57%:43%. */
 /* align-items:start (grid's default is stretch) — the two columns are no
    longer meant to match a shared 100vh, so each sizes to its own content:
-   .gal to the (now capped, smaller) photo + thumbs, .info to whatever its
-   text actually needs. Without this, grid stretch was forcing .gal's own
-   box to the height of .info's much taller content, leaving a visible gap
-   of empty sand-coloured space below the thumbnails. */
-.pdp{display:grid;grid-template-columns:.8fr 1.2fr;align-items:start}
+   .gal to the photo + thumbs, .info to whatever its text actually needs.
+   Without this, grid stretch was forcing .gal's own box to the height of
+   .info's much taller content, leaving a visible gap of empty space
+   below the thumbnails. */
+.pdp{display:grid;grid-template-columns:4fr 3fr;align-items:start}
 /* Matches the page's own background (--bone), not --sand — a photo
-   narrower than the column (portrait shot, contain, no crop) leaves
-   this showing down its sides, and it should read as the page itself
-   rather than a visibly different-toned mat around the picture. */
+   narrower than the column (contain, no crop) leaves this showing down
+   its sides, and it should read as the page itself rather than a
+   visibly different-toned mat around the picture. */
 .pdp .gal{background:var(--bone);position:sticky;top:var(--nav-h);display:flex;flex-direction:column}
-/* No fixed aspect-ratio on the box any more — that was cropping every
-   photo to fit a shape it didn't actually have. The box now sizes to
-   whatever the photo's own proportions are (capped by max-height so
-   the whole product still fits without scrolling), so contain never
-   has anything left over to letterbox: the frame *is* the photo. */
-.pdp .gal-main{position:relative;width:100%;max-height:64vh;overflow:hidden;touch-action:pan-y;
-  display:flex;align-items:center;justify-content:center}
-.pdp .gal-main img{width:auto;height:auto;max-width:100%;max-height:64vh;object-fit:contain;display:block;margin:0 auto}
+/* No fixed box (no aspect-ratio, no height) drives this any more — every
+   photo used to get cropped or letterboxed to fit a shape it didn't
+   actually have. width/height:auto with only max-* ceilings means the
+   browser sizes the image from its OWN intrinsic ratio, uniformly
+   scaled down only as far as it has to be: portrait photos stay tall,
+   landscape stays short, square stays square, and a photo already
+   smaller than its ceiling isn't stretched up to fill anything. The
+   max-height is a safety ceiling for an unusually tall photo, not the
+   thing that's sizing every image — most photos are bounded by
+   max-width (the column) well before they'd ever reach it. */
+.pdp .gal-main{position:relative;width:100%;touch-action:pan-y;
+  display:flex;align-items:flex-start;justify-content:center}
+.pdp .gal-main img{width:auto;height:auto;max-width:100%;max-height:min(82vh,900px);object-fit:contain;display:block;margin:0 auto}
 .gal-arrow{position:absolute;top:50%;translate:0 -50%;z-index:5;width:46px;height:46px;border-radius:50%;
   border:1px solid var(--line);background:rgba(231,237,199,.86);backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--display);
@@ -984,8 +988,12 @@ footer .fbot a:hover{color:var(--on-dark)}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static}
+  /* A sliver of side padding so the photo reads as ~92% of the screen
+     rather than touching both edges — full-bleed at this size looked
+     like the image was cut off, not deliberately framed. */
+  .pdp .gal-main{padding:0 4vw}
   .gal-arrow{display:none}
-  .pdp .info{min-height:auto;padding:34px 22px 60px}
+  .pdp .info{min-height:auto;padding:22px 22px 60px}
   .frow{grid-template-columns:1fr;gap:10px}
   .ftoggle{display:block}
   .filters{display:none;border-top:0}
