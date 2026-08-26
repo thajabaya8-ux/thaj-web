@@ -461,7 +461,10 @@ section{position:relative}
 .card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em}
 .card .meta h3 i{display:block;font-style:normal;font-family:var(--ar);font-size:12px;color:var(--ink-faint);margin-top:3px;direction:rtl}
 .card .meta .pr{font-family:var(--display);font-size:14px;letter-spacing:.03em;white-space:nowrap}
-.card .meta .pr small{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+/* white-space:normal overrides the nowrap it'd otherwise inherit from
+   .pr — at 13px the old 8px-tuned .24em tracking made "AVAILABLE" wide
+   enough to overflow a narrow mobile card instead of wrapping. */
+.card .meta .pr small{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;white-space:normal}
 .dark .card .meta{border-color:var(--on-dark-line)}
 
 /* editorial home composition */
