@@ -16,7 +16,10 @@ export async function POST(req: Request) {
 
   const rows = await sql`SELECT * FROM users WHERE email = ${email}`;
   const user = rows[0];
-  const validPassword = bcrypt.compareSync(password, user ? user.password_hash : DUMMY_HASH);
+  // A Google-only account has no password_hash to compare against — falls
+  // through to the dummy hash exactly like an unknown email, so this also
+  // doesn't leak "this email exists but only via Google" through timing.
+  const validPassword = bcrypt.compareSync(password, (user && user.password_hash) || DUMMY_HASH);
 
   if (!user || !validPassword) {
     return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });

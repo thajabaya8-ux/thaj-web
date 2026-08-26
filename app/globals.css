@@ -1028,4 +1028,10 @@ footer .fbot a:hover{color:var(--on-dark)}
 .adm-login .field input{border-color:var(--on-dark-line);color:var(--on-dark)}
 .adm-error{color:#E39A9A;font-size:11px;letter-spacing:.05em;min-height:16px;margin-top:4px}
 .adm-switch{background:none;border:0;color:var(--on-dark-soft);font-size:11px;letter-spacing:.05em;text-decoration:underline;cursor:pointer;display:block;margin:18px auto 0}
+.auth-google{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--bone);
+  color:var(--ink);border-color:var(--bone);text-decoration:none}
+.auth-google:hover{background:var(--on-dark);border-color:var(--on-dark)}
+.auth-divider{display:flex;align-items:center;gap:14px;color:var(--on-dark-soft);font-size:10px;
+  letter-spacing:.2em;text-transform:uppercase;margin:22px 0}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--on-dark-line)}
 } /* end @layer thaj */

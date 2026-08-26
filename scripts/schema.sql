@@ -3,16 +3,24 @@
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  -- Nullable: a Google-signed-in account never sets one. Every login route
+  -- has to branch on this being null rather than assuming it's always set.
+  password_hash TEXT,
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('admin','customer')),
   name TEXT,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended')),
   last_login TIMESTAMPTZ,
+  -- Google's stable per-account subject id ("sub" in the id_token) — the
+  -- lookup key for Google sign-in, separate from email so a later email
+  -- change on the Google side doesn't orphan the link.
+  google_id TEXT UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended'));
 ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id TEXT UNIQUE;
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
 
 CREATE TABLE IF NOT EXISTS collections (
   key TEXT PRIMARY KEY,
