@@ -448,19 +448,14 @@ section{position:relative}
 .price-sale{color:var(--emerald)}
 /* pointer-events:none while invisible — opacity:0 alone still leaves an
    element clickable, and on a touch device these never really get a
-   :hover to reveal them first. Without this, tapping a card (especially
-   a small one, where this bottom-third overlay is a big share of the
-   whole frame) could silently hit the "Add" button underneath instead
-   of the Link navigating to the product page. */
+   :hover to reveal them first (which was silently intercepting taps on
+   small cards before the "Add" button was removed from the card
+   entirely — kept for .save, the one overlay control left). */
 .card .save{position:absolute;top:10px;right:10px;z-index:4;background:rgba(231,237,199,.86);border:0;cursor:pointer;
   width:30px;height:30px;font-size:12px;color:var(--ink);opacity:0;transform:translateY(-6px);pointer-events:none;
   transition:all .6s var(--e);line-height:1}
 .card:hover .save,.card .save.on{opacity:1;transform:none;pointer-events:auto}
 .card .save.on{color:var(--gold)}
-.card .quick{position:absolute;left:10px;right:10px;bottom:10px;z-index:4;background:rgba(231,237,199,.92);
-  border:0;cursor:pointer;padding:13px;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink);
-  opacity:0;transform:translateY(10px);pointer-events:none;transition:all .6s var(--e)}
-.card:hover .quick{opacity:1;transform:none;pointer-events:auto}
 .card .meta{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-top:14px;
   border-top:1px solid var(--line-soft);padding-top:11px}
 .card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em}
@@ -881,7 +876,6 @@ footer .fbot a:hover{color:var(--on-dark)}
 [dir="rtl"] .ftoggle{font-size:14.5px}
 [dir="rtl"] .shopbar .lbl{font-size:14px}
 [dir="rtl"] .card .meta span,[dir="rtl"] .card .meta .pr small{font-size:13px;letter-spacing:0}
-[dir="rtl"] .card .quick{font-size:13.5px;letter-spacing:0;padding:14px}
 [dir="rtl"] .card .save{font-size:15px}
 [dir="rtl"] .sizes button{font-size:14.5px;letter-spacing:0;padding:13px 20px}
 [dir="rtl"] .spec .r .k{font-size:13.5px;letter-spacing:0}
@@ -997,6 +991,10 @@ footer .fbot a:hover{color:var(--on-dark)}
   header .util .u-hide{display:none}
   .burger{display:flex}
   header .brand{margin-right:auto}
+  /* Was auto-fill,minmax(240px,1fr) — on a phone-width column that
+     never fit two, so every piece stacked one to a row. Two equal
+     columns instead, at whatever width actually fits. */
+  .grid-shop{grid-template-columns:repeat(2,1fr);gap:14px 12px}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static}

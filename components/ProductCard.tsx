@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { useSite, effectivePrice, availableStock } from '@/lib/siteContext';
+import { useSite, availableStock } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
 
 export default function ProductCard({ piece, className }: { piece?: Piece | null; className?: string }) {
-  const { L, AR, esc, pName, money, wish, toggleWish, quickAdd, AVAIL_AR } = useSite();
+  const { L, AR, esc, pName, money, wish, toggleWish, AVAIL_AR } = useSite();
   if (!piece) return null;
   const saved = wish.includes(piece.id);
   // Out of real stock overrides whatever the admin last set availability
@@ -29,15 +29,6 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWish(piece.id); }}
         >{saved ? '●' : '○'}</button>
         <img src={`/${piece.img}`} alt={pName(piece)} loading="lazy" style={soldOut ? { opacity: .55 } : undefined} />
-        {soldOut ? (
-          <span className="quick" style={{ opacity: .6, pointerEvents: 'none' }}>{L('Sold out', 'نفدت الكمية')}</span>
-        ) : (
-          <button
-            type="button"
-            className="quick"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); quickAdd(piece.id); }}
-          >{L('Add', 'أضيفي')} · {money(effectivePrice(piece), piece.currency)}</button>
-        )}
       </Link>
       <Link href={`/product/${piece.id}`} className="meta">
         <h3>{pName(piece)}{AR() ? '' : <i>{esc(piece.ar)}</i>}</h3>

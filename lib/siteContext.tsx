@@ -99,7 +99,6 @@ interface SiteContextValue {
   itemPriceEgp: (c: CartItem) => number;
   egpPerSar: number;
   addToCart: (id: string, size?: string, withPants?: boolean) => void;
-  quickAdd: (id: string) => void;
   qty: (i: number, d: number) => void;
   rmItem: (i: number) => void;
   toggleWish: (id: string) => void;
@@ -303,24 +302,6 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     }
   }, [byId, pName, L, toast]);
 
-  const quickAdd = useCallback((id: string) => {
-    const size = '54';
-    setCart((cur) => {
-      const i = cur.findIndex((c) => c.pid === id && c.size === size);
-      if (i > -1) { const next = [...cur]; next[i] = { ...next[i], q: next[i].q + 1 }; return next; }
-      return [...cur, { pid: id, size, q: 1 }];
-    });
-    setDrawerOpen(true);
-    const p = byId(id);
-    toast(p ? `${pName(p)}${L(' added · size 54', ' اتضافت · مقاس ٥٤')}` : L('Added', 'اتضافت'));
-    if (p) {
-      trackPixel('AddToCart', {
-        content_ids: [p.id], content_name: L(p.n, p.ar), content_type: 'product',
-        contents: [{ id: p.id, quantity: 1 }], value: p.price, currency: p.currency
-      });
-    }
-  }, [byId, pName, L, toast]);
-
   const qty = useCallback((i: number, d: number) => {
     setCart((cur) => {
       const next = [...cur];
@@ -432,7 +413,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     lang, setLang, AR, L, num, ord, money, authRole, fa, stLabel, paymentStatusLabel, paymentMethodLabel, esc,
     pieces, collections, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
-    cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, quickAdd, qty, rmItem, toggleWish,
+    cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, qty, rmItem, toggleWish,
     coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitAppointment, submitReview,
     acctTab, setAcctTab, sort, setSort, facets, setFacets,
     drawerOpen, setDrawerOpen, searchOpen, setSearchOpen, menuOpen, setMenuOpen,
