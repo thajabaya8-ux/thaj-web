@@ -8,6 +8,7 @@ import { orderPublicOut } from '@/lib/serverMappers';
 import { isEmail, str } from '@/lib/serverValidators';
 import { computeOrderTotals } from '@/lib/payment';
 import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
+import { sendOrderNotification } from '@/lib/resend';
 import type { Settings } from '@/lib/types';
 
 export async function GET() {
@@ -73,6 +74,7 @@ export async function POST(req: Request) {
   // consistent currency regardless of how the cart's pieces are individually priced.
   let subtotalEgp = 0;
   const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
+  const itemsForEmail: { name: string; size: string; qty: number; withPants?: boolean }[] = [];
 
   // Stock is reserved (not yet permanently deducted — that only happens
   // when the admin approves the payment) right here, atomically per item,
@@ -115,7 +117,9 @@ export async function POST(req: Request) {
     const unitPrice = base + (withPants ? p.pants_price : 0);
     const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
     subtotalEgp += unitPriceEgp * qty;
-    cleanItems.push({ id: p.id, size: str(it.size, 40), qty, withPants });
+    const size = str(it.size, 40);
+    cleanItems.push({ id: p.id, size, qty, withPants });
+    itemsForEmail.push({ name: p.name_en, size, qty, withPants });
   }
 
   const { subtotal, shippingFee, total, deposit } = computeOrderTotals(subtotalEgp, governorate.price, settings);
@@ -157,6 +161,14 @@ export async function POST(req: Request) {
     numItems: cleanItems.reduce((s, i) => s + i.qty, 0),
     eventSourceUrl: req.headers.get('referer') || 'https://thaj-web.vercel.app/checkout',
     ...capiSignalsFromRequest(req)
+  });
+
+  // Fire-and-forget email to the shop's own inbox — see lib/resend.ts.
+  sendOrderNotification({
+    orderNumber, customerName: str(ship.name, 200) || str(name, 200) || '—',
+    phone: str(ship.phone, 40) || str(phone, 40) || '—', email: str(email, 254) || undefined,
+    governorate: governorate.name_en, city: str(ship.city, 100), address: str(ship.address, 500),
+    notes: str(ship.notes, 500) || undefined, items: itemsForEmail, total, deposit, paymentMethod
   });
 
   return NextResponse.json(orderPublicOut(rows[0]), { status: 201 });
