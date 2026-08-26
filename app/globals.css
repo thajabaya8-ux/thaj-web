@@ -951,7 +951,15 @@ footer .fbot a:hover{color:var(--on-dark)}
   header nav{display:none}
 }
 @media(max-width:1080px){
-  .c-1,.c-2,.c-3,.c-4{grid-column:span 6;margin-top:0}
+  /* Was a uniform 2x2 (every card span 6) below the desktop width — the
+     same "everything identical" flattening the 820px rule below used to
+     do, just one breakpoint earlier. c-1/c-4 (the tall/wide hero shots)
+     now stay full-width the whole way down from here, with c-2/c-3
+     paired half-width between them, so the alternating big/small rhythm
+     holds at any narrower-than-desktop width, not only true phone
+     widths. */
+  .c-1,.c-4{grid-column:span 12;margin-top:0}
+  .c-2,.c-3{grid-column:span 6;margin-top:0}
   .ed-head h2{grid-column:2/13}
   .ed-head .aside{grid-column:1/13;margin-top:16px}
 }
@@ -984,14 +992,6 @@ footer .fbot a:hover{color:var(--on-dark)}
   header .util .u-hide{display:none}
   .burger{display:flex}
   header .brand{margin-right:auto}
-  /* The desktop composition deliberately varies scale ("some dominate,
-     some are found") — collapsing everything to one uniform column on
-     mobile lost that entirely. c-1/c-4 (already the tall/wide "hero"
-     shots) stay full-width; c-2/c-3 pair up half-width on one row
-     between them, so the rhythm reads as big / small+small / big
-     instead of four identical stacked cards. */
-  .c-1,.c-4{grid-column:span 12}
-  .c-2,.c-3{grid-column:span 6}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static}
