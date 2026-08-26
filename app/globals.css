@@ -1005,7 +1005,15 @@ footer .fbot a:hover{color:var(--on-dark)}
   /* Was auto-fill,minmax(240px,1fr) — on a phone-width column that
      never fit two, so every piece stacked one to a row. Two equal
      columns instead, at whatever width actually fits. */
-  .grid-shop{grid-template-columns:repeat(2,1fr);gap:14px 12px}
+  /* minmax(0,1fr), not bare 1fr — a bare 1fr track has an implicit
+     min-width of its content's min-content size, not 0, so a column
+     whose text (a longer name, an unbreakable price/label run) needed
+     more room than its neighbour's ended up wider than it — nothing to
+     do with the row's align-items, the two tracks genuinely weren't
+     equal widths, confirmed by measuring the live page's own computed
+     grid-template-columns. minmax(0,1fr) forces the equal split "1fr"
+     actually implies. */
+  .grid-shop{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
   .split>*{grid-column:span 12 !important}
   .pdp{grid-template-columns:1fr}
   .pdp .gal{position:static}
