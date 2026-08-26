@@ -7,6 +7,7 @@
    PageView-per-route wiring live in components/MetaPixel.tsx —
    this file only owns the trackPixel() call.
    ========================================================== */
+import { logAnalyticsEvent } from './analytics';
 
 export type PixelEventName =
   | 'ViewContent' | 'AddToCart' | 'InitiateCheckout'
@@ -33,7 +34,12 @@ declare global {
 // (see lib/metaCapi.ts) so Meta can deduplicate the browser call against
 // the matching server-side call instead of double-counting it.
 export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?: string) {
-  if (typeof window === 'undefined' || typeof window.fbq !== 'function') return;
+  if (typeof window === 'undefined') return;
+  // Logged regardless of whether a Meta Pixel ID is even configured —
+  // /admin/analytics has to work on its own, not only once Marketing
+  // settings are filled in.
+  logAnalyticsEvent(event, window.location.pathname);
+  if (typeof window.fbq !== 'function') return;
   if (eventId) window.fbq('track', event, params || {}, { eventID: eventId });
   else window.fbq('track', event, params || {});
 }

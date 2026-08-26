@@ -197,3 +197,20 @@ CREATE TABLE IF NOT EXISTS marquee_pieces (
   piece_id TEXT PRIMARY KEY REFERENCES pieces(id) ON DELETE CASCADE,
   sort INTEGER NOT NULL DEFAULT 0
 );
+
+-- First-party analytics — powers /admin/analytics. `type` is either
+-- 'pageview' or one of the same Meta Pixel event names already fired by
+-- lib/pixel.ts's trackPixel() (ViewContent, AddToCart, InitiateCheckout,
+-- Purchase, Lead, CompleteRegistration, Contact), so this table is always
+-- exactly what's been sent to Meta — no separate tracking plan to keep in
+-- sync. Pageviews are logged unconditionally by components/Analytics.tsx
+-- regardless of whether a Meta Pixel ID is even configured, since this
+-- dashboard has to work on its own either way.
+CREATE TABLE IF NOT EXISTS analytics_events (
+  id SERIAL PRIMARY KEY,
+  type TEXT NOT NULL,
+  path TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_created_at ON analytics_events(created_at);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_type_path ON analytics_events(type, path);

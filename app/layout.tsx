@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import MetaPixel from '@/components/MetaPixel';
 import PwaInstall from '@/components/PwaInstall';
+import Analytics from '@/components/Analytics';
 
 // Self-hosted Arabic web font (see --ar in globals.css) — without this,
 // [dir="rtl"] text fell back to whatever Arabic serif the visitor's OS
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" dir="ltr" className={cairoAr.variable}>
       <body>
         <MetaPixel />
+        <Analytics />
         {children}
         <PwaInstall />
       </body>
