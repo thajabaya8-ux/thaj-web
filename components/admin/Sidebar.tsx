@@ -10,6 +10,7 @@ const NAV: [string, string, string][] = [
   ['/admin/users', 'Customers', 'العميلات'], ['/admin/shipping', 'Shipping', 'الشحن'],
   ['/admin/appointments', 'Appointments', 'المواعيد'],
   ['/admin/reviews', 'Reviews', 'الرسائل'], ['/admin/media', 'Site images', 'صور الموقع'],
+  ['/admin/homepage', 'Homepage content', 'محتوى الرئيسية'],
   ['/admin/marquee', 'Homepage strip', 'الشريط المتحرك'],
   ['/admin/social', 'Social', 'السوشيال ميديا'], ['/admin/settings', 'Settings', 'الإعدادات']
 ];

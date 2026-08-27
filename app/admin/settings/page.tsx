@@ -7,10 +7,6 @@ import type { Settings } from '@/lib/types';
 const NUMBER_FIELDS = new Set(['egp_per_sar', 'deposit_percent']);
 
 const CONTENT_FIELDS: [string, string, string][] = [
-  ['hero_eyebrow_en', 'Home hero eyebrow (EN)', 'عنوان فرعي للصفحة الرئيسية (إنجليزي)'],
-  ['hero_eyebrow_ar', 'Home hero eyebrow (AR)', 'عنوان فرعي للصفحة الرئيسية (عربي)'],
-  ['hero_title_en', 'Home hero title (EN)', 'العنوان الرئيسي (إنجليزي)'],
-  ['hero_title_ar', 'Home hero title (AR)', 'العنوان الرئيسي (عربي)'],
   ['contact_email', 'Contact email', 'إيميل التواصل'],
   ['contact_location_en', 'Contact location (EN)', 'موقع التواصل (إنجليزي)'],
   ['contact_location_ar', 'Contact location (AR)', 'موقع التواصل (عربي)'],
@@ -62,6 +58,10 @@ export default function SettingsPage() {
   return (
     <>
       <div className="adm-head"><h1>{L('Settings', 'الإعدادات')}</h1></div>
+      <p className="body" style={{ fontSize: 12, marginBottom: 18, color: 'var(--ink-faint)', maxWidth: 640 }}>
+        {L('Editing the homepage’s own wording — hero, section headings, descriptions — moved to its own page: ', 'تعديل كلام الصفحة الرئيسية نفسها — الهيرو، عناوين الأقسام، الأوصاف — بقى ليه صفحة لوحده: ')}
+        <Link href="/admin/homepage">{L('Homepage content', 'محتوى الصفحة الرئيسية')}</Link>.
+      </p>
       <form className="form" style={{ maxWidth: 640 }} onSubmit={onSubmit}>
         {CONTENT_FIELDS.map(renderField)}
         <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>

@@ -10,6 +10,7 @@ import { collectionOut, pieceOut } from '@/lib/serverMappers';
 import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
 import { PAYMENT_SETTINGS_KEYS } from '@/lib/payment';
 import { META_SETTINGS_KEYS } from '@/lib/marketing';
+import { HOME_CONTENT_KEYS } from '@/lib/homeContent';
 import type { Collection, Piece, Settings } from '@/lib/types';
 
 export async function getPieces(): Promise<Piece[]> {
@@ -33,7 +34,7 @@ export async function getCollection(key: string): Promise<Collection | null> {
 }
 
 const PUBLIC_SETTINGS_ALLOWLIST = [
-  'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
+  ...HOME_CONTENT_KEYS,
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
   ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...META_SETTINGS_KEYS
 ];
