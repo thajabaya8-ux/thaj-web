@@ -11,7 +11,11 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const isSlug = (v: unknown): v is string => typeof v === 'string' && SLUG.test(v);
 export const isEmail = (v: unknown): v is string => typeof v === 'string' && v.length <= 254 && EMAIL.test(v);
 
-export const str = (v: unknown, max = 500): string => (typeof v === 'string' ? v.slice(0, max) : '');
+// .trim() first — a stray leading/trailing space (a common copy-paste
+// artifact, e.g. pasting a Meta Pixel ID from its dashboard) is never
+// something any caller actually wants preserved, and left untrimmed it
+// can silently break exact-match consumers like fbq('init', pixelId).
+export const str = (v: unknown, max = 500): string => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
 export const strArray = (v: unknown, maxItems = 40, maxLen = 2000): string[] =>
   Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, maxItems).map((x) => x.slice(0, maxLen)) : [];
