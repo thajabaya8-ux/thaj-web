@@ -1,18 +1,11 @@
+/* Was its own hardcoded copy of the public settings allowlist,
+   independent of (and silently drifting from) the one lib/api.ts's
+   getSettings() actually uses for the server-rendered page itself — the
+   homepage content editor's new keys landed in one and not the other
+   until this was caught live. One function, one allowlist, both callers. */
 import { NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
-import { IMAGE_SETTINGS_KEYS } from '@/lib/img';
-import { PAYMENT_SETTINGS_KEYS } from '@/lib/payment';
-import { META_SETTINGS_KEYS } from '@/lib/marketing';
-
-const PUBLIC_SETTINGS_ALLOWLIST = [
-  'hero_eyebrow_en', 'hero_eyebrow_ar', 'hero_title_en', 'hero_title_ar',
-  'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
-  ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...META_SETTINGS_KEYS
-];
+import { getSettings } from '@/lib/api';
 
 export async function GET() {
-  const rows = await sql`SELECT key, value FROM settings WHERE key = ANY(${PUBLIC_SETTINGS_ALLOWLIST})`;
-  const out: Record<string, string> = {};
-  for (const r of rows) out[r.key] = r.value;
-  return NextResponse.json(out);
+  return NextResponse.json(await getSettings());
 }
