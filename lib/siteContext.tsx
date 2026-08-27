@@ -132,17 +132,16 @@ const SiteContext = createContext<SiteContextValue | null>(null);
 interface SiteProviderProps {
   initialPieces?: Piece[];
   initialCollections?: Collection[];
-  initialOrders?: Order[];
   initialSettings?: Settings;
   children: ReactNode;
 }
 
-export function SiteProvider({ initialPieces, initialCollections, initialOrders, initialSettings, children }: SiteProviderProps) {
+export function SiteProvider({ initialPieces, initialCollections, initialSettings, children }: SiteProviderProps) {
   const [lang, setLangState] = useState<Lang>('en');
   const [authRole, setAuthRole] = useState<AuthRole>(undefined);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wish, setWish] = useState<string[]>([]);
-  const [orders, setOrders] = useState<Order[]>(initialOrders || []);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [coData, setCoData] = useState<CheckoutDraft>({});
   const [coStep, setCoStep] = useState(0);
   const [acctTab, setAcctTab] = useState('orders');
@@ -219,6 +218,23 @@ export function SiteProvider({ initialPieces, initialCollections, initialOrders,
     }).catch(() => { if (!cancelled) setAuthRole(null); });
     return () => { cancelled = true; };
   }, []);
+
+  // Only once we know someone's actually signed in — this used to be
+  // seeded for every visitor from a server-side fetch of the 100 most
+  // recent orders across the whole site (see the removed getOrders() in
+  // lib/api.ts), which meant anyone landing on /account saw everyone's
+  // order history, not just their own. /api/account/orders is scoped to
+  // the session's own user.
+  useEffect(() => {
+    if (!authRole) return;
+    let cancelled = false;
+    fetch('/api/account/orders', { credentials: 'same-origin' }).then(async (r) => {
+      if (cancelled || !r.ok) return;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setOrders(await r.json());
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [authRole]);
 
   // A hard navigation, not a client-side route change — /account and
   // /wishlist are server-side gated (proxy.ts), so this has to actually

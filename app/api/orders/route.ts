@@ -1,7 +1,11 @@
-/* The site has no forced customer login — "My THAJ" is a shared demo
-   view. It must NOT leak other customers' name/email/phone/shipping;
-   orderPublicOut strips them. Order tracking by number lives at
-   app/api/orders/[orderNumber]/route.ts instead. */
+/* A customer's own order history is at /api/account/orders (session-
+   scoped), an admin's full view is at /api/admin/orders (admin-gated),
+   and tracking a single order by its number is
+   app/api/orders/[orderNumber]/route.ts (a public bearer-token lookup —
+   see that file's own note). This route only ever handles creating a
+   new order; it used to also have a completely unauthenticated GET
+   returning the last 100 orders to anyone, unused by anything in the
+   app — deleted, not fixed, since nothing needed it. */
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { orderPublicOut } from '@/lib/serverMappers';
@@ -9,12 +13,8 @@ import { isEmail, str } from '@/lib/serverValidators';
 import { computeOrderTotals } from '@/lib/payment';
 import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
 import { sendOrderNotification } from '@/lib/resend';
+import { getSession } from '@/lib/session';
 import type { Settings } from '@/lib/types';
-
-export async function GET() {
-  const rows = await sql`SELECT * FROM orders ORDER BY id DESC LIMIT 100`;
-  return NextResponse.json(rows.map(orderPublicOut));
-}
 
 async function nextOrderNumber(): Promise<string> {
   const year = new Date().getFullYear();
@@ -25,6 +25,10 @@ async function nextOrderNumber(): Promise<string> {
 const PAYMENT_METHODS = ['vodafone_cash', 'instapay'];
 
 export async function POST(req: Request) {
+  // Checkout has never required an account — this is null for a guest
+  // checkout, same as always, and only links the order to a user_id when
+  // one's actually signed in.
+  const session = await getSession();
   const body = await req.json().catch(() => ({}));
   const { items, name, email, phone, shipping, paymentMethod, receiptKey, egpPerSar } = body || {};
 
@@ -135,10 +139,10 @@ export async function POST(req: Request) {
   try {
     rows = await sql`INSERT INTO orders
       (order_number, customer_name, email, phone, items, total, status,
-       subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active)
+       subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id)
       VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
         ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
-        ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true)
+        ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null})
       RETURNING *`;
   } catch (err) {
     // The order row itself failed to write — the stock reserved above for

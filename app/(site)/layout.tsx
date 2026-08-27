@@ -29,13 +29,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
-  const { pieces, collections, orders, settings } = await getSiteData();
+  const { pieces, collections, settings } = await getSiteData();
 
   return (
     <SiteProvider
       initialPieces={pieces}
       initialCollections={collections}
-      initialOrders={orders}
       initialSettings={settings}
     >
       <RouteEffects />
