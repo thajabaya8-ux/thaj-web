@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Appointment, Collection, Customer, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -90,13 +90,6 @@ export function orderPublicOut(r: any): Order {
     rejectionReason: r.rejection_reason ?? null, approvedAt: r.approved_at ? toIso(r.approved_at) : null,
     hasReceipt: !!r.receipt_key
   };
-}
-
-export function appointmentOut(r: any): Appointment {
-  return {
-    id: r.id, name: r.name, email: r.email, date: r.date, time: r.time,
-    type: r.type, mode: r.mode, notes: r.notes, status: r.status, d: toIso(r.created_at)
-  } as Appointment;
 }
 
 export function governorateOut(r: any): Governorate {

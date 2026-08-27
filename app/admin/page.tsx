@@ -37,11 +37,10 @@ export default function DashboardPage() {
     <>
       <div className="adm-head"><h1>{L('Dashboard', 'الرئيسية')}</h1><span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('The state of the house', 'حالة الدار')}</span></div>
       <section className="dark adm-panel">
-        <div className="split" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
+        <div className="split" style={{ gridTemplateColumns: 'repeat(3,1fr)' }}>
           <FigTile label={L('Pieces', 'القطع')} val={d.pieces} sub={L('In the catalogue', 'في الكتالوج')} />
           <FigTile label={L('Collections', 'المجموعات')} val={d.collections} sub={L('Open chapters', 'فصول مفتوحة')} />
           <FigTile label={L('Orders', 'الطلبات')} val={d.ordersPending} sub={L('Awaiting delivery', 'بانتظار التسليم')} />
-          <FigTile label={L('Appointments', 'المواعيد')} val={d.appointmentsPending} sub={L('Awaiting response', 'بانتظار الرد')} />
         </div>
         <div className="lbl" style={{ color: 'var(--champagne)', margin: '44px 0 18px' }}>{L('Collections · share of the catalogue', 'المجموعات · نسبة من الكتالوج')}</div>
         {d.collectionProgress.length ? d.collectionProgress.map((c) => (
@@ -61,24 +60,14 @@ export default function DashboardPage() {
           )) : <p className="body">{L('No orders yet.', 'مافيش طلبات لسه.')}</p>}
         </div>
       </section>
-      <div className="split" style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <div>
-          <div className="lbl" style={{ color: 'var(--ink-faint)', marginBottom: 14 }}>{L('Recent orders', 'أحدث الطلبات')}</div>
-          {d.recentOrders.length ? d.recentOrders.map((o) => (
-            <div className="adm-row" style={{ gridTemplateColumns: '1fr auto auto' }} key={o.n}>
-              <span>{o.n}</span><span>{egp(o.tot)}</span>
-              <span className={`pill ${o.st === 'Delivered' ? '' : 'g'}`}>{o.st}</span>
-            </div>
-          )) : <p className="body">{L('None yet.', 'ولا واحد لسه.')}</p>}
-        </div>
-        <div>
-          <div className="lbl" style={{ color: 'var(--ink-faint)', marginBottom: 14 }}>{L('Recent appointments', 'أحدث المواعيد')}</div>
-          {d.recentAppointments.length ? d.recentAppointments.map((a) => (
-            <div className="adm-row" style={{ gridTemplateColumns: '1fr auto' }} key={a.id}>
-              <span>{a.name} · {a.date || '—'}</span><span className="pill g">{a.status}</span>
-            </div>
-          )) : <p className="body">{L('None yet.', 'ولا واحد لسه.')}</p>}
-        </div>
+      <div>
+        <div className="lbl" style={{ color: 'var(--ink-faint)', marginBottom: 14 }}>{L('Recent orders', 'أحدث الطلبات')}</div>
+        {d.recentOrders.length ? d.recentOrders.map((o) => (
+          <div className="adm-row" style={{ gridTemplateColumns: '1fr auto auto' }} key={o.n}>
+            <span>{o.n}</span><span>{egp(o.tot)}</span>
+            <span className={`pill ${o.st === 'Delivered' ? '' : 'g'}`}>{o.st}</span>
+          </div>
+        )) : <p className="body">{L('None yet.', 'ولا واحد لسه.')}</p>}
       </div>
     </>
   );

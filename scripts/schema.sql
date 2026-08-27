@@ -141,13 +141,11 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id)
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS reservation_active BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS stock_deducted BOOLEAN NOT NULL DEFAULT false;
 
-CREATE TABLE IF NOT EXISTS appointments (
-  id SERIAL PRIMARY KEY,
-  name TEXT, email TEXT,
-  date TEXT, time TEXT, type TEXT, mode TEXT, notes TEXT,
-  status TEXT NOT NULL DEFAULT 'Requested',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- The "appointments" table itself (private-room booking, now removed as
+-- a feature) is deliberately left in the live database rather than
+-- dropped here — schema.sql only ever adds, so removing its CREATE just
+-- stops a fresh install from getting one. No app code reads or writes it
+-- any more.
 
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,

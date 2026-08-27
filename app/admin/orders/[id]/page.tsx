@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
-import type { Order, Piece, Settings } from '@/lib/types';
+import type { Order, Piece } from '@/lib/types';
 
 const FULFILMENT_STATUSES = ['Under Review', 'Confirmed', 'Preparing', 'Shipped', 'Delivered', 'Cancelled'];
 const STATUS_AR: Record<string, string> = {
@@ -22,7 +22,6 @@ export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: order, loading, error, reload } = useAdminFetch<Order>(`/orders/${id}`);
   const { data: pieces } = useAdminFetch<Piece[]>('/pieces');
-  const { data: settings } = useAdminFetch<Settings>('/settings');
   const { call, toast, L, AR } = useAdmin();
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
@@ -51,7 +50,15 @@ export default function OrderDetailPage() {
   if (!order) return null;
 
   const ship = order.shipping;
-  const waNumber = (settings?.admin_whatsapp_number || '').replace(/[^0-9]/g, '');
+  // The CUSTOMER's number, not the admin's own (admin_whatsapp_number is a
+  // site setting for a completely different purpose — where THAJ's own
+  // WhatsApp contact link on the storefront points to). A local Egyptian
+  // number (leading 0, no country code — how customers actually type it
+  // at checkout, see the "0"-prefixed values throughout real orders)
+  // needs +20 in place of that 0 for wa.me to resolve it at all; a number
+  // that already has a country code (+966, …) is left as-is.
+  const rawPhone = (ship?.phone || order.phone || '').replace(/[^0-9]/g, '');
+  const waNumber = rawPhone.startsWith('0') ? `20${rawPhone.slice(1)}` : rawPhone;
   const waText = encodeURIComponent(
     `${L('Order', 'طلب')} ${order.n}\n${ship?.name || order.name || ''}\n${ship?.phone || order.phone || ''}\n${L('Deposit', 'العربون')}: ${fmt(order.depositAmount)}`
   );

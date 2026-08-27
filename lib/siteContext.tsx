@@ -109,7 +109,6 @@ interface SiteContextValue {
   setCoStep: React.Dispatch<React.SetStateAction<number>>;
   uploadReceipt: (file: File) => Promise<string | null>;
   submitOrder: (paymentMethod: PaymentMethod, receiptKey: string, govName?: string, govNameAr?: string) => Promise<Order | null>;
-  submitAppointment: (data: Record<string, string>) => Promise<boolean>;
   submitReview: (pieceId: string, data: { name: string; email?: string; message: string }) => Promise<boolean>;
   acctTab: string;
   setAcctTab: React.Dispatch<React.SetStateAction<string>>;
@@ -398,21 +397,6 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
     return created;
   }, [cart, coData, egpPerSar, L, toast]);
 
-  const submitAppointment = useCallback(async (data: Record<string, string>) => {
-    try {
-      const r = await fetch('/api/appointments', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
-      });
-      if (!r.ok) throw new Error('appointment failed');
-      toast(L('Request received', 'وصلنا طلبك'));
-      trackPixel('Lead', { content_name: 'Private Room appointment' });
-      return true;
-    } catch {
-      toast(L('Could not reach the server — try again.', 'معرفناش نوصل للسيرفر — جرّبي تاني.'));
-      return false;
-    }
-  }, [L, toast]);
-
   const submitReview = useCallback(async (pieceId: string, data: { name: string; email?: string; message: string }) => {
     try {
       const r = await fetch('/api/reviews', {
@@ -440,7 +424,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
     pieces, collections, settings, orders,
     byId, pName, collName, dateLabel, orderItemsLabel, AVAIL_AR,
     cart, wish, cartTotalEgp, itemPrice, itemPriceEgp, egpPerSar, addToCart, qty, rmItem, toggleWish,
-    coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitAppointment, submitReview,
+    coData, setCoData, coStep, setCoStep, uploadReceipt, submitOrder, submitReview,
     acctTab, setAcctTab, sort, setSort, facets, setFacets,
     drawerOpen, setDrawerOpen, searchOpen, setSearchOpen, menuOpen, setMenuOpen,
     toastMsg, toast

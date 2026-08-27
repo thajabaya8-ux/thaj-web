@@ -12,6 +12,7 @@ import { HOME_CONTENT_KEYS } from '@/lib/homeContent';
 const SETTINGS_ALLOWLIST = [
   ...HOME_CONTENT_KEYS,
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
+  'return_policy_en', 'return_policy_ar',
   ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...ADMIN_ONLY_SETTINGS_KEYS,
   ...META_SETTINGS_KEYS, ...META_ADMIN_ONLY_SETTINGS_KEYS
 ];
@@ -44,7 +45,9 @@ export async function PUT(req: Request) {
         if (!Number.isFinite(n) || n <= 0) continue; // ignore garbage, keep the previous value
         value = String(n);
       } else {
-        value = key === 'contact_email' ? str(b[key], 254) : str(b[key], 500);
+        value = key === 'contact_email' ? str(b[key], 254)
+          : key === 'return_policy_en' || key === 'return_policy_ar' ? str(b[key], 2000)
+          : str(b[key], 500);
       }
       await sql`INSERT INTO settings (key,value) VALUES (${key},${value})
         ON CONFLICT (key) DO UPDATE SET value = excluded.value`;

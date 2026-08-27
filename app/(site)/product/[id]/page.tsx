@@ -10,7 +10,7 @@ import ReviewForm from '@/components/ReviewForm';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
-  const { L, AR, esc, num, fa, collName, pName, money, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR } = useSite();
+  const { L, AR, esc, num, fa, collName, pName, money, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR, settings } = useSite();
   const [size, setSize] = useState<string | null>(null);
   const [withPants, setWithPants] = useState(false);
   const [active, setActive] = useState(0);
@@ -172,6 +172,11 @@ export default function ProductPage() {
             )}
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>
+          {(settings.return_policy_en || settings.return_policy_ar) && (
+            <p className="body rv" style={{ fontSize: 11, lineHeight: 1.9, color: 'var(--ink-faint)', marginBottom: 24 }}>
+              {L(esc(settings.return_policy_en), esc(settings.return_policy_ar))}
+            </p>
+          )}
           <div className="spec rv">
             {specs.filter(([, v]) => v).map(([k, v]) => (
               <div className="r" key={k}><span className="k">{k}</span><span className="v">{v}</span></div>

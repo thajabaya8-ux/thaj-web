@@ -37,7 +37,6 @@ export default function Footer() {
           </div>
           <div className="fcol">
             <h5>{L('Client', 'العميلة')}</h5>
-            <Link className="fl" href="/private">{L('Private appointment', 'موعد خاص')}</Link>
             <Link className="fl" href="/account">{L('My THAJ', 'حسابي')}</Link>
             <Link className="fl" href="/wishlist">{L('My archive', 'أرشيفي')}</Link>
           </div>

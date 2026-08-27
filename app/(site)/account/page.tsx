@@ -95,21 +95,7 @@ function AccAddr() {
   );
 }
 
-function AccAppt() {
-  const { L } = useSite();
-  return (
-    <>
-      <div style={{ border: '1px solid var(--line)', padding: 26, marginBottom: 16 }}>
-        <span className="pill g">{L('Confirmed', 'مؤكد')}</span>
-        <div className="h-m" style={{ margin: '16px 0 8px' }}>{L('Collection preview', 'معاينة مجموعة')}</div>
-        <p className="body" style={{ fontSize: 13 }}>{L('28 August 2026 · Afternoon · THAJ atelier, Riyadh', '٢٨ أغسطس ٢٠٢٦ · بعد الظهر · أتيليه ثاج، الرياض')}</p>
-      </div>
-      <Link className="btn" href="/private">{L('Request another', 'اطلبي موعد تاني')}</Link>
-    </>
-  );
-}
-
-type TabKey = 'orders' | 'pieces' | 'saved' | 'appt' | 'info' | 'addr';
+type TabKey = 'orders' | 'pieces' | 'saved' | 'info' | 'addr';
 
 export default function AccountPage() {
   const { L, acctTab, setAcctTab, logout } = useSite();
@@ -117,7 +103,6 @@ export default function AccountPage() {
     ['orders', L('Orders', 'الطلبات'), AccOrders],
     ['pieces', L('My pieces', 'قطعي'), AccPieces],
     ['saved', L('My archive', 'أرشيفي'), AccSaved],
-    ['appt', L('Appointments', 'المواعيد'), AccAppt],
     ['info', L('Personal', 'بياناتي'), AccInfo],
     ['addr', L('Addresses', 'العناوين'), AccAddr]
   ];
@@ -128,7 +113,7 @@ export default function AccountPage() {
       <Mast
         label={L('My THAJ', 'حسابي في ثاج')}
         title={L('Your house record', 'سجلّك في الدار')}
-        desc={L('Orders, pieces held in your name, saved archive and private appointments.', 'طلباتك، والقطع المسجّلة باسمك، وأرشيفك المحفوظ، ومواعيدك الخاصة.')}
+        desc={L('Orders, pieces held in your name, and your saved archive.', 'طلباتك، والقطع المسجّلة باسمك، وأرشيفك المحفوظ.')}
       />
       <section className="wrap" style={{ paddingBottom: 'clamp(70px,11vh,140px)' }}>
         <div className="acct">

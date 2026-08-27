@@ -21,9 +21,7 @@ export const HOME_CONTENT_KEYS = [
   'home_s2_desc_en', 'home_s2_desc_ar', 'home_s2_cta_en', 'home_s2_cta_ar',
   'home_s3_title_en', 'home_s3_title_ar', 'home_s3_desc_en', 'home_s3_desc_ar',
   'home_s4_eyebrow_en', 'home_s4_eyebrow_ar', 'home_s4_title_en', 'home_s4_title_ar',
-  'home_s4_desc_en', 'home_s4_desc_ar', 'home_s4_cta_en', 'home_s4_cta_ar',
-  'home_room_eyebrow_en', 'home_room_eyebrow_ar', 'home_room_title_en', 'home_room_title_ar',
-  'home_room_desc_en', 'home_room_desc_ar', 'home_room_cta_en', 'home_room_cta_ar'
+  'home_s4_desc_en', 'home_s4_desc_ar', 'home_s4_cta_en', 'home_s4_cta_ar'
 ];
 
 export const applyCount = (template: string, count: string) => (template || '').replace(/\{count\}/g, count);

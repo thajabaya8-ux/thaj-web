@@ -120,17 +120,6 @@ export interface Order {
   hasReceipt?: boolean;
 }
 
-export interface Appointment {
-  id: string | number;
-  name: string;
-  email?: string;
-  date?: string;
-  time?: string;
-  type?: string;
-  mode?: string;
-  status: string;
-  notes?: string;
-}
 
 export interface Settings {
   hero_eyebrow_en?: string;
@@ -221,9 +210,7 @@ export interface DashboardData {
   pieces: number;
   collections: number;
   ordersPending: number;
-  appointmentsPending: number;
   collectionProgress: CollectionProgress[];
   revenueByMonth: RevenueMonth[];
   recentOrders: Order[];
-  recentAppointments: Appointment[];
 }

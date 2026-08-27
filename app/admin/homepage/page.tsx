@@ -64,15 +64,6 @@ const SECTIONS: SectionDef[] = [
       { key: 'home_s4_desc', en: 'Description', ar: 'الوصف', long: true },
       { key: 'home_s4_cta', en: 'Link', ar: 'الرابط' }
     ]
-  },
-  {
-    title: ['The Private Room', 'الغرفة الخاصة'],
-    fields: [
-      { key: 'home_room_eyebrow', en: 'Small label above the title', ar: 'السطر الصغير فوق العنوان' },
-      { key: 'home_room_title', en: 'Title', ar: 'العنوان' },
-      { key: 'home_room_desc', en: 'Description', ar: 'الوصف', long: true },
-      { key: 'home_room_cta', en: 'Button', ar: 'الزرار' }
-    ]
   }
 ];
 

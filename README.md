@@ -35,7 +35,7 @@ thaj-web/
 │   └── admin/
 │       ├── layout.js             imports admin.css, wraps in AdminProvider + AdminGate
 │       ├── admin.css              copied from thaj-site/admin/css/admin.css
-│       └── page.js, pieces/, collections/, orders/, appointments/, settings/
+│       └── page.js, pieces/, collections/, orders/, settings/
 ├── components/                  Header, Footer, ProductCard, CartDrawer, SearchOverlay, …
 │   └── admin/                    Sidebar, LoginForm, PieceForm, CollectionForm, ImageUpload
 ├── lib/

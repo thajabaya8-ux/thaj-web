@@ -8,8 +8,7 @@ export const NAVLINKS: [string, string, string][] = [
   ['/shop', 'Shop', 'المتجر'],
   ['/collections', 'Collections', 'المجموعات'],
   ['/maison', 'Maison', 'الدار'],
-  ['/atelier', 'Atelier', 'الأتيليه'],
-  ['/private', 'Private Room', 'الغرفة الخاصة']
+  ['/atelier', 'Atelier', 'الأتيليه']
 ];
 
 export default function Header() {

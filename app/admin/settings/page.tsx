@@ -27,7 +27,10 @@ const MARKETING_FIELDS: [string, string, string][] = [
   ['meta_capi_token', 'Meta Conversions API token (optional)', 'توكن Meta Conversions API (اختياري)']
 ];
 
+const POLICY_FIELDS = ['return_policy_en', 'return_policy_ar'];
+
 const ALL_FIELDS = [...CONTENT_FIELDS, ...PAYMENT_FIELDS, ...MARKETING_FIELDS];
+const ALL_KEYS = [...ALL_FIELDS.map(([k]) => k), ...POLICY_FIELDS];
 
 export default function SettingsPage() {
   const { data: settings, loading, error } = useAdminFetch<Settings>('/settings');
@@ -37,7 +40,7 @@ export default function SettingsPage() {
     e.preventDefault();
     const f = e.currentTarget;
     const body: Record<string, string> = {};
-    ALL_FIELDS.forEach(([k]) => { body[k] = (f.elements.namedItem(k) as HTMLInputElement).value; });
+    ALL_KEYS.forEach((k) => { body[k] = (f.elements.namedItem(k) as HTMLInputElement | HTMLTextAreaElement).value; });
     try { await call('/settings', { method: 'PUT', body: JSON.stringify(body) }); toast(L('Settings saved', 'الإعدادات اتحفظت')); }
     catch (err) { toast(err instanceof Error ? err.message : String(err)); }
   };
@@ -72,6 +75,22 @@ export default function SettingsPage() {
           <Link href="/admin/shipping">{L('Shipping page', 'الشحن')}</Link>.
         </p>
         {PAYMENT_FIELDS.map(renderField)}
+        <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>
+          {L('Return & exchange policy', 'سياسة الاسترجاع والاستبدال')}
+        </div>
+        <p className="body" style={{ fontSize: 12, marginBottom: 18, color: 'var(--ink-faint)' }}>
+          {L('One policy, shown in two places: its own row on the Shipping & Returns page, and a short note on every product page.', 'سياسة واحدة، بتتعرض في مكانين: صف لوحده في صفحة الشحن والإرجاع، وملاحظة قصيرة في كل صفحة منتج.')}
+        </p>
+        <div className="f2">
+          <div className="field">
+            <label>{L('Policy (EN)', 'السياسة (إنجليزي)')}</label>
+            <textarea name="return_policy_en" rows={4} defaultValue={settings.return_policy_en || ''} />
+          </div>
+          <div className="field">
+            <label>{L('Policy (AR)', 'السياسة (عربي)')}</label>
+            <textarea name="return_policy_ar" rows={4} dir="rtl" defaultValue={settings.return_policy_ar || ''} />
+          </div>
+        </div>
         <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>
           {L('Marketing', 'التسويق')}
         </div>

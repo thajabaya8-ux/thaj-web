@@ -36,6 +36,10 @@ export async function getCollection(key: string): Promise<Collection | null> {
 const PUBLIC_SETTINGS_ALLOWLIST = [
   ...HOME_CONTENT_KEYS,
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
+  // One policy, shown in two places (the shipping page's own row, and a
+  // short note on every product page) — a single admin field instead of
+  // two copies that could say different things.
+  'return_policy_en', 'return_policy_ar',
   ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...META_SETTINGS_KEYS
 ];
 

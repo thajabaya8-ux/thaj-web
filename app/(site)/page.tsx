@@ -130,14 +130,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="dark pad">
-        <div className="wrap-n" style={{ textAlign: 'center' }}>
-          <div className="lbl rv" style={{ color: 'var(--champagne)', marginBottom: 22 }}>{L(esc(settings.home_room_eyebrow_en), esc(settings.home_room_eyebrow_ar))}</div>
-          <h2 className="h-l rv"><span className="clip">{L(esc(settings.home_room_title_en), esc(settings.home_room_title_ar))}</span></h2>
-          <p className="body rv" style={{ margin: '26px auto 34px', maxWidth: '52ch' }}>{L(esc(settings.home_room_desc_en), esc(settings.home_room_desc_ar))}</p>
-          <div className="rv"><Link className="btn" href="/private">{L(esc(settings.home_room_cta_en), esc(settings.home_room_cta_ar))}</Link></div>
-        </div>
-      </section>
     </>
   );
 }
