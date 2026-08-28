@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
@@ -9,13 +9,29 @@ import EdHead from '@/components/EdHead';
 import ReviewForm from '@/components/ReviewForm';
 
 export default function ProductPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductPageInner />
+    </Suspense>
+  );
+}
+
+function ProductPageInner() {
   const { id } = useParams<{ id: string }>();
   const { L, AR, esc, num, fa, collName, pName, money, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR, settings } = useSite();
   const p = byId(id) || pieces[0];
+  // A colour picked from the product's own card in a grid (shop, related,
+  // etc.) rides along as ?color= so the piece opens already showing what
+  // the customer tapped — falls back to the first colour, same as before,
+  // when there's no query param or it doesn't match one of this piece's colours.
+  const colorParam = useSearchParams().get('color');
   const [size, setSize] = useState<string | null>(null);
   const [withPants, setWithPants] = useState(false);
   const [active, setActive] = useState(0);
-  const [color, setColor] = useState<string | null>(() => p?.colors?.[0]?.id || null);
+  const [color, setColor] = useState<string | null>(() => {
+    if (colorParam && p?.colors?.some((c) => c.id === colorParam)) return colorParam;
+    return p?.colors?.[0]?.id || null;
+  });
   const galGesture = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {

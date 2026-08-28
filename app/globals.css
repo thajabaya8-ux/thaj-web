@@ -434,8 +434,13 @@ section{position:relative}
 .card.tall .frame{aspect-ratio:9/14}
 .card.wide .frame{aspect-ratio:1/1}
 .card img{width:100%;height:100%;object-fit:cover;transform:scale(1.004);
-  transition:transform 1.9s var(--e),filter 1.2s var(--e);filter:saturate(.94)}
+  transition:transform 1.9s var(--e),filter 1.2s var(--e);filter:saturate(.94);animation:card-img-in .5s var(--e)}
 .card:hover img{transform:scale(1.07);filter:saturate(1)}
+/* Keyed on src by ProductCard, so picking a colour swap remounts this img
+   and replays the fade — the same soft cue used on the product page's own
+   gallery, kept quick here since a grid can have several cards doing it. */
+@keyframes card-img-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.card img{animation:none}}
 .card .ed{position:absolute;top:12px;left:12px;z-index:4;font-size:8px;letter-spacing:.28em;text-transform:uppercase;
   background:rgba(231,237,199,.86);padding:5px 9px;color:var(--ink)}
 .card .pants-badge{position:absolute;top:40px;left:12px;z-index:4;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;
@@ -456,6 +461,17 @@ section{position:relative}
   transition:all .6s var(--e);line-height:1}
 .card:hover .save,.card .save.on{opacity:1;transform:none;pointer-events:auto}
 .card .save.on{color:var(--gold)}
+/* Reuses the .colour-dot ring mechanics from the product page (defined
+   with .sizes below), just at card scale — same selected-state language
+   everywhere a colour can be picked, not a second design invented for
+   the grid. Sits between the photo and the title/price row rather than
+   floating over the image, so it never crowds a badge or the save button
+   already living there. */
+.card-colours{display:flex;align-items:center;flex-wrap:wrap;gap:0 1px;margin-top:10px;min-height:24px}
+.card-colours .colour-dot{width:24px;height:24px}
+.card-colours .colour-dot .dot{width:13px;height:13px}
+.card-colours .colour-dot::before{inset:3px}
+.card-colours-more{font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint);margin-inline-start:4px}
 .card .meta{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-top:14px;
   border-top:1px solid var(--line-soft);padding-top:11px}
 .card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em}

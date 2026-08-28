@@ -1,10 +1,17 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useSite, availableStock } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
 
+// A card only ever shows this many dots before folding the rest behind a
+// "+N" — a piece can carry up to 8 colours, and eight full-size dots on a
+// narrow mobile card is exactly the clutter this feature was asked to avoid.
+const MAX_DOTS = 6;
+
 export default function ProductCard({ piece, className }: { piece?: Piece | null; className?: string }) {
   const { L, AR, esc, pName, money, wish, toggleWish, AVAIL_AR } = useSite();
+  const [cardColor, setCardColor] = useState<string | null>(null);
   if (!piece) return null;
   const saved = wish.includes(piece.id);
   // Out of real stock overrides whatever the admin last set availability
@@ -14,10 +21,15 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
   const av = soldOut ? L('Sold Out', 'نفدت الكمية') : (AR() ? (AVAIL_AR[piece.av] || piece.av) : piece.av);
   const onSale = piece.salePrice != null;
   const pct = onSale ? Math.round((1 - piece.salePrice! / piece.price) * 100) : 0;
+  const activeColor = piece.colors.find((c) => c.id === cardColor) || null;
+  const img = activeColor?.images[0] || piece.img;
+  const href = cardColor ? `/product/${piece.id}?color=${cardColor}` : `/product/${piece.id}`;
+  const shownDots = piece.colors.slice(0, MAX_DOTS);
+  const hiddenCount = piece.colors.length - shownDots.length;
 
   return (
     <article className={`card rv ${className || ''}`.trim()}>
-      <Link href={`/product/${piece.id}`} className="frame" style={{ display: 'block', position: 'relative' }}>
+      <Link href={href} className="frame" style={{ display: 'block', position: 'relative' }}>
         <div className="veil" />
         {piece.ed && <div className="ed">{esc(piece.ed)}</div>}
         {soldOut ? <div className="sold-badge">{L('Sold Out', 'نفدت الكمية')}</div>
@@ -28,9 +40,24 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
           className={`save ${saved ? 'on' : ''}`}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWish(piece.id); }}
         >{saved ? '●' : '○'}</button>
-        <img src={`/${piece.img}`} alt={pName(piece)} loading="lazy" style={soldOut ? { opacity: .55 } : undefined} />
+        <img key={img} src={`/${img}`} alt={pName(piece)} loading="lazy" style={soldOut ? { opacity: .55 } : undefined} />
       </Link>
-      <Link href={`/product/${piece.id}`} className="meta">
+      {piece.colors.length > 0 && (
+        <div className="card-colours">
+          {shownDots.map((c) => (
+            <button
+              key={c.id} type="button" className={`colour-dot ${cardColor === c.id ? 'on' : ''}`}
+              style={{ '--dot': c.hex } as React.CSSProperties}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCardColor((cur) => (cur === c.id ? null : c.id)); }}
+              aria-label={esc(L(c.nameEn, c.nameAr))} aria-pressed={cardColor === c.id}
+            >
+              <span className="dot" />
+            </button>
+          ))}
+          {hiddenCount > 0 && <span className="card-colours-more">+{hiddenCount}</span>}
+        </div>
+      )}
+      <Link href={href} className="meta">
         <h3>{pName(piece)}{AR() ? '' : <i>{esc(piece.ar)}</i>}</h3>
         <div className="pr">
           {onSale ? (
