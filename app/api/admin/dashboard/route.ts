@@ -13,9 +13,14 @@ export async function GET() {
 
   const ordersByStatus = await sql`SELECT status, COUNT(*)::int AS n FROM orders GROUP BY status`;
 
+  // payment_status, not just status — an order's payment_status never
+  // changes when it's later cancelled (see PATCH in
+  // app/api/admin/orders/[id]/route.ts), so both conditions are needed:
+  // an approved-then-cancelled order is neither real revenue nor still
+  // "approved" in any meaningful sense.
   const revenueByMonthRows = await sql`
     SELECT to_char(created_at, 'YYYY-MM') AS month, SUM(total)::int AS total
-    FROM orders GROUP BY month ORDER BY month DESC LIMIT 6
+    FROM orders WHERE payment_status = 'approved' AND status != 'Cancelled' GROUP BY month ORDER BY month DESC LIMIT 6
   `;
   const revenueByMonth = [...revenueByMonthRows].reverse();
 

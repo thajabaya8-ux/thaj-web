@@ -28,12 +28,18 @@ export async function GET() {
   const orders = await sql`SELECT status, payment_status, payment_method, total, deposit_amount, amount_paid, items, shipping_json, created_at FROM orders` as unknown as RawOrder[];
 
   const totalOrders = orders.length;
+  // A cancelled order's own payment_status never changes when it's
+  // cancelled (see app/api/admin/orders/[id]/route.ts) — it stays
+  // whatever it last was, 'approved' included, so every revenue figure
+  // below has to check status too, not just payment_status, or an
+  // approve-then-cancel still counted as real money in.
   const approved = orders.filter((o) => o.payment_status === 'approved');
+  const approvedActive = approved.filter((o) => o.status !== 'Cancelled');
   const underReview = orders.filter((o) => o.payment_status === 'under_review');
   const rejected = orders.filter((o) => o.payment_status === 'rejected');
 
-  const totalRevenue = approved.reduce((s, o) => s + (o.total || 0), 0);
-  const totalDeposits = approved.reduce((s, o) => s + (o.amount_paid || 0), 0);
+  const totalRevenue = approvedActive.reduce((s, o) => s + (o.total || 0), 0);
+  const totalDeposits = approvedActive.reduce((s, o) => s + (o.amount_paid || 0), 0);
   const avgOrderValue = totalOrders ? Math.round(orders.reduce((s, o) => s + (o.total || 0), 0) / totalOrders) : 0;
 
   const byMethod: Record<string, { count: number; revenue: number }> = {};
@@ -41,7 +47,7 @@ export async function GET() {
     const m = o.payment_method || 'unknown';
     if (!byMethod[m]) byMethod[m] = { count: 0, revenue: 0 };
     byMethod[m].count++;
-    if (o.payment_status === 'approved') byMethod[m].revenue += o.total || 0;
+    if (o.payment_status === 'approved' && o.status !== 'Cancelled') byMethod[m].revenue += o.total || 0;
   }
 
   const byGov: Record<string, { key: string; name: string; nameAr: string; count: number; revenue: number }> = {};
@@ -50,7 +56,7 @@ export async function GET() {
     const key = ship.governorate || 'unknown';
     if (!byGov[key]) byGov[key] = { key, name: ship.governorateName || key, nameAr: ship.governorateNameAr || key, count: 0, revenue: 0 };
     byGov[key].count++;
-    if (o.payment_status === 'approved') byGov[key].revenue += o.total || 0;
+    if (o.payment_status === 'approved' && o.status !== 'Cancelled') byGov[key].revenue += o.total || 0;
   }
 
   const pieceCounts: Record<string, number> = {};
@@ -66,7 +72,7 @@ export async function GET() {
 
   const revenueByMonthRows = await sql`
     SELECT to_char(created_at, 'YYYY-MM') AS month, SUM(total)::int AS total
-    FROM orders WHERE payment_status = 'approved' GROUP BY month ORDER BY month DESC LIMIT 6
+    FROM orders WHERE payment_status = 'approved' AND status != 'Cancelled' GROUP BY month ORDER BY month DESC LIMIT 6
   `;
   const revenueByMonth = [...revenueByMonthRows].reverse();
 
