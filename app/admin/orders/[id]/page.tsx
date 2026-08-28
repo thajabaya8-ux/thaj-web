@@ -77,12 +77,13 @@ export default function OrderDetailPage() {
             const p = byId(it.id);
             const qty = it.qty || 1;
             const unit = p ? p.price + (it.withPants && p.pantsPrice ? p.pantsPrice : 0) : 0;
+            const colr = p && it.color ? p.colors.find((c) => c.id === it.color) : null;
             return (
               <div className="adm-row" style={{ gridTemplateColumns: '48px 1fr 70px 100px' }} key={i}>
-                {p ? <img className="thumb" src={`/${p.img}`} alt="" /> : <span />}
+                {p ? <img className="thumb" src={`/${colr?.images[0] || p.img}`} alt="" /> : <span />}
                 <span className="body" style={{ fontSize: 12.5 }}>
                   {p ? L(p.n, p.ar) : it.id}<br />
-                  <span style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {it.size}{it.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
+                  <span style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {it.size}{colr ? ` · ${L(colr.nameEn, colr.nameAr)}` : ''}{it.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                 </span>
                 <span className="body" style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>{L('Qty', 'الكمية')} {qty}</span>
                 <span>{p ? fmt(unit * qty) : ''}</span>

@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, Review, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, PieceColor, Review, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -43,7 +43,9 @@ export function pieceOut(r: any): Piece {
     visible: r.visible !== false,
     stock: r.stock ?? 0,
     reserved: r.reserved ?? 0,
-    featured: r.featured === true
+    featured: r.featured === true,
+    colors: parseArr<PieceColor>(r.colors),
+    sizes: parseArr<string>(r.sizes)
   };
 }
 

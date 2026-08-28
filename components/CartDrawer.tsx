@@ -19,15 +19,17 @@ export default function CartDrawer() {
           ) : cart.map((c, i) => {
             const p = byId(c.pid);
             if (!p) return null;
+            const colr = c.color ? p.colors.find((x) => x.id === c.color) : null;
+            const img = colr?.images[0] || p.img;
             return (
-              <div className="citem" key={`${c.pid}-${c.size}-${i}`}>
-                <img src={`/${p.img}`} alt="" />
+              <div className="citem" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`}>
+                <img src={`/${img}`} alt="" />
                 <div className="ci">
                   <div className="top">
                     <span className="h-s" style={{ fontSize: 17 }}>{esc(p.n)}</span>
                     <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{money(itemPrice(c) * c.q, p.currency)}</span>
                   </div>
-                  <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
+                  <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   <div className="qty" style={{ marginTop: 8 }}>
                     <button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button>
                   </div>

@@ -99,7 +99,7 @@ interface SiteContextValue {
   itemPrice: (c: CartItem) => number;
   itemPriceEgp: (c: CartItem) => number;
   egpPerSar: number;
-  addToCart: (id: string, size?: string, withPants?: boolean) => void;
+  addToCart: (id: string, size?: string, withPants?: boolean, color?: string) => void;
   qty: (i: number, d: number) => void;
   rmItem: (i: number) => void;
   toggleWish: (id: string) => void;
@@ -308,12 +308,12 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
 
   const cartTotalEgp = useMemo(() => cart.reduce((s, c) => s + itemPriceEgp(c) * c.q, 0), [cart, itemPriceEgp]);
 
-  const addToCart = useCallback((id: string, size?: string, withPants?: boolean) => {
+  const addToCart = useCallback((id: string, size?: string, withPants?: boolean, color?: string) => {
     const useSize = size || '54';
     setCart((cur) => {
-      const i = cur.findIndex((c) => c.pid === id && c.size === useSize && !!c.withPants === !!withPants);
+      const i = cur.findIndex((c) => c.pid === id && c.size === useSize && !!c.withPants === !!withPants && (c.color || undefined) === (color || undefined));
       if (i > -1) { const next = [...cur]; next[i] = { ...next[i], q: next[i].q + 1 }; return next; }
-      return [...cur, { pid: id, size: useSize, q: 1, withPants: !!withPants }];
+      return [...cur, { pid: id, size: useSize, q: 1, withPants: !!withPants, color: color || undefined }];
     });
     setDrawerOpen(true);
     const p = byId(id);

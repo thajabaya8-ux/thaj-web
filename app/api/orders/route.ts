@@ -77,8 +77,8 @@ export async function POST(req: Request) {
   // are added as-is, so the deposit/total math below always works in one
   // consistent currency regardless of how the cart's pieces are individually priced.
   let subtotalEgp = 0;
-  const cleanItems: { id: string; size: string; qty: number; withPants?: boolean }[] = [];
-  const itemsForEmail: { name: string; size: string; qty: number; withPants?: boolean }[] = [];
+  const cleanItems: { id: string; size: string; qty: number; withPants?: boolean; color?: string }[] = [];
+  const itemsForEmail: { name: string; size: string; qty: number; withPants?: boolean; color?: string }[] = [];
 
   // Stock is reserved (not yet permanently deducted — that only happens
   // when the admin approves the payment) right here, atomically per item,
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     const rows = await sql`
       UPDATE pieces SET reserved = reserved + ${qty}
       WHERE id = ${pid} AND (stock - reserved) >= ${qty}
-      RETURNING id, price, pants_price, currency, sale_price, name_en`;
+      RETURNING id, price, pants_price, currency, sale_price, name_en, colors`;
 
     if (!rows.length) {
       await releaseReserved();
@@ -122,8 +122,14 @@ export async function POST(req: Request) {
     const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
     subtotalEgp += unitPriceEgp * qty;
     const size = str(it.size, 40);
-    cleanItems.push({ id: p.id, size, qty, withPants });
-    itemsForEmail.push({ name: p.name_en, size, qty, withPants });
+    // Only a colour id that actually exists on this piece is ever trusted —
+    // same rule as withPants above, the client's claim is just a hint.
+    let pieceColors: { id: string; nameEn: string }[] = [];
+    try { pieceColors = JSON.parse(p.colors || '[]'); } catch { /* left empty */ }
+    const colorMatch = pieceColors.find((c) => c.id === it.color);
+    const color = colorMatch?.id;
+    cleanItems.push({ id: p.id, size, qty, withPants, ...(color ? { color } : {}) });
+    itemsForEmail.push({ name: p.name_en, size, qty, withPants, ...(colorMatch ? { color: colorMatch.nameEn } : {}) });
   }
 
   const { subtotal, shippingFee, total, deposit } = computeOrderTotals(subtotalEgp, governorate.price, settings);

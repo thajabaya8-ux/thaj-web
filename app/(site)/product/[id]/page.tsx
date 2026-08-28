@@ -11,12 +11,12 @@ import ReviewForm from '@/components/ReviewForm';
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
   const { L, AR, esc, num, fa, collName, pName, money, byId, pieces, collections, wish, toggleWish, addToCart, AVAIL_AR, settings } = useSite();
+  const p = byId(id) || pieces[0];
   const [size, setSize] = useState<string | null>(null);
   const [withPants, setWithPants] = useState(false);
   const [active, setActive] = useState(0);
+  const [color, setColor] = useState<string | null>(() => p?.colors?.[0]?.id || null);
   const galGesture = useRef<{ x: number; y: number } | null>(null);
-
-  const p = byId(id) || pieces[0];
 
   useEffect(() => {
     if (!p) return;
@@ -27,13 +27,17 @@ export default function ProductPage() {
   if (!p) return null;
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
-  const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
+  const sizes = [...(p.sizes.length ? p.sizes : SIZES), L(SIZE_MTM.en, SIZE_MTM.ar)];
+  const activeColor = p.colors.find((c) => c.id === color) || null;
+  const selectColor = (cid: string) => { setColor(cid); setActive(0); };
   // The trousers photo (if any) rides along at the end of the same
   // gallery, tagged, instead of only ever living inside the small
   // pants-select thumbnail — so it's browsable/swipeable like any other
   // product shot, but always clearly labelled as trousers, not confused
-  // for another abaya photo.
-  const galleryImgs = p.images.length ? p.images : [p.img];
+  // for another abaya photo. A selected colour with its own photos takes
+  // over the whole gallery (not just prepended) — mixing that colour's
+  // shots with every other colour's would defeat the point of picking one.
+  const galleryImgs = activeColor?.images.length ? activeColor.images : (p.images.length ? p.images : [p.img]);
   const gallery = [
     ...galleryImgs.map((img) => ({ img, isPants: false })),
     ...(p.pantsImg ? [{ img: p.pantsImg, isPants: true }] : [])
@@ -78,7 +82,7 @@ export default function ProductPage() {
       <section className="pdp">
         <div className="gal">
           <div className="gal-main" onPointerDown={onGalPointerDown} onPointerUp={onGalPointerUp}>
-            <img src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} />
+            <img key={activeImg} src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} />
             {activeIsPants && <span className="gal-pants-tag">{L('Trousers', 'البنطلون')}</span>}
             {gallery.length > 1 && (
               <>
@@ -155,6 +159,26 @@ export default function ProductPage() {
             </>
           )}
 
+          {p.colors.length > 0 && (
+            <div className="rv">
+              <div className="lbl" style={{ color: 'var(--ink-faint)' }}>
+                {L('Colour', 'اللون')}
+                {activeColor && <span className="colour-name"> — {esc(L(activeColor.nameEn, activeColor.nameAr))}</span>}
+              </div>
+              <div className="colours">
+                {p.colors.map((c) => (
+                  <button
+                    key={c.id} type="button" className={`colour-dot ${color === c.id ? 'on' : ''}`}
+                    style={{ '--dot': c.hex } as React.CSSProperties}
+                    onClick={() => selectColor(c.id)} aria-pressed={color === c.id}
+                    aria-label={esc(L(c.nameEn, c.nameAr))}
+                  >
+                    <span className="dot" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="rv">
             <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'المقاس')}</div>
             <div className="sizes">
@@ -168,7 +192,7 @@ export default function ProductPage() {
             {soldOut ? (
               <button className="btn fill" disabled style={{ opacity: .5, cursor: 'default' }}>{L('Sold out', 'نفدت الكمية')}</button>
             ) : (
-              <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
+              <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants, activeColor?.id)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
             )}
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>

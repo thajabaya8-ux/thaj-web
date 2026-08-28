@@ -7,6 +7,14 @@
 
 export type PieceCurrency = 'SAR' | 'EGP';
 
+export interface PieceColor {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  hex: string;
+  images: string[];
+}
+
 export interface Piece {
   id: string;
   n: string;
@@ -42,6 +50,13 @@ export interface Piece {
   reserved: number;
   // Admin-curated pick for the homepage's featured composition.
   featured: boolean;
+  // Colour variants, each with its own photo set — see PieceColor.
+  // Empty for a piece that doesn't offer a colour choice.
+  colors: PieceColor[];
+  // Which standard sizes (SIZES in lib/siteContext.tsx) this piece comes
+  // in. Empty means "every standard size" — the pre-existing behaviour
+  // every piece had before this field existed.
+  sizes: string[];
 }
 
 export interface Collection {
@@ -65,6 +80,8 @@ export interface OrderLineItem {
   size: string;
   qty?: number;
   withPants?: boolean;
+  // The chosen PieceColor's id, if the piece offers colours.
+  color?: string;
 }
 
 export type PaymentMethod = 'vodafone_cash' | 'instapay';
@@ -146,6 +163,7 @@ export interface CartItem {
   size: string;
   q: number;
   withPants?: boolean;
+  color?: string;
 }
 
 export interface Review {

@@ -16,7 +16,7 @@ interface OrderNotifyInput {
   city: string;
   address: string;
   notes?: string;
-  items: { name: string; size: string; qty: number; withPants?: boolean }[];
+  items: { name: string; size: string; qty: number; withPants?: boolean; color?: string }[];
   total: number;
   deposit: number;
   paymentMethod: string;
@@ -37,7 +37,7 @@ export async function sendOrderNotification(input: OrderNotifyInput): Promise<vo
     `<tr><td style="padding:5px 14px 5px 0;color:#777;white-space:nowrap">${esc(label)}</td><td>${value}</td></tr>`;
 
   const itemsHtml = input.items
-    .map((it) => `<li>${esc(it.name)} — ${esc(it.size)} × ${it.qty}${it.withPants ? ' (+ trousers)' : ''}</li>`)
+    .map((it) => `<li>${esc(it.name)} — ${esc(it.size)}${it.color ? ` · ${esc(it.color)}` : ''} × ${it.qty}${it.withPants ? ' (+ trousers)' : ''}</li>`)
     .join('');
 
   const html = `

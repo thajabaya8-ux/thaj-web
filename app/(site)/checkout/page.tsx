@@ -228,15 +228,17 @@ export default function CheckoutPage() {
             {cart.map((c, i) => {
               const p = byId(c.pid);
               if (!p) return null;
+              const colr = c.color ? p.colors.find((x) => x.id === c.color) : null;
+              const img = colr?.images[0] || p.img;
               return (
-                <div className="citem" key={`${c.pid}-${i}`} style={{ gridTemplateColumns: '64px 1fr' }}>
-                  <img src={`/${p.img}`} alt="" />
+                <div className="citem" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`} style={{ gridTemplateColumns: '64px 1fr' }}>
+                  <img src={`/${img}`} alt="" />
                   <div className="ci">
                     <div className="top">
                       <span className="h-s" style={{ fontSize: 16 }}>{pName(p)}</span>
                       <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{money(itemPrice(c) * c.q, p.currency)}</span>
                     </div>
-                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
+                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   </div>
                 </div>
               );

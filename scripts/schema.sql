@@ -77,6 +77,19 @@ CREATE TABLE IF NOT EXISTS pieces (
   -- pieces until the admin has actually chosen any, so this migration
   -- doesn't blank the homepage out for every site that hasn't opted in yet.
   featured BOOLEAN NOT NULL DEFAULT false,
+  -- Colour variants: [{id, nameEn, nameAr, hex, images:[...]}]. Same
+  -- JSON-in-TEXT convention as `images`/`story_en` above rather than a
+  -- separate table — one small, genuinely-repeating field, not
+  -- relational data anything else needs to join against. Each colour's
+  -- own `images` replaces the piece's single `images` gallery on the
+  -- product page once any colours exist; a piece with none keeps
+  -- working exactly as before (this is additive, not a replacement).
+  colors TEXT NOT NULL DEFAULT '[]',
+  -- Which of the standard sizes (see SIZES in lib/siteContext.tsx) this
+  -- piece actually comes in — e.g. ["52","54"]. Empty means "every
+  -- standard size", the same as every piece before this column existed,
+  -- so nothing already live loses size options from this migration.
+  sizes TEXT NOT NULL DEFAULT '[]',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -87,6 +100,8 @@ ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_image TEXT;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS pants_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sale_price INTEGER;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS visible BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS colors TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE pieces ADD COLUMN IF NOT EXISTS sizes TEXT NOT NULL DEFAULT '[]';
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS stock INTEGER NOT NULL DEFAULT 999;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS reserved INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE pieces ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT false;

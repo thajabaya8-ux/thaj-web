@@ -25,14 +25,16 @@ export default function CartPage() {
         {cart.map((c, i) => {
           const p = byId(c.pid);
           if (!p) return null;
+          const colr = c.color ? p.colors.find((x) => x.id === c.color) : null;
+          const img = colr?.images[0] || p.img;
           return (
-            <div className="split cart-row rv" key={`${c.pid}-${c.size}-${i}`} style={{ gridTemplateColumns: 'repeat(12,1fr)', padding: '26px 0', borderBottom: '1px solid var(--line-soft)', alignItems: 'center' }}>
+            <div className="split cart-row rv" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`} style={{ gridTemplateColumns: 'repeat(12,1fr)', padding: '26px 0', borderBottom: '1px solid var(--line-soft)', alignItems: 'center' }}>
               <div className="cr-img" style={{ gridColumn: '1/3', position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--sand)' }}>
-                <img src={`/${p.img}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                <img src={`/${img}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>
-                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
+                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
               </div>
               <div style={{ gridColumn: '8/11' }}>
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>

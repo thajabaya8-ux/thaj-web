@@ -530,7 +530,13 @@ section{position:relative}
    max-width (the column) well before they'd ever reach it. */
 .pdp .gal-main{position:relative;width:100%;touch-action:pan-y;
   display:flex;align-items:flex-start;justify-content:center}
-.pdp .gal-main img{width:auto;height:auto;max-width:100%;max-height:min(82vh,900px);object-fit:contain;display:block;margin:0 auto}
+.pdp .gal-main img{width:auto;height:auto;max-width:100%;max-height:min(82vh,900px);object-fit:contain;display:block;margin:0 auto;
+  animation:gal-fade .55s var(--e)}
+/* Keyed on src by the page, so switching photo (arrows, thumbnails, or a
+   colour swap) remounts this img and replays the fade — a soft cue that
+   something changed instead of a hard jump-cut. */
+@keyframes gal-fade{from{opacity:0;transform:scale(1.012)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.pdp .gal-main img{animation:none}}
 .gal-arrow{position:absolute;top:50%;translate:0 -50%;z-index:5;width:46px;height:46px;border-radius:50%;
   border:1px solid var(--line);background:rgba(231,237,199,.86);backdrop-filter:blur(6px);
   display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--display);
@@ -723,6 +729,23 @@ section{position:relative}
   transition:all .5s var(--e)}
 .sizes button:hover{border-color:var(--ink-soft)}
 .sizes button.on{background:var(--ink);border-color:var(--ink);color:var(--bone)}
+
+/* Colour swatches — a ring grows in around the dot on selection rather
+   than swapping the dot itself, so the ring reads as "chosen" no matter
+   what hue the swatch is (a pale swatch needs the same clear cue as a
+   dark one). */
+.colour-name{color:var(--ink);letter-spacing:.02em;text-transform:none;transition:opacity .3s var(--e)}
+.colours{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 8px}
+.colour-dot{position:relative;width:40px;height:40px;padding:0;border:0;background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;border-radius:50%;-webkit-tap-highlight-color:transparent}
+.colour-dot::before{content:'';position:absolute;inset:2px;border-radius:50%;border:1px solid transparent;
+  transition:border-color .4s var(--e),transform .4s var(--e);transform:scale(.68)}
+.colour-dot .dot{display:block;width:22px;height:22px;border-radius:50%;background:var(--dot);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);transition:transform .4s var(--e)}
+.colour-dot:hover .dot{transform:scale(1.1)}
+.colour-dot.on::before{border-color:var(--ink);transform:scale(1)}
+.colour-dot.on .dot{transform:scale(.92)}
+.colour-dot:focus-visible::before{border-color:var(--gold);transform:scale(1)}
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
 .acts .btn{flex:1 1 220px;text-align:center}
 .spec{margin-top:44px;border-top:1px solid var(--line)}

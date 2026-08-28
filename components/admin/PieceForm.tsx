@@ -2,9 +2,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
+import { SIZES } from '@/lib/siteContext';
 import ImageUpload from './ImageUpload';
 import MultiImageUpload from './MultiImageUpload';
-import type { Collection, Piece } from '@/lib/types';
+import type { Collection, Piece, PieceColor } from '@/lib/types';
+
+let colorKeySeq = 0;
+const newColor = (): PieceColor & { key: number } => ({ key: colorKeySeq++, id: '', nameEn: '', nameAr: '', hex: '#1B271F', images: [] });
 
 const AVAIL_OPTS = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only', 'Sold Out'];
 const AVAIL_AR: Record<string, string> = {
@@ -29,7 +33,17 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
   const [coll, setColl] = useState(piece?.coll || defaultCollKey || '');
   const [visible, setVisible] = useState(piece?.visible ?? true);
   const [featured, setFeatured] = useState(piece?.featured ?? false);
+  const [colors, setColors] = useState<(PieceColor & { key: number })[]>(
+    () => (piece?.colors || []).map((c) => ({ ...c, key: colorKeySeq++ }))
+  );
+  const [sizes, setSizes] = useState<string[]>(piece?.sizes || []);
   const [saving, setSaving] = useState(false);
+
+  const updateColor = (i: number, patch: Partial<PieceColor>) =>
+    setColors((cur) => cur.map((c, idx) => (idx === i ? { ...c, ...patch } : c)));
+  const removeColor = (i: number) => setColors((cur) => cur.filter((_, idx) => idx !== i));
+  const toggleSize = (s: string, on: boolean) =>
+    setSizes((cur) => (on ? [...cur, s] : cur.filter((x) => x !== s)));
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,6 +52,8 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
 
     if (!images.length) { toast(L('At least one photo of the piece is required', 'لازم صورة واحدة على الأقل للقطعة')); return; }
     if (hasPants && !pantsImg) { toast(L('Add a trouser photo, or turn the trousers toggle off', 'ضيفي صورة البنطلون، أو ألغي خيار البنطلون')); return; }
+    if (colors.some((c) => !c.nameEn.trim() || !c.nameAr.trim())) { toast(L('Every colour needs a name in both languages', 'كل لون محتاج اسم بالإنجليزي والعربي')); return; }
+    if (colors.some((c) => !c.images.length)) { toast(L('Every colour needs at least one photo', 'كل لون محتاج صورة واحدة على الأقل')); return; }
 
     const n = val('n');
     const body = {
@@ -51,7 +67,9 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       salePrice: val('salePrice') ? parseInt(val('salePrice'), 10) : null,
       visible,
       stock: parseInt(val('stock'), 10) || 0,
-      featured
+      featured,
+      colors: colors.map(({ key: _key, ...c }) => c),
+      sizes
     };
     setSaving(true);
     try {
@@ -118,6 +136,45 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         <div className="field"><label>{L('Description (AR)', 'الوصف (عربي)')}</label><textarea name="dAr" defaultValue={v('dAr')} /></div>
       </div>
       <MultiImageUpload value={images} onChange={setImages} label={L('Piece photos (up to 10 — first is the cover)', 'صور القطعة (لغاية 10 — أول صورة هي الغلاف)')} />
+
+      <div className="field">
+        <label>{L('Available sizes', 'المقاسات المتاحة')}</label>
+        <div className="adm-size-checks">
+          {SIZES.map((s) => (
+            <label key={s} className={`adm-size-check ${sizes.includes(s) ? 'on' : ''}`}>
+              <input type="checkbox" checked={sizes.includes(s)} onChange={(e) => toggleSize(s, e.target.checked)} />
+              <span>{s}</span>
+            </label>
+          ))}
+        </div>
+        <p className="body" style={{ fontSize: 11, color: 'var(--ink-faint)', marginTop: 6 }}>
+          {L('Leave all unchecked to offer every size.', 'سيبيهم كلهم من غير اختيار عشان كل المقاسات تتاح.')}
+        </p>
+      </div>
+
+      <div className="adm-colors">
+        <label>{L('Colour variants (optional)', 'الألوان (اختياري)')}</label>
+        <p className="body" style={{ fontSize: 11, color: 'var(--ink-faint)', margin: '2px 0 14px' }}>
+          {L('Each colour gets its own photos — once any colour is added, its photos replace the piece photos above on the product page. No colours means the piece just shows the photos above, like today.', 'كل لون بصوره بتاعته — أول ما تضيفي لون، صوره بتحل محل صور القطعة اللي فوق في صفحة المنتج. من غير ألوان، القطعة بتفضل تعرض الصور اللي فوق زي ما هي دلوقتي.')}
+        </p>
+        {colors.map((c, i) => (
+          <div className="adm-color-card" key={c.key}>
+            <div className="adm-color-head">
+              <input type="color" value={c.hex} onChange={(e) => updateColor(i, { hex: e.target.value })} aria-label={L('Swatch colour', 'لون العينة')} />
+              <input value={c.nameEn} onChange={(e) => updateColor(i, { nameEn: e.target.value })} placeholder={L('Name (EN)', 'الاسم (إنجليزي)')} />
+              <input value={c.nameAr} onChange={(e) => updateColor(i, { nameAr: e.target.value })} placeholder={L('Name (AR)', 'الاسم (عربي)')} dir="rtl" />
+              <button type="button" className="rm" onClick={() => removeColor(i)} aria-label={L('Remove colour', 'حذف اللون')}>×</button>
+            </div>
+            <MultiImageUpload
+              value={c.images} onChange={(imgs) => updateColor(i, { images: imgs })}
+              label={L('Photos for this colour', 'صور اللون ده')}
+            />
+          </div>
+        ))}
+        <button type="button" className="btn" onClick={() => setColors((cur) => [...cur, newColor()])}>
+          {L('+ Add colour', '+ إضافة لون')}
+        </button>
+      </div>
 
       <div className="adm-pants">
         <label className="adm-pants-toggle">
