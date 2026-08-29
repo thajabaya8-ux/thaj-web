@@ -143,7 +143,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       <MultiImageUpload value={images} onChange={setImages} label={L('Piece photos (up to 10 — first is the cover)', 'صور القطعة (لغاية 10 — أول صورة هي الغلاف)')} />
 
       <div className="field">
-        <label>{L('Available sizes', 'المقاسات المتاحة')}</label>
+        <label>{L('Available heights (cm)', 'الأطوال المتاحة (سم)')}</label>
         <div className="adm-size-checks">
           {SIZES.map((s) => (
             <label key={s} className={`adm-size-check ${sizes.includes(s) ? 'on' : ''}`}>
@@ -153,7 +153,7 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
           ))}
         </div>
         <p className="body" style={{ fontSize: 11, color: 'var(--ink-faint)', marginTop: 6 }}>
-          {L('Leave all unchecked to offer every size.', 'سيبيهم كلهم من غير اختيار عشان كل المقاسات تتاح.')}
+          {L('Leave all unchecked to offer every height.', 'سيبيهم كلهم من غير اختيار عشان كل الأطوال تتاح.')}
         </p>
       </div>
 

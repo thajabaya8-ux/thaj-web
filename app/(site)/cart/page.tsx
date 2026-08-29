@@ -20,7 +20,7 @@ export default function CartPage() {
 
   return (
     <>
-      <Mast label={L('Your Selection', 'اختيارك')} title={t} desc={L('Sizes and quantities can be changed here before you continue.', 'تقدري تغيّري المقاسات والكميات هنا قبل ما تكمّلي.')} />
+      <Mast label={L('Your Selection', 'اختيارك')} title={t} desc={L('Heights and quantities can be changed here before you continue.', 'تقدري تغيّري الأطوال والكميات هنا قبل ما تكمّلي.')} />
       <section className="wrap-n" style={{ paddingBottom: 'clamp(70px,11vh,140px)' }}>
         {cart.map((c, i) => {
           const p = byId(c.pid);
@@ -34,7 +34,7 @@ export default function CartPage() {
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>
-                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Size', 'مقاس')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
+                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Height', 'الطول')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
               </div>
               <div style={{ gridColumn: '8/11' }}>
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>

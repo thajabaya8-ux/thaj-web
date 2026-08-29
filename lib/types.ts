@@ -61,9 +61,9 @@ export interface Piece {
   // Colour variants, each with its own photo set — see PieceColor.
   // Empty for a piece that doesn't offer a colour choice.
   colors: PieceColor[];
-  // Which standard sizes (SIZES in lib/siteContext.tsx) this piece comes
-  // in. Empty means "every standard size" — the pre-existing behaviour
-  // every piece had before this field existed.
+  // Which standard heights, in cm (SIZES in lib/siteContext.tsx), this
+  // piece comes in. Empty means "every standard height" — the
+  // pre-existing behaviour every piece had before this field existed.
   sizes: string[];
 }
 

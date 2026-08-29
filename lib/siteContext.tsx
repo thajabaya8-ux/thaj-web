@@ -55,7 +55,9 @@ const PAYMENT_METHOD_LABEL: Record<string, [string, string]> = {
 };
 const AD = '٠١٢٣٤٥٦٧٨٩';
 
-export const SIZES = ['52', '54', '56', '58'];
+// Height in cm, not a garment size — how abaya length is actually chosen
+// in Egypt, not the Saudi dress-size numbers this used to hold.
+export const SIZES = ['150', '155', '160', '165', '170'];
 export const SIZE_MTM = { en: 'Made to measure', ar: 'تفصيل' };
 
 // The price actually charged — the sale price when the piece is on sale,
@@ -319,7 +321,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
   const cartTotalEgp = useMemo(() => cart.reduce((s, c) => s + itemPriceEgp(c) * c.q, 0), [cart, itemPriceEgp]);
 
   const addToCart = useCallback((id: string, size?: string, withPants?: boolean, color?: string) => {
-    const useSize = size || '54';
+    const useSize = size || '160';
     setCart((cur) => {
       const i = cur.findIndex((c) => c.pid === id && c.size === useSize && !!c.withPants === !!withPants && (c.color || undefined) === (color || undefined));
       if (i > -1) { const next = [...cur]; next[i] = { ...next[i], q: next[i].q + 1 }; return next; }

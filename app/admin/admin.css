@@ -92,7 +92,7 @@ body{background:var(--bone-2)}
 .adm-pants-body .field{min-width:180px}
 
 .adm-size-checks{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-.adm-size-check{display:flex;align-items:center;justify-content:center;width:46px;height:46px;
+.adm-size-check{display:flex;align-items:center;justify-content:center;min-width:46px;height:46px;padding:0 8px;
   border:1px solid var(--line);cursor:pointer;font-size:13px;color:var(--ink-faint);
   transition:border-color .25s var(--e),color .25s var(--e),background .25s var(--e)}
 .adm-size-check input{display:none}

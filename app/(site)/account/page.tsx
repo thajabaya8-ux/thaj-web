@@ -68,7 +68,7 @@ function AccInfo() {
       <div className="field"><label>{L('Email', 'الإيميل')}</label><input defaultValue="you@domain.com" /></div>
       <div className="field"><label>{L('Phone', 'الموبايل')}</label><input defaultValue="+966" /></div>
       <div className="f2">
-        <div className="field"><label>{L('Preferred size', 'المقاس المفضّل')}</label><select>{sizes.map((s) => <option key={s}>{s}</option>)}</select></div>
+        <div className="field"><label>{L('Preferred height', 'الطول المفضّل')}</label><select>{sizes.map((s) => <option key={s}>{s}</option>)}</select></div>
         <div className="field"><label>{L('Language', 'اللغة')}</label><select><option>English</option><option>العربية</option></select></div>
       </div>
       <button className="btn" style={{ width: 'max-content' }} type="submit">{L('Save', 'حفظ')}</button>

@@ -93,7 +93,7 @@ export default function OrderDetailPage() {
                 {p ? <img className="thumb" src={`/${colr?.images[0] || p.img}`} alt="" /> : <span />}
                 <span className="body" style={{ fontSize: 12.5 }}>
                   {p ? L(p.n, p.ar) : it.id}<br />
-                  <span style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {it.size}{colr ? ` · ${L(colr.nameEn, colr.nameAr)}` : ''}{it.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
+                  <span style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')} {it.size}{colr ? ` · ${L(colr.nameEn, colr.nameAr)}` : ''}{it.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                 </span>
                 <span className="body" style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>{L('Qty', 'الكمية')} {qty}</span>
                 <span>{p ? fmt(unit * qty) : ''}</span>

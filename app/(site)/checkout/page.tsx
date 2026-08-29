@@ -238,7 +238,7 @@ export default function CheckoutPage() {
                       <span className="h-s" style={{ fontSize: 16 }}>{pName(p)}</span>
                       <span style={{ fontFamily: 'var(--display)', fontSize: 14 }}>{money(itemPrice(c) * c.q, p.currency)}</span>
                     </div>
-                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'مقاس')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
+                    <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''} · ×{c.q}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</span>
                   </div>
                 </div>
               );

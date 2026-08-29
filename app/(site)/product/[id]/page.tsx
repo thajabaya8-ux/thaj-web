@@ -208,19 +208,19 @@ function ProductPageInner() {
             </div>
           )}
           <div className="rv">
-            <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Size', 'المقاس')}</div>
+            <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')}</div>
             <div className="sizes">
               {sizes.map((s) => (
                 <button key={s} className={size === s ? 'on' : ''} onClick={() => setSize(s)}>{s}</button>
               ))}
             </div>
-            <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Measurements taken from the shoulder. Made to measure adds three weeks.', 'المقاسات محسوبة من الكتف. التفصيل بيزوّد تلات أسابيع.')}</div>
+            <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Pick the length closest to your height, in cm. Made to measure adds three weeks.', 'اختاري الطول الأقرب لطولك، بالسنتيمتر. التفصيل بيزوّد تلات أسابيع.')}</div>
           </div>
           <div className="acts rv">
             {soldOut || activeColorOut ? (
               <button className="btn fill" disabled style={{ opacity: .5, cursor: 'default' }}>{L('Sold out', 'نفدت الكمية')}</button>
             ) : (
-              <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants, activeColor?.id)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
+              <button className="btn fill" onClick={() => addToCart(p.id, size || '160', withPants, activeColor?.id)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
             )}
             <button className="btn" onClick={() => toggleWish(p.id)}>{saved ? L('Saved to archive', 'محفوظة في أرشيفك') : L('Save to archive', 'احفظي في أرشيفك')}</button>
           </div>
