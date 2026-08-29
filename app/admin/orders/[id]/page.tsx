@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
 import type { Order, Piece } from '@/lib/types';
@@ -20,6 +20,7 @@ const fmt = (n?: number) => `${(n || 0).toLocaleString('en-US')} EGP`;
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { data: order, loading, error, reload } = useAdminFetch<Order>(`/orders/${id}`);
   const { data: pieces } = useAdminFetch<Piece[]>('/pieces');
   const { call, toast, L, AR } = useAdmin();
@@ -43,6 +44,15 @@ export default function OrderDetailPage() {
   const onStatus = async (status: string) => {
     try { await call(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast(L('Updated', 'اتحدّث')); reload(); }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
+  };
+  const onDelete = async () => {
+    if (!confirm(L(
+      'Delete this order completely? This removes it for good, not just marks it Cancelled — any reserved or deducted stock is given back first. This cannot be undone.',
+      'تمسحي الطلب ده نهائيًا؟ الخطوة دي بتشيله خالص مش بس تحطه ملغى — أي مخزون محجوز أو متخصوم هيرجع الأول. الخطوة دي ما بترجعش.'
+    ))) return;
+    setBusy(true);
+    try { await call(`/orders/${id}`, { method: 'DELETE' }); toast(L('Order deleted', 'الطلب اتمسح')); router.push('/admin/orders'); }
+    catch (e) { toast(e instanceof Error ? e.message : String(e)); setBusy(false); }
   };
 
   if (loading) return null;
@@ -150,6 +160,10 @@ export default function OrderDetailPage() {
           )}
 
           <p className="body" style={{ fontSize: 11, marginTop: 24, color: 'var(--ink-faint)' }}>{L('Placed', 'اتسجّل')} {(order.d || '').slice(0, 16).replace('T', ' ')}</p>
+
+          <button className="btn" disabled={busy} onClick={onDelete} style={{ display: 'block', width: '100%', marginTop: 24 }}>
+            {L('Delete order', 'حذف الطلب')}
+          </button>
         </div>
       </div>
     </>
