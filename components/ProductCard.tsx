@@ -18,10 +18,15 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
   // to, without touching that stored value — the moment stock is topped
   // up again it's back to whatever it said before, automatically.
   const soldOut = piece.av === 'Sold Out' || availableStock(piece) <= 0;
-  const av = soldOut ? L('Sold Out', 'نفدت الكمية') : (AR() ? (AVAIL_AR[piece.av] || piece.av) : piece.av);
   const onSale = piece.salePrice != null;
   const pct = onSale ? Math.round((1 - piece.salePrice! / piece.price) * 100) : 0;
   const activeColor = piece.colors.find((c) => c.id === cardColor) || null;
+  // A colour picked right here on the card can be sold out even while the
+  // piece overall isn't — worth showing without having to open the
+  // product page to find out.
+  const activeColorOut = !!activeColor && colorSoldOut(activeColor);
+  const shownOut = soldOut || activeColorOut;
+  const av = shownOut ? L('Sold Out', 'نفدت الكمية') : (AR() ? (AVAIL_AR[piece.av] || piece.av) : piece.av);
   const img = activeColor?.images[0] || piece.img;
   const href = cardColor ? `/product/${piece.id}?color=${cardColor}` : `/product/${piece.id}`;
   const shownDots = piece.colors.slice(0, MAX_DOTS);
@@ -32,7 +37,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
       <Link href={href} className="frame" style={{ display: 'block', position: 'relative' }}>
         <div className="veil" />
         {piece.ed && <div className="ed">{esc(piece.ed)}</div>}
-        {soldOut ? <div className="sold-badge">{L('Sold Out', 'نفدت الكمية')}</div>
+        {shownOut ? <div className="sold-badge">{L('Sold Out', 'نفدت الكمية')}</div>
           : onSale ? <div className="sale-badge">−{pct}%</div>
           : piece.pantsImg ? <div className="pants-badge">{L('+ Trousers available', '+ بنطلون متاح')}</div> : null}
         <button
@@ -40,7 +45,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
           className={`save ${saved ? 'on' : ''}`}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWish(piece.id); }}
         >{saved ? '●' : '○'}</button>
-        <img key={img} src={`/${img}`} alt={pName(piece)} loading="lazy" style={soldOut ? { opacity: .55 } : undefined} />
+        <img key={img} src={`/${img}`} alt={pName(piece)} loading="lazy" style={shownOut ? { opacity: .55 } : undefined} />
       </Link>
       {piece.colors.length > 0 && (
         <div className="card-colours">
