@@ -107,6 +107,8 @@ body{background:var(--bone-2)}
   background:none;cursor:pointer;font-size:15px;color:var(--ink-faint);line-height:1;
   transition:border-color .2s var(--e),color .2s var(--e)}
 .adm-color-head .rm:hover{border-color:#B75B5B;color:#B75B5B}
+.adm-color-stock{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:12px}
+.adm-color-stock .field{margin:0;max-width:140px}
 
 .adm-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px 28px}
 .adm-media-slot .field{margin:0}

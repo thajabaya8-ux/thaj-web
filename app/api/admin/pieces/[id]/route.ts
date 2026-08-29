@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
-import { pieceOut } from '@/lib/serverMappers';
+import { normalizePieceColors, pieceOut } from '@/lib/serverMappers';
 import { nonNegativeInt, sanitizePieceColors, sanitizeSizes, str, strArray } from '@/lib/serverValidators';
 
 const AVAILABILITY = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only', 'Sold Out'];
@@ -73,7 +73,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     // they've already reserved regardless of this edit.
     stock: b.stock !== undefined ? nonNegativeInt(b.stock, existing.stock) : existing.stock,
     featured: b.featured === undefined ? existing.featured : !!b.featured,
-    colors: JSON.stringify(b.colors !== undefined ? sanitizePieceColors(b.colors) : parseArr(existing.colors)),
+    colors: JSON.stringify(b.colors !== undefined ? sanitizePieceColors(b.colors, normalizePieceColors(existing.colors)) : normalizePieceColors(existing.colors)),
     sizes: JSON.stringify(b.sizes !== undefined ? sanitizeSizes(b.sizes) : parseArr(existing.sizes))
   };
 

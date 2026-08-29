@@ -8,7 +8,9 @@ import MultiImageUpload from './MultiImageUpload';
 import type { Collection, Piece, PieceColor } from '@/lib/types';
 
 let colorKeySeq = 0;
-const newColor = (): PieceColor & { key: number } => ({ key: colorKeySeq++, id: '', nameEn: '', nameAr: '', hex: '#1B271F', images: [] });
+const newColor = (): PieceColor & { key: number } => ({
+  key: colorKeySeq++, id: '', nameEn: '', nameAr: '', hex: '#1B271F', images: [], stock: 999, reserved: 0, soldOut: false
+});
 
 const AVAIL_OPTS = ['Available', 'Two remaining', 'By request', 'Pre-order', 'Archive only', 'Sold Out'];
 const AVAIL_AR: Record<string, string> = {
@@ -68,7 +70,10 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
       visible,
       stock: parseInt(val('stock'), 10) || 0,
       featured,
-      colors: colors.map(({ key: _key, ...c }) => c),
+      // reserved is never admin-set — it's dropped here too, on top of the
+      // server ignoring it, so it's obvious from the payload alone that
+      // this isn't a field the form controls.
+      colors: colors.map(({ key: _key, reserved: _reserved, ...c }) => c),
       sizes
     };
     setSaving(true);
@@ -165,6 +170,24 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
               <input value={c.nameAr} onChange={(e) => updateColor(i, { nameAr: e.target.value })} placeholder={L('Name (AR)', 'الاسم (عربي)')} dir="rtl" />
               <button type="button" className="rm" onClick={() => removeColor(i)} aria-label={L('Remove colour', 'حذف اللون')}>×</button>
             </div>
+            <div className="adm-color-stock">
+              <div className="field">
+                <label>{L('Stock (this colour)', 'المخزون (اللون ده)')}</label>
+                <input
+                  type="number" min="0" value={c.stock}
+                  onChange={(e) => updateColor(i, { stock: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+                />
+              </div>
+              <label className="adm-pants-toggle" style={{ marginTop: 0 }}>
+                <input type="checkbox" checked={c.soldOut} onChange={(e) => updateColor(i, { soldOut: e.target.checked })} />
+                <span>{L('Mark as Sold Out', 'حددها نفدت الكمية')}</span>
+              </label>
+            </div>
+            {c.stock <= 0 && !c.soldOut && (
+              <p className="body" style={{ fontSize: 10.5, color: 'var(--ink-faint)', margin: '2px 0 12px' }}>
+                {L('Stock is 0 — this colour will show as Sold Out to customers automatically.', 'المخزون صفر — اللون ده هيظهر للعميل نفدت الكمية تلقائيًا.')}
+              </p>
+            )}
             <MultiImageUpload
               value={c.images} onChange={(imgs) => updateColor(i, { images: imgs })}
               label={L('Photos for this colour', 'صور اللون ده')}

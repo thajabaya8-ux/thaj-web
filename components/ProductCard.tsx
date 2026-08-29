@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSite, availableStock } from '@/lib/siteContext';
+import { useSite, availableStock, colorSoldOut } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
 
 // A card only ever shows this many dots before folding the rest behind a
@@ -44,16 +44,19 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
       </Link>
       {piece.colors.length > 0 && (
         <div className="card-colours">
-          {shownDots.map((c) => (
-            <button
-              key={c.id} type="button" className={`colour-dot ${cardColor === c.id ? 'on' : ''}`}
-              style={{ '--dot': c.hex } as React.CSSProperties}
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCardColor((cur) => (cur === c.id ? null : c.id)); }}
-              aria-label={esc(L(c.nameEn, c.nameAr))} aria-pressed={cardColor === c.id}
-            >
-              <span className="dot" />
-            </button>
-          ))}
+          {shownDots.map((c) => {
+            const out = colorSoldOut(c);
+            return (
+              <button
+                key={c.id} type="button" className={`colour-dot ${cardColor === c.id ? 'on' : ''} ${out ? 'out' : ''}`}
+                style={{ '--dot': c.hex } as React.CSSProperties}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCardColor((cur) => (cur === c.id ? null : c.id)); }}
+                aria-label={`${esc(L(c.nameEn, c.nameAr))}${out ? ` — ${L('Sold Out', 'نفدت الكمية')}` : ''}`} aria-pressed={cardColor === c.id}
+              >
+                <span className="dot" />
+              </button>
+            );
+          })}
           {hiddenCount > 0 && <span className="card-colours-more">+{hiddenCount}</span>}
         </div>
       )}

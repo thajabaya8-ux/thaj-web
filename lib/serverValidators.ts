@@ -34,9 +34,22 @@ const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-'
 // (falls back to a neutral grey rather than rejecting the whole piece
 // over one bad swatch), and its own photo set, same size cap as the
 // piece-level gallery.
-export function sanitizePieceColors(v: unknown): { id: string; nameEn: string; nameAr: string; hex: string; images: string[] }[] {
+//
+// `reserved` is never admin-editable — same rule as the piece-level
+// column, it's only ever moved by the order lifecycle (see
+// lib/colorStock.ts) — so it's not read from the request body at all.
+// `existing` (the piece's colours as currently stored, when editing) is
+// how a colour that already had units reserved keeps that count instead
+// of silently resetting to 0 every time the admin saves the form; a
+// colour with no match there — including every colour on a brand new
+// piece — starts at 0, correctly.
+export function sanitizePieceColors(
+  v: unknown,
+  existing: { id: string; reserved?: number }[] = []
+): { id: string; nameEn: string; nameAr: string; hex: string; images: string[]; stock: number; reserved: number; soldOut: boolean }[] {
   if (!Array.isArray(v)) return [];
   const seen = new Set<string>();
+  const prevReserved = new Map(existing.map((e) => [e.id, e.reserved || 0]));
   return v.slice(0, 8).map((c, i) => {
     const o = (c && typeof c === 'object' ? c : {}) as Record<string, unknown>;
     const nameEn = str(o.nameEn, 40);
@@ -46,7 +59,10 @@ export function sanitizePieceColors(v: unknown): { id: string; nameEn: string; n
     return {
       id, nameEn, nameAr: str(o.nameAr, 40),
       hex: typeof o.hex === 'string' && HEX_COLOR.test(o.hex) ? o.hex : '#CCCCCC',
-      images: strArray(o.images, 10, 300)
+      images: strArray(o.images, 10, 300),
+      stock: nonNegativeInt(o.stock, 999),
+      reserved: prevReserved.get(id) || 0,
+      soldOut: !!o.soldOut
     };
   }).filter((c) => c.nameEn || c.images.length);
 }

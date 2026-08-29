@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 import { orderOut } from '@/lib/serverMappers';
+import { releaseColorReserved, restoreColorStock } from '@/lib/colorStock';
 import type { OrderLineItem } from '@/lib/types';
 
 // 'In atelier' is legacy (pre-dates the deposit checkout flow) — kept
@@ -42,7 +43,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       // stock was never touched for this order.
       for (const it of parseItems(existing.items)) {
         const qty = Math.min(20, Math.max(1, it.qty || 1));
-        await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
+        if (it.color) await releaseColorReserved(it.id, it.color, qty);
+        else await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
       }
       await sql`UPDATE orders SET reservation_active = false WHERE id = ${id}`;
     } else if (existing.stock_deducted) {
@@ -51,7 +53,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       // repeat call) is a no-op instead of restocking twice.
       for (const it of parseItems(existing.items)) {
         const qty = Math.min(20, Math.max(1, it.qty || 1));
-        await sql`UPDATE pieces SET stock = stock + ${qty} WHERE id = ${it.id}`;
+        if (it.color) await restoreColorStock(it.id, it.color, qty);
+        else await sql`UPDATE pieces SET stock = stock + ${qty} WHERE id = ${it.id}`;
       }
       await sql`UPDATE orders SET stock_deducted = false WHERE id = ${id}`;
     }

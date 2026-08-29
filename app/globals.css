@@ -762,6 +762,13 @@ section{position:relative}
 .colour-dot.on::before{border-color:var(--ink);transform:scale(1)}
 .colour-dot.on .dot{transform:scale(.92)}
 .colour-dot:focus-visible::before{border-color:var(--gold);transform:scale(1)}
+/* Sold-out colours stay fully visible and clickable (still worth showing
+   what the piece looks like in that colour) — just dimmed, with a thin
+   diagonal line through the swatch, the same "can't have this one" mark
+   used for a struck-through price, so it reads at a glance without text. */
+.colour-dot.out .dot{position:relative;opacity:.4}
+.colour-dot.out .dot::after{content:'';position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(135deg,transparent 46%,var(--ink) 48%,var(--ink) 52%,transparent 54%);opacity:.55}
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
 .acts .btn{flex:1 1 220px;text-align:center}
 .spec{margin-top:44px;border-top:1px solid var(--line)}

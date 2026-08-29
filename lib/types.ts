@@ -13,6 +13,14 @@ export interface PieceColor {
   nameAr: string;
   hex: string;
   images: string[];
+  // Stock tracked separately per colour, same stock/reserved split as the
+  // piece level (available = stock - reserved) — see availableStock() and
+  // colorAvailable() in lib/siteContext.tsx.
+  stock: number;
+  reserved: number;
+  // Admin override, independent of the computed stock<=0 sold-out state —
+  // either one is enough to show this colour as sold out.
+  soldOut: boolean;
 }
 
 export interface Piece {

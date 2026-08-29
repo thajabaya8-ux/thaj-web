@@ -8,9 +8,10 @@
    app — deleted, not fixed, since nothing needed it. */
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
-import { orderPublicOut } from '@/lib/serverMappers';
+import { normalizePieceColors, orderPublicOut } from '@/lib/serverMappers';
 import { isEmail, str } from '@/lib/serverValidators';
 import { computeOrderTotals } from '@/lib/payment';
+import { releaseColorReserved, reserveColorStock } from '@/lib/colorStock';
 import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
 import { sendOrderNotification } from '@/lib/resend';
 import { getSession } from '@/lib/session';
@@ -82,14 +83,17 @@ export async function POST(req: Request) {
 
   // Stock is reserved (not yet permanently deducted — that only happens
   // when the admin approves the payment) right here, atomically per item,
-  // so two customers can't both claim the last piece at once: the UPDATE
-  // only succeeds if (stock - reserved) still covers this qty at the exact
-  // moment it runs. If any item in the cart can't be reserved, everything
-  // already reserved for this same attempt is released before failing.
-  const reservedSoFar: { id: string; qty: number }[] = [];
+  // so two customers can't both claim the last piece/colour at once: the
+  // reservation only succeeds if (stock - reserved) still covers this qty
+  // at the exact moment it runs — see lib/colorStock.ts for the colour
+  // case, or the plain piece-level UPDATE below when no colour applies.
+  // If any item in the cart can't be reserved, everything already
+  // reserved for this same attempt is released before failing.
+  const reservedSoFar: { id: string; qty: number; color?: string }[] = [];
   const releaseReserved = async () => {
     for (const r of reservedSoFar) {
-      await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${r.qty}) WHERE id = ${r.id}`;
+      if (r.color) await releaseColorReserved(r.id, r.color, r.qty);
+      else await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${r.qty}) WHERE id = ${r.id}`;
     }
   };
 
@@ -97,20 +101,37 @@ export async function POST(req: Request) {
     const pid = String((it && it.id) || '');
     const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
 
-    const rows = await sql`
-      UPDATE pieces SET reserved = reserved + ${qty}
-      WHERE id = ${pid} AND (stock - reserved) >= ${qty}
-      RETURNING id, price, pants_price, currency, sale_price, name_en, colors`;
-
-    if (!rows.length) {
+    const pieceRows = await sql`SELECT id, price, pants_price, currency, sale_price, name_en, colors FROM pieces WHERE id = ${pid}`;
+    if (!pieceRows.length) {
       await releaseReserved();
-      const cur = await sql`SELECT name_en, stock, reserved FROM pieces WHERE id = ${pid}`;
-      if (!cur.length) return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
-      const available = Math.max(0, cur[0].stock - cur[0].reserved);
-      return NextResponse.json({ error: `Only ${available} of "${cur[0].name_en}" left in stock` }, { status: 409 });
+      return NextResponse.json({ error: `Unknown piece: ${pid}` }, { status: 400 });
     }
-    reservedSoFar.push({ id: pid, qty });
-    const p = rows[0];
+    const p = pieceRows[0];
+    // Only a colour id that actually exists on this piece is ever trusted —
+    // same rule as withPants below, the client's claim is just a hint.
+    // A piece with colours tracks stock per colour, not on the piece
+    // itself — once it has at least one colour, ordering it always goes
+    // through that colour's own pool (the product page always has a
+    // colour picked by the time "Add to selection" is reachable).
+    const colorMatch = normalizePieceColors(p.colors).find((c) => c.id === it.color);
+
+    const reserveOk = colorMatch
+      ? await reserveColorStock(pid, colorMatch.id, qty)
+      : (await sql`UPDATE pieces SET reserved = reserved + ${qty} WHERE id = ${pid} AND (stock - reserved) >= ${qty} RETURNING id`).length > 0;
+
+    if (!reserveOk) {
+      await releaseReserved();
+      if (colorMatch) {
+        const cur = await sql`SELECT colors FROM pieces WHERE id = ${pid}`;
+        const fresh = cur.length ? normalizePieceColors(cur[0].colors).find((c) => c.id === colorMatch.id) : null;
+        const available = fresh ? Math.max(0, fresh.stock - fresh.reserved) : 0;
+        return NextResponse.json({ error: `Only ${available} of "${p.name_en} — ${colorMatch.nameEn}" left in stock` }, { status: 409 });
+      }
+      const cur = await sql`SELECT stock, reserved FROM pieces WHERE id = ${pid}`;
+      const available = cur.length ? Math.max(0, cur[0].stock - cur[0].reserved) : 0;
+      return NextResponse.json({ error: `Only ${available} of "${p.name_en}" left in stock` }, { status: 409 });
+    }
+    reservedSoFar.push({ id: pid, qty, color: colorMatch?.id });
 
     // Trousers can only be added alongside the piece they belong to, and
     // only when that piece still offers them server-side — never trust
@@ -122,13 +143,7 @@ export async function POST(req: Request) {
     const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
     subtotalEgp += unitPriceEgp * qty;
     const size = str(it.size, 40);
-    // Only a colour id that actually exists on this piece is ever trusted —
-    // same rule as withPants above, the client's claim is just a hint.
-    let pieceColors: { id: string; nameEn: string }[] = [];
-    try { pieceColors = JSON.parse(p.colors || '[]'); } catch { /* left empty */ }
-    const colorMatch = pieceColors.find((c) => c.id === it.color);
-    const color = colorMatch?.id;
-    cleanItems.push({ id: p.id, size, qty, withPants, ...(color ? { color } : {}) });
+    cleanItems.push({ id: p.id, size, qty, withPants, ...(colorMatch ? { color: colorMatch.id } : {}) });
     itemsForEmail.push({ name: p.name_en, size, qty, withPants, ...(colorMatch ? { color: colorMatch.nameEn } : {}) });
   }
 

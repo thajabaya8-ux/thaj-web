@@ -12,7 +12,7 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode
 } from 'react';
 import type {
-  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, Order, PaymentMethod, Piece, PieceCurrency, Settings
+  CartItem, CheckoutDraft, Collection, CollectionMap, Facets, Order, PaymentMethod, Piece, PieceColor, PieceCurrency, Settings
 } from '@/lib/types';
 import { trackPixel, trackPurchase } from '@/lib/pixel';
 
@@ -63,10 +63,20 @@ export const SIZE_MTM = { en: 'Made to measure', ar: 'تفصيل' };
 // salePrice is null unless it's genuinely lower than price.
 export const effectivePrice = (p: Piece): number => p.salePrice ?? p.price;
 
+// A colour's own available units — same stock-minus-reserved shape as
+// the piece level, just scoped to one colour's own pool.
+export const colorAvailable = (c: PieceColor): number => Math.max(0, c.stock - c.reserved);
+// Either the admin's manual override or the computed count hitting zero
+// is enough to show this colour as sold out.
+export const colorSoldOut = (c: PieceColor): boolean => c.soldOut || colorAvailable(c) <= 0;
+
 // What's actually purchasable right now — real stock minus whatever's
 // tied up in orders still under review (not yet a permanent deduction,
-// but still not free to sell to someone else).
-export const availableStock = (p: Piece): number => Math.max(0, p.stock - p.reserved);
+// but still not free to sell to someone else). Once a piece has colour
+// variants, its stock lives per-colour, not on the piece itself, so the
+// piece is only fully sold out when every one of its colours is.
+export const availableStock = (p: Piece): number =>
+  p.colors.length ? p.colors.reduce((s, c) => s + colorAvailable(c), 0) : Math.max(0, p.stock - p.reserved);
 
 interface SiteContextValue {
   lang: Lang;

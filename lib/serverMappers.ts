@@ -22,6 +22,19 @@ function toIso(v: unknown): string {
   return typeof v === 'string' ? v : '';
 }
 
+// Colours saved before per-colour stock existed have no stock/reserved/
+// soldOut fields at all — default them here, the one place every reader
+// (admin form, product page, order creation) goes through, rather than
+// every call site having to guard against undefined.
+export function normalizePieceColors(v: unknown): PieceColor[] {
+  return parseArr<PieceColor>(v).map((c) => ({
+    ...c,
+    stock: c.stock ?? 999,
+    reserved: c.reserved ?? 0,
+    soldOut: c.soldOut ?? false
+  }));
+}
+
 export function pieceOut(r: any): Piece {
   // Older rows (seeded before the gallery feature) only ever had a single
   // `image` column and no `images` array — fall back to a one-photo
@@ -44,7 +57,7 @@ export function pieceOut(r: any): Piece {
     stock: r.stock ?? 0,
     reserved: r.reserved ?? 0,
     featured: r.featured === true,
-    colors: parseArr<PieceColor>(r.colors),
+    colors: normalizePieceColors(r.colors),
     sizes: parseArr<string>(r.sizes)
   };
 }

@@ -6,6 +6,7 @@ import { sql } from '@/lib/db';
 import { requireAdmin } from '@/lib/adminAuth';
 import { orderOut } from '@/lib/serverMappers';
 import { str } from '@/lib/serverValidators';
+import { deductColorStock, releaseColorReserved } from '@/lib/colorStock';
 import type { OrderLineItem } from '@/lib/types';
 
 function parseItems(v: unknown): OrderLineItem[] {
@@ -36,7 +37,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (existing.reservation_active) {
       for (const it of parseItems(existing.items)) {
         const qty = Math.min(20, Math.max(1, it.qty || 1));
-        await sql`UPDATE pieces SET stock = stock - ${qty}, reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
+        if (it.color) await deductColorStock(it.id, it.color, qty);
+        else await sql`UPDATE pieces SET stock = stock - ${qty}, reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
       }
       await sql`UPDATE orders SET reservation_active = false, stock_deducted = true WHERE id = ${id}`;
     }
@@ -50,7 +52,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (existing.reservation_active) {
       for (const it of parseItems(existing.items)) {
         const qty = Math.min(20, Math.max(1, it.qty || 1));
-        await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
+        if (it.color) await releaseColorReserved(it.id, it.color, qty);
+        else await sql`UPDATE pieces SET reserved = GREATEST(0, reserved - ${qty}) WHERE id = ${it.id}`;
       }
       await sql`UPDATE orders SET reservation_active = false WHERE id = ${id}`;
     }

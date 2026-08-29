@@ -1,7 +1,7 @@
 'use client';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useSite, effectivePrice, availableStock } from '@/lib/siteContext';
+import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
 import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
@@ -64,6 +64,10 @@ function ProductPageInner() {
   // Out of real stock overrides whatever the admin last set availability
   // to, without touching that stored value — restocking brings it back.
   const soldOut = p.av === 'Sold Out' || availableStock(p) <= 0;
+  // A piece with colours can still be "available" overall while the one
+  // colour currently picked is itself out — that's blocked separately,
+  // right at the Add button, without touching the piece-wide soldOut badge.
+  const activeColorOut = !!activeColor && colorSoldOut(activeColor);
   const onSale = p.salePrice != null;
   const pct = onSale ? Math.round((1 - p.salePrice! / p.price) * 100) : 0;
   const total = effectivePrice(p) + (withPants && p.pantsPrice ? p.pantsPrice : 0);
@@ -182,17 +186,25 @@ function ProductPageInner() {
                 {activeColor && <span className="colour-name"> — {esc(L(activeColor.nameEn, activeColor.nameAr))}</span>}
               </div>
               <div className="colours">
-                {p.colors.map((c) => (
-                  <button
-                    key={c.id} type="button" className={`colour-dot ${color === c.id ? 'on' : ''}`}
-                    style={{ '--dot': c.hex } as React.CSSProperties}
-                    onClick={() => selectColor(c.id)} aria-pressed={color === c.id}
-                    aria-label={esc(L(c.nameEn, c.nameAr))}
-                  >
-                    <span className="dot" />
-                  </button>
-                ))}
+                {p.colors.map((c) => {
+                  const out = colorSoldOut(c);
+                  return (
+                    <button
+                      key={c.id} type="button" className={`colour-dot ${color === c.id ? 'on' : ''} ${out ? 'out' : ''}`}
+                      style={{ '--dot': c.hex } as React.CSSProperties}
+                      onClick={() => selectColor(c.id)} aria-pressed={color === c.id}
+                      aria-label={`${esc(L(c.nameEn, c.nameAr))}${out ? ` — ${L('Sold Out', 'نفدت الكمية')}` : ''}`}
+                    >
+                      <span className="dot" />
+                    </button>
+                  );
+                })}
               </div>
+              {activeColorOut && (
+                <p className="body" style={{ fontSize: 11, color: '#B75B5B', marginTop: 8 }}>
+                  {L('This colour is sold out.', 'اللون ده نفدت الكمية بتاعته.')}
+                </p>
+              )}
             </div>
           )}
           <div className="rv">
@@ -205,7 +217,7 @@ function ProductPageInner() {
             <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Measurements taken from the shoulder. Made to measure adds three weeks.', 'المقاسات محسوبة من الكتف. التفصيل بيزوّد تلات أسابيع.')}</div>
           </div>
           <div className="acts rv">
-            {soldOut ? (
+            {soldOut || activeColorOut ? (
               <button className="btn fill" disabled style={{ opacity: .5, cursor: 'default' }}>{L('Sold out', 'نفدت الكمية')}</button>
             ) : (
               <button className="btn fill" onClick={() => addToCart(p.id, size || '54', withPants, activeColor?.id)}>{L('Add to selection', 'ضيفي لاختيارك')}</button>
