@@ -115,6 +115,15 @@ export async function POST(req: Request) {
     // colour picked by the time "Add to selection" is reachable).
     const colorMatch = normalizePieceColors(p.colors).find((c) => c.id === it.color);
 
+    // The admin's manual "Sold Out" flag is enforced here too, not just
+    // hidden behind the disabled Add button on the product page — the
+    // stock count alone (checked next) wouldn't catch a colour that's
+    // flagged sold out while units are still technically left.
+    if (colorMatch?.soldOut) {
+      await releaseReserved();
+      return NextResponse.json({ error: `"${p.name_en} — ${colorMatch.nameEn}" is sold out` }, { status: 409 });
+    }
+
     const reserveOk = colorMatch
       ? await reserveColorStock(pid, colorMatch.id, qty)
       : (await sql`UPDATE pieces SET reserved = reserved + ${qty} WHERE id = ${pid} AND (stock - reserved) >= ${qty} RETURNING id`).length > 0;
