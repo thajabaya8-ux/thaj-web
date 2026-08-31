@@ -10,7 +10,7 @@ const SUGG: [string, string][] = [
 ];
 
 export default function SearchOverlay() {
-  const { L, AR, esc, pieces, collections, fa, pName, money, searchOpen, setSearchOpen } = useSite();
+  const { L, AR, pieces, collections, fa, pName, money, searchOpen, setSearchOpen } = useSite();
   const [q, setQ] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -51,7 +51,7 @@ export default function SearchOverlay() {
         {results.length ? results.map((p) => (
           <Link key={p.id} className="card in" href={`/product/${p.id}`} onClick={close}>
             <div className="frame"><img src={`/${p.img}`} alt="" loading="lazy" /></div>
-            <div className="meta"><h3>{pName(p)}{AR() ? '' : <i>{esc(p.ar)}</i>}</h3><div className="pr">{money(p.price, p.currency)}</div></div>
+            <div className="meta"><h3>{pName(p)}</h3><div className="pr">{money(p.price, p.currency)}</div></div>
           </Link>
         )) : (
           <p className="body" style={{ gridColumn: '1/-1' }}>
