@@ -482,7 +482,13 @@ section{position:relative}
 .card .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;align-items:baseline;margin-top:14px;
   border-top:1px solid var(--line-soft);padding-top:11px}
 .card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em;min-width:0}
-.card .meta h3 i{display:block;font-style:normal;font-family:var(--ar);font-size:12px;color:var(--ink-faint);margin-top:3px;direction:rtl}
+/* Inline next to the English name, not stacked under it — a block
+   subtitle line added its own row's worth of height to every card, on
+   top of the price already having been pushed onto its own line, so
+   the two space-savers were fighting each other instead of adding up.
+   Wraps onto its own line by itself, same as any inline text, if a
+   long name genuinely doesn't fit — it doesn't force one. */
+.card .meta h3 i{display:inline;font-style:normal;font-family:var(--ar);font-size:12px;color:var(--ink-faint);margin-inline-start:8px;direction:rtl}
 .card .meta .pr{font-family:var(--display);font-size:14px;letter-spacing:.03em;white-space:nowrap}
 /* white-space:normal overrides the nowrap it'd otherwise inherit from
    .pr — at 13px the old 8px-tuned .24em tracking made "AVAILABLE" wide
