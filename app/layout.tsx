@@ -21,6 +21,23 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfa
 const TITLE = 'THAJ — Maison';
 const DESCRIPTION = 'THAJ — an abaya fashion house in Riyadh. Pieces catalogued and editioned, cut in Riyadh and finished by hand.';
 
+// Organization structured data — separate from the openGraph/twitter image
+// tags above, which only govern link-preview cards (WhatsApp, social
+// shares). This is what tells Google's own crawler which image is the
+// brand's logo, for use in things like a knowledge panel; it's not a
+// switch that makes an image appear in search results, since that also
+// depends on Google re-crawling the site and its own ranking signals,
+// which happen on Google's schedule, not this deploy's.
+const ORG_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'THAJ',
+  url: 'https://thajabaya.com',
+  logo: 'https://thajabaya.com/assets/logo/og-image.png',
+  image: 'https://thajabaya.com/assets/logo/og-image.png',
+  sameAs: ['https://www.instagram.com/thaj.abaya']
+};
+
 // metadataBase turns every relative URL below (the OG/Twitter images,
 // canonical/alternate links elsewhere in the app) into an absolute one —
 // without it, a crawler that fetches only the HTML (not this same
@@ -71,6 +88,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" dir="ltr" className={`${cairoAr.variable} ${playfair.variable}`}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }} />
         <MetaPixel />
         <Analytics />
         {children}
