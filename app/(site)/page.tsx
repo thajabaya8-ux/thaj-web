@@ -10,7 +10,7 @@ import HeroFilm from '@/components/HeroFilm';
 import type { Piece } from '@/lib/types';
 
 export default function HomePage() {
-  const { L, AR, esc, num, pName, pieces, collections, settings } = useSite();
+  const { L, esc, num, pName, pieces, collections, settings } = useSite();
   // The featured composition below is built for exactly four pieces —
   // whichever the admin has picked at /admin/collections (the "Feature"
   // action per piece), in catalogue order. Falls back to the newest four
@@ -108,7 +108,7 @@ export default function HomePage() {
             <Link key={k} className={`card rv ${['c-1', 'c-2', 'c-3', 'c-4'][i]}`} href={`/collections/${k}`}>
               <div className="frame" style={{ aspectRatio: i % 2 ? '3/4' : '4/5' }}><div className="veil" /><img src={`/${c.img}`} loading="lazy" alt="" /></div>
               <div className="meta">
-                <h3>{esc(L(c.name, c.nameAr))}{AR() ? '' : <i>{esc(c.ar)}</i>}</h3>
+                <h3>{esc(L(c.name, c.nameAr))}</h3>
                 <div className="pr" style={{ fontSize: 11, letterSpacing: '.2em', fontFamily: 'var(--sans)', textTransform: 'uppercase' }}>{esc(L(c.line, c.lineAr))}</div>
               </div>
             </Link>

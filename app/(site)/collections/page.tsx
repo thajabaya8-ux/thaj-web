@@ -4,7 +4,7 @@ import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
 
 export default function CollectionsPage() {
-  const { L, AR, esc, collections, pieces } = useSite();
+  const { L, esc, collections, pieces } = useSite();
   return (
     <>
       <Mast
@@ -18,7 +18,7 @@ export default function CollectionsPage() {
             <Link key={k} className={`card rv ${['c-1 tall', 'c-2', 'c-3', 'c-4 wide'][i]}`} href={`/collections/${k}`}>
               <div className="frame"><div className="veil" /><img src={`/${c.img}`} loading="lazy" alt="" /></div>
               <div className="meta">
-                <h3>{esc(L(c.name, c.nameAr))}{AR() ? '' : <i>{esc(c.ar)}</i>}</h3>
+                <h3>{esc(L(c.name, c.nameAr))}</h3>
                 <div className="pr" style={{ fontFamily: 'var(--sans)', fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase' }}>
                   {pieces.filter((p) => p.coll === k).length} {L('pieces', 'قطع')}
                 </div>

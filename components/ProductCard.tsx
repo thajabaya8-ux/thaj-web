@@ -66,7 +66,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
         </div>
       )}
       <Link href={href} className="meta">
-        <h3>{pName(piece)}{AR() ? '' : <i>{esc(piece.ar)}</i>}</h3>
+        <h3>{pName(piece)}</h3>
         <div className="pr">
           {onSale ? (
             <>
