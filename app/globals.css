@@ -472,9 +472,16 @@ section{position:relative}
 .card-colours .colour-dot .dot{width:13px;height:13px}
 .card-colours .colour-dot::before{inset:3px}
 .card-colours-more{font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint);margin-inline-start:4px}
-.card .meta{display:flex;justify-content:space-between;gap:14px;align-items:baseline;margin-top:14px;
+/* flex-wrap + min-width:0 on h3 — Playfair Display's numerals run wider
+   than the plain fallback serif that preceded it, so a name and a
+   nowrap price (esp. a strikethrough-plus-sale-price pair) that used to
+   just fit on one line no longer do on a narrow two-up mobile card.
+   Without these, flex's default min-width:auto keeps both items at
+   their full content width and the price visibly overflows the card
+   into the next grid column instead of dropping to its own line. */
+.card .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;align-items:baseline;margin-top:14px;
   border-top:1px solid var(--line-soft);padding-top:11px}
-.card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em}
+.card .meta h3{font-family:var(--display);font-weight:400;font-size:clamp(16px,1.5vw,21px);letter-spacing:.03em;min-width:0}
 .card .meta h3 i{display:block;font-style:normal;font-family:var(--ar);font-size:12px;color:var(--ink-faint);margin-top:3px;direction:rtl}
 .card .meta .pr{font-family:var(--display);font-size:14px;letter-spacing:.03em;white-space:nowrap}
 /* white-space:normal overrides the nowrap it'd otherwise inherit from
