@@ -1,5 +1,5 @@
 import './globals.css';
-import { Cairo } from 'next/font/google';
+import { Cairo, Playfair_Display } from 'next/font/google';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import MetaPixel from '@/components/MetaPixel';
@@ -11,6 +11,12 @@ import Analytics from '@/components/Analytics';
 // happened to have (often none on Windows), rendering thin, undersized,
 // and inconsistent between machines.
 const cairoAr = Cairo({ subsets: ['arabic'], variable: '--font-cairo', display: 'swap' });
+
+// English display serif — "Didot"/"Bodoni" in globals.css's --display stack
+// are Apple-only system fonts, and "Playfair Display" was named as the next
+// fallback but never actually loaded, so non-Apple visitors (most of them)
+// skipped straight past it to the browser's generic Times New Roman.
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair', display: 'swap' });
 
 const TITLE = 'THAJ — Maison';
 const DESCRIPTION = 'THAJ — an abaya fashion house in Riyadh. Pieces catalogued and editioned, cut in Riyadh and finished by hand.';
@@ -63,7 +69,7 @@ export const metadata: Metadata = {
 // Arabic font variable above, and the <html>/<body> shell.
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" dir="ltr" className={cairoAr.variable}>
+    <html lang="en" dir="ltr" className={`${cairoAr.variable} ${playfair.variable}`}>
       <body>
         <MetaPixel />
         <Analytics />

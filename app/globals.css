@@ -77,7 +77,7 @@
   --on-dark:#EFEBE0;
   --on-dark-soft:rgba(239,235,224,.62);
   --on-dark-line:rgba(239,235,224,.18);
-  --display:"Didot","Bodoni 72","Bodoni MT","Playfair Display",'Times New Roman',Georgia,serif;
+  --display:"Didot","Bodoni 72","Bodoni MT",var(--font-playfair),'Times New Roman',Georgia,serif;
   --sans:"Helvetica Neue","Inter","Segoe UI",Arial,sans-serif;
   --ar:var(--font-cairo),"SF Arabic","Segoe UI",Tahoma,sans-serif;
   /* Was Amiri (a Naskh serif) — its letterforms run wider than Cairo's at
