@@ -461,8 +461,8 @@ section{position:relative}
   transition:all .6s var(--e);line-height:1}
 .card:hover .save,.card .save.on{opacity:1;transform:none;pointer-events:auto}
 .card .save.on{color:var(--gold)}
-/* Reuses the .colour-dot ring mechanics from the product page (defined
-   with .sizes below), just at card scale — same selected-state language
+/* Reuses the .colour-dot ring mechanics from the product page, just at
+   card scale — same selected-state language
    everywhere a colour can be picked, not a second design invented for
    the grid. Sits between the photo and the title/price row rather than
    floating over the image, so it never crowds a badge or the save button
@@ -746,11 +746,37 @@ section{position:relative}
   .wb-row,.wb-head{border-color:#ccc}
 }
 
-.sizes{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 8px}
-.sizes button{background:none;border:1px solid var(--line);cursor:pointer;padding:13px 19px;font-size:10px;letter-spacing:.16em;
-  transition:all .5s var(--e)}
-.sizes button:hover{border-color:var(--ink-soft)}
-.sizes button.on{background:var(--ink);border-color:var(--ink);color:var(--bone)}
+/* Size picker: a gov-trigger-style field (reusing its class — same
+   look as the checkout governorate select) that opens #sg-panel, a
+   centered modal listing every height this piece offers with its exact
+   cm range, instead of a bare row of number buttons a customer has to
+   guess between. Rows fade/rise in with a per-row transition-delay set
+   inline in SizeGuide.tsx, so the table visibly populates on open
+   rather than just appearing. */
+#sg-scrim{position:fixed;inset:0;z-index:210;background:rgba(4,45,41,.46);backdrop-filter:blur(3px);
+  opacity:0;visibility:hidden;transition:opacity .5s var(--e),visibility 0s .5s}
+#sg-scrim.open{opacity:1;visibility:visible;transition:opacity .5s var(--e)}
+#sg-panel{position:fixed;top:50%;left:50%;z-index:211;width:min(420px,92vw);max-height:82vh;overflow-y:auto;
+  background:var(--bone);padding:30px 30px 18px;
+  transform:translate(-50%,-46%) scale(.94);opacity:0;visibility:hidden;
+  transition:transform .6s var(--e),opacity .45s var(--e),visibility 0s .6s}
+#sg-panel.open{transform:translate(-50%,-50%) scale(1);opacity:1;visibility:visible;transition:transform .6s var(--e),opacity .45s var(--e)}
+.sg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.sg-close{background:none;border:0;cursor:pointer;font-size:22px;line-height:1;color:var(--ink-faint);padding:0}
+.sg-th{display:flex;justify-content:space-between;padding:0 4px 10px;border-bottom:1px solid var(--line);
+  font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint)}
+.sg-table{display:flex;flex-direction:column}
+.sg-row{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;
+  border-bottom:1px solid var(--line-soft);cursor:pointer;padding:15px 4px;text-align:start;
+  font-family:var(--display);font-size:16px;letter-spacing:.02em;color:var(--ink);
+  opacity:0;transform:translateY(8px);transition:opacity .4s var(--e),transform .4s var(--e),background .3s}
+#sg-panel.open .sg-row{opacity:1;transform:translateY(0)}
+.sg-row:last-child{border-bottom:0}
+.sg-row:hover{background:var(--bone-2)}
+.sg-row.on{background:var(--bone-2);color:var(--emerald)}
+.sg-row span:last-child{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase}
+.sg-row.on span:last-child{color:var(--emerald)}
+.size-select .gov-trigger{width:100%;margin:14px 0 8px}
 
 /* Colour swatches — a ring grows in around the dot on selection rather
    than swapping the dot itself, so the ring reads as "chosen" no matter
@@ -955,7 +981,6 @@ footer .fbot a:hover{color:var(--on-dark)}
 [dir="rtl"] .card .meta span{font-size:13px}
 [dir="rtl"] .card .meta span,[dir="rtl"] .card .meta .pr small{letter-spacing:0}
 [dir="rtl"] .card .save{font-size:15px}
-[dir="rtl"] .sizes button{font-size:14.5px;letter-spacing:0;padding:13px 20px}
 [dir="rtl"] .spec .r .k{font-size:13.5px;letter-spacing:0}
 [dir="rtl"] .spec .r .v{font-size:17.5px}
 [dir="rtl"] .pdp .desc{font-size:16.5px !important}
@@ -1017,7 +1042,7 @@ footer .fbot a:hover{color:var(--on-dark)}
 [dir="rtl"] .ed-head .n{direction:ltr}
 [dir="rtl"] .scrollcue,[dir="rtl"] .lbl,[dir="rtl"] .pill{letter-spacing:0}
 [dir="rtl"] .btn,[dir="rtl"] .link,[dir="rtl"] .fopts button,[dir="rtl"] .filters button,
-[dir="rtl"] .sizes button,[dir="rtl"] .acct .side button,[dir="rtl"] .steps span,
+[dir="rtl"] .acct .side button,[dir="rtl"] .steps span,
 [dir="rtl"] header nav a,[dir="rtl"] header .util button,[dir="rtl"] footer h5{letter-spacing:.06em}
 [dir="rtl"] .btn:hover{letter-spacing:.12em}
 
