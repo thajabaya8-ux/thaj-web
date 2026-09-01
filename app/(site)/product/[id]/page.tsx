@@ -212,6 +212,10 @@ function ProductPageInner() {
             <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')}</div>
             <SizeGuide sizes={sizes} value={size} onChange={setSize} L={L} />
           </div>
+          <div className="rv" style={{ marginTop: 6 }}>
+            <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('Add a note', 'ضيفي ملاحظة')}</div>
+            <ReviewForm pieceId={p.id} />
+          </div>
           <div className="acts rv">
             {soldOut || activeColorOut ? (
               <button className="btn fill" disabled style={{ opacity: .5, cursor: 'default' }}>{L('Sold out', 'نفدت الكمية')}</button>
@@ -248,11 +252,6 @@ function ProductPageInner() {
         </div>
       </section>
       )}
-
-      <section className="pad wrap-n">
-        <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('A note to the atelier', 'رسالة للأتيليه')}</div>
-        <ReviewForm pieceId={p.id} />
-      </section>
 
       {rel.length > 0 && (
         <section className="pad wrap">
