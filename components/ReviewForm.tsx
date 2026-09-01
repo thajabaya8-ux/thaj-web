@@ -29,7 +29,7 @@ export default function ReviewForm({ pieceId }: { pieceId: string }) {
       <div className="field"><label>{L('Name', 'الاسم')}</label><input value={name} onChange={(e) => setName(e.target.value)} required /></div>
       <div className="field"><label>{L('Message', 'الرسالة')}</label><textarea value={message} onChange={(e) => setMessage(e.target.value)} required /></div>
       <button className="btn" style={{ width: 'max-content' }} type="submit" disabled={busy}>
-        {busy ? L('Sending…', 'بيتبعت…') : L('Send to the atelier', 'ابعتي للأتيليه')}
+        {busy ? L('Sending…', 'بيتبعت…') : L('Add note', 'ضيفي الملاحظة')}
       </button>
     </form>
   );
