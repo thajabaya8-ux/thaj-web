@@ -2,11 +2,12 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
-import { SIZES, SIZE_MTM, sizeRangeLabel } from '@/lib/siteContext';
+import { SIZES, SIZE_MTM } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 import ReviewForm from '@/components/ReviewForm';
+import SizeGuide from '@/components/SizeGuide';
 
 export default function ProductPage() {
   return (
@@ -209,18 +210,7 @@ function ProductPageInner() {
           )}
           <div className="rv">
             <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')}</div>
-            <div className="sizes">
-              {sizes.map((s) => (
-                <button key={s} className={size === s ? 'on' : ''} onClick={() => setSize(s)}>{s}</button>
-              ))}
-            </div>
-            <div className="body" style={{ fontSize: 11, lineHeight: 1.9 }}>{L('Pick the length closest to your height, in cm. Made to measure adds three weeks.', 'اختاري الطول الأقرب لطولك، بالسنتيمتر. التفصيل بيزوّد تلات أسابيع.')}</div>
-            <div className="body" style={{ fontSize: 10.5, lineHeight: 2, color: 'var(--ink-faint)' }}>
-              {SIZES.filter((s) => sizes.includes(s)).map((s) => {
-                const r = sizeRangeLabel(s)!;
-                return L(`${s}: ${r.en}. `, `${s}: ${r.ar}. `);
-              })}
-            </div>
+            <SizeGuide sizes={sizes} value={size} onChange={setSize} L={L} />
           </div>
           <div className="acts rv">
             {soldOut || activeColorOut ? (

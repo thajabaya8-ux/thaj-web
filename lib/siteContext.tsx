@@ -78,6 +78,15 @@ export function sizeRangeLabel(size: string): { en: string; ar: string } | null 
     : { en: `Fits heights ${lo}–${hi}cm`, ar: `مناسب للطول من ${lo} إلى ${hi} سم` };
 }
 
+// Same range, without the "fits heights" sentence — for a table cell that
+// already carries its own "Fits height" column header.
+export function sizeRangeCompact(size: string): { en: string; ar: string } | null {
+  const range = SIZE_RANGE[size];
+  if (!range) return null;
+  const [lo, hi] = range;
+  return hi == null ? { en: `${lo}cm+`, ar: `${lo} سم+` } : { en: `${lo}–${hi}cm`, ar: `${lo}–${hi} سم` };
+}
+
 // The price actually charged — the sale price when the piece is on sale,
 // the regular price otherwise. serverMappers.pieceOut already guarantees
 // salePrice is null unless it's genuinely lower than price.
