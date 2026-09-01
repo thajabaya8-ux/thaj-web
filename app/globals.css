@@ -776,7 +776,17 @@ section{position:relative}
 .sg-row.on{background:var(--bone-2);color:var(--emerald)}
 .sg-row span:last-child{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase}
 .sg-row.on span:last-child{color:var(--emerald)}
-.size-select .gov-trigger{width:100%;margin:14px 0 8px}
+/* A full bordered box, not the checkout's plain underlined field — this
+   sits next to real .btn buttons on the product page (not other inputs),
+   so it needs its own clearly-clickable affordance: a visible border,
+   a hover fill, and the same chevron the governorate select uses (kept
+   pointing down always — this opens a modal, not an inline toggle). */
+.size-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  background:none;border:1px solid var(--line);cursor:pointer;padding:15px 18px;margin:14px 0 8px;
+  font-size:14.5px;text-align:start;transition:border-color .25s var(--e),background .25s var(--e)}
+.size-trigger:hover{border-color:var(--ink-soft);background:var(--bone-2)}
+.size-trigger span:first-child{flex:1;color:var(--ink)}
+.size-trigger b{font-family:var(--display);font-weight:400;color:var(--emerald);font-size:13px;white-space:nowrap}
 
 /* Colour swatches — a ring grows in around the dot on selection rather
    than swapping the dot itself, so the ring reads as "chosen" no matter
