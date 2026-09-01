@@ -26,9 +26,10 @@ export default function SizeGuide({ sizes, value, onChange, L }: {
 
   return (
     <div className="size-select" ref={ref}>
-      <button type="button" className="gov-trigger" onClick={() => setOpen(true)}>
+      <button type="button" className="size-trigger" onClick={() => setOpen(true)}>
         <span>{value || L('Select your height', 'اختاري طولك')}</span>
         {selectedRange && <b>{L(selectedRange.en, selectedRange.ar)}</b>}
+        <i className="gov-chev" />
       </button>
 
       <div id="sg-scrim" className={open ? 'open' : ''} onClick={() => setOpen(false)} />
