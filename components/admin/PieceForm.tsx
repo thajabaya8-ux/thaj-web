@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
-import { SIZES } from '@/lib/siteContext';
+import { SIZES, sizeRangeLabel } from '@/lib/siteContext';
 import ImageUpload from './ImageUpload';
 import MultiImageUpload from './MultiImageUpload';
 import type { Collection, Piece, PieceColor } from '@/lib/types';
@@ -154,6 +154,12 @@ export default function PieceForm({ piece, collections, defaultCollKey, onSaved 
         </div>
         <p className="body" style={{ fontSize: 11, color: 'var(--ink-faint)', marginTop: 6 }}>
           {L('Leave all unchecked to offer every height.', 'سيبيهم كلهم من غير اختيار عشان كل الأطوال تتاح.')}
+        </p>
+        <p className="body" style={{ fontSize: 11, color: 'var(--ink-faint)', marginTop: 4, lineHeight: 1.9 }}>
+          {SIZES.map((s) => {
+            const r = sizeRangeLabel(s)!;
+            return L(`${s}: ${r.en}. `, `${s}: ${r.ar}. `);
+          })}
         </p>
       </div>
 
