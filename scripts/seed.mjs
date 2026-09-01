@@ -143,7 +143,7 @@ const ORDERS = [
   { order_number: 'THAJ-2026-0184', customer_name: 'Client of the house', email: 'you@domain.com', phone: '+966500000000',
     items: [{ id: 'najma', size: '54', qty: 1 }], total: 2450, status: 'Delivered' },
   { order_number: 'THAJ-2026-0151', customer_name: 'Client of the house', email: 'you@domain.com', phone: '+966500000000',
-    items: [{ id: 'zaytoon', size: '56', qty: 1 }, { id: 'tibr', size: 'Made to measure', qty: 1 }], total: 3750, status: 'Delivered' },
+    items: [{ id: 'zaytoon', size: '56', qty: 1 }, { id: 'tibr', size: '165', qty: 1 }], total: 3750, status: 'Delivered' },
   { order_number: 'THAJ-2026-0207', customer_name: 'Client of the house', email: 'you@domain.com', phone: '+966500000000',
     items: [{ id: 'sadaf', size: '54', qty: 1 }], total: 2750, status: 'In atelier' }
 ];

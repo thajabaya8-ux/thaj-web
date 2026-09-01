@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
-import { SIZES, SIZE_MTM } from '@/lib/siteContext';
+import { SIZES } from '@/lib/siteContext';
 import ProductCard from '@/components/ProductCard';
 import Mast from '@/components/Mast';
 
@@ -58,7 +58,6 @@ function AccSaved() {
 
 function AccInfo() {
   const { L, toast } = useSite();
-  const sizes = [...SIZES, L(SIZE_MTM.en, SIZE_MTM.ar)];
   return (
     <form className="form" onSubmit={(e) => { e.preventDefault(); toast(L('Saved', 'اتحفظ')); }}>
       <div className="f2">
@@ -68,7 +67,7 @@ function AccInfo() {
       <div className="field"><label>{L('Email', 'الإيميل')}</label><input defaultValue="you@domain.com" /></div>
       <div className="field"><label>{L('Phone', 'الموبايل')}</label><input defaultValue="+966" /></div>
       <div className="f2">
-        <div className="field"><label>{L('Preferred height', 'الطول المفضّل')}</label><select>{sizes.map((s) => <option key={s}>{s}</option>)}</select></div>
+        <div className="field"><label>{L('Preferred height', 'الطول المفضّل')}</label><select>{SIZES.map((s) => <option key={s}>{s}</option>)}</select></div>
         <div className="field"><label>{L('Language', 'اللغة')}</label><select><option>English</option><option>العربية</option></select></div>
       </div>
       <button className="btn" style={{ width: 'max-content' }} type="submit">{L('Save', 'حفظ')}</button>
