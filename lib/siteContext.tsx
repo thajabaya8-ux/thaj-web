@@ -58,7 +58,6 @@ const AD = '٠١٢٣٤٥٦٧٨٩';
 // Height in cm, not a garment size — how abaya length is actually chosen
 // in Egypt, not the Saudi dress-size numbers this used to hold.
 export const SIZES = ['150', '155', '160', '165', '170', '175', '180'];
-export const SIZE_MTM = { en: 'Made to measure', ar: 'تفصيل' };
 
 // Which actual heights each size fits — a customer picking by the bare
 // number alone (e.g. someone 152cm unsure whether that's "150" or "155")

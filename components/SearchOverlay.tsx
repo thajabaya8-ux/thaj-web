@@ -6,7 +6,7 @@ import type { Piece } from '@/lib/types';
 
 const SUGG: [string, string][] = [
   ['Black silhouettes', 'سيلويت أسود'], ['Ramadan', 'رمضان'], ['Silk', 'حرير'], ['Evening', 'سهرة'],
-  ['Linen', 'كتان'], ['Signature', 'التوقيع'], ['Made to measure', 'تفصيل']
+  ['Linen', 'كتان'], ['Signature', 'التوقيع']
 ];
 
 export default function SearchOverlay() {

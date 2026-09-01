@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
-import { SIZES, SIZE_MTM } from '@/lib/siteContext';
+import { SIZES } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
@@ -44,7 +44,7 @@ function ProductPageInner() {
   if (!p) return null;
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
-  const sizes = [...(p.sizes.length ? p.sizes : SIZES), L(SIZE_MTM.en, SIZE_MTM.ar)];
+  const sizes = p.sizes.length ? p.sizes : SIZES;
   const activeColor = p.colors.find((c) => c.id === color) || null;
   const selectColor = (cid: string) => { setColor(cid); setActive(0); };
   // The trousers photo (if any) rides along at the end of the same

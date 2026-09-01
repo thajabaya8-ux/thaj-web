@@ -41,7 +41,7 @@ export default function SizeGuide({ sizes, value, onChange, L }: {
         <div className="sg-th"><span>{L('Size', 'المقاس')}</span><span>{L('Fits height', 'مناسب للطول')}</span></div>
         <div className="sg-table">
           {sizes.map((s, i) => {
-            const r = sizeRangeCompact(s);
+            const r = sizeRangeCompact(s)!;
             return (
               <button
                 type="button" key={s} className={`sg-row ${value === s ? 'on' : ''}`}
@@ -49,7 +49,7 @@ export default function SizeGuide({ sizes, value, onChange, L }: {
                 onClick={() => { onChange(s); setOpen(false); }}
               >
                 <span>{s}</span>
-                <span>{r ? L(r.en, r.ar) : L('+3 weeks', '+ ٣ أسابيع')}</span>
+                <span>{L(r.en, r.ar)}</span>
               </button>
             );
           })}
