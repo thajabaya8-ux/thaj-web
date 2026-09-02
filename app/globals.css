@@ -882,7 +882,12 @@ section{position:relative}
   font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-faint);transition:color .5s}
 .acct .side button:hover{color:var(--ink-soft)}
 .acct .side button.on{color:var(--ink)}
-.orow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--line-soft);align-items:center}
+/* Now a Link to the order's own tracking page, not a plain row — the
+   hover fill is the only cue that it's clickable (no border/button
+   chrome), same restrained treatment as the account nav elsewhere. */
+.orow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;padding:20px 0;border-bottom:1px solid var(--line-soft);align-items:center;
+  transition:background .25s var(--e)}
+.orow:hover{background:var(--bone-2)}
 .orow .on{font-family:var(--display);font-size:17px}
 .pill{display:inline-block;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;padding:6px 11px;
   border:1px solid var(--line);color:var(--ink-soft)}
