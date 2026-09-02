@@ -132,7 +132,7 @@ function ConfirmPageInner() {
         <div className="track-alert rv"><b>{L('Order cancelled', 'الطلب اتلغى')}</b></div>
       )}
 
-      {showNext && whatsapp && (
+      {showNext && idx <= 1 && whatsapp && (
         <div className="wa-cta rv">
           <p className="body">{L('Please go to WhatsApp and send us a message to confirm your order.', 'يرجى التوجه إلى واتساب وإرسال رسالة لتأكيد طلبك.')}</p>
           <a className="btn fill" href={waLink!} target="_blank" rel="noopener noreferrer">{L('Message us on WhatsApp', 'راسلينا على واتساب')}</a>

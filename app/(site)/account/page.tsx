@@ -20,12 +20,12 @@ function AccOrders() {
         ))}
       </div>
       {orders.map((o) => (
-        <div className="orow" key={o.n}>
+        <Link className="orow" href={`/checkout/confirm?order=${encodeURIComponent(o.n)}`} key={o.n}>
           <div><div className="on">{o.n.split('-').pop()}</div><div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 5 }}>{esc(o.n)}</div></div>
           <div className="body" style={{ fontSize: 12 }}>{dateLabel(o.d)}</div>
           <div className="body" style={{ fontSize: 12 }}>{orderItemsLabel(o)}<br /><b style={{ fontFamily: 'var(--display)', fontSize: 14, color: 'var(--ink)' }}>{money(o.tot, 'EGP')}</b></div>
           <div><span className={`pill ${o.st === 'Delivered' ? '' : 'g'}`}>{stLabel(o.st)}</span></div>
-        </div>
+        </Link>
       ))}
     </>
   );
