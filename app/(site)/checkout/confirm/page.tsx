@@ -116,9 +116,16 @@ function ConfirmPageInner() {
     <section className="pad wrap-n" style={{ paddingTop: 'calc(var(--nav-h) + 60px)', paddingBottom: 'clamp(70px,11vh,140px)' }}>
       <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 14 }}>{L('Order received', 'وصلنا طلبك')}</div>
       <h1 className="h-l rv" style={{ marginBottom: 10 }}><span className="clip">{L('Thank you', 'شكرًا لك')}</span></h1>
-      <p className="body rv" style={{ marginBottom: 40 }}>
+      <p className="body rv" style={{ marginBottom: 24 }}>
         {L('Order', 'رقم الطلب')} <b style={{ fontFamily: 'var(--display)', color: 'var(--ink)' }}>{esc(order.n)}</b>
       </p>
+
+      <div className="rv" style={{ background: 'var(--bone-2)', padding: '18px 22px', marginBottom: 40 }}>
+        <p className="body" style={{ fontSize: 12.5, marginBottom: 8 }}>
+          {L('Track this order any time from your account — see the deposit, what’s been paid, and every stage from here to delivery.', 'تقدري تتابعي طلبك في أي وقت من حسابك — شوفي العربون، المدفوع لحد دلوقتي، وكل مرحلة لحد التسليم.')}
+        </p>
+        <Link className="link" href="/account">{L('Go to My THAJ', 'روحي لحسابي')}</Link>
+      </div>
 
       {rejected && (
         <div className="track-alert rv">
