@@ -134,6 +134,9 @@ export interface Order {
   items: OrderLineItem[];
   // Deposit checkout (EGP) — undefined on pre-existing orders that predate it.
   subtotal?: number;
+  // What subtotal would be at full (non-sale) price — undefined on orders
+  // placed before this column existed, same as subtotal itself.
+  originalSubtotal?: number;
   shippingFee?: number;
   depositAmount?: number;
   amountPaid?: number;

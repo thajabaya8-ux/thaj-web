@@ -120,6 +120,10 @@ CREATE TABLE IF NOT EXISTS orders (
   -- total (subtotal + shipping) for orders placed through this flow.
   -- Pre-existing orders just never populate these columns.
   subtotal INTEGER,
+  -- What subtotal would have been at each item's full (non-sale) price —
+  -- frozen at order time, same as subtotal, so a later price/sale change
+  -- never rewrites what this order's own thank-you page shows it saved.
+  original_subtotal INTEGER,
   shipping_fee INTEGER NOT NULL DEFAULT 0,
   deposit_amount INTEGER,
   amount_paid INTEGER NOT NULL DEFAULT 0,
@@ -143,6 +147,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS subtotal INTEGER;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS original_subtotal INTEGER;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_fee INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS deposit_amount INTEGER;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS amount_paid INTEGER NOT NULL DEFAULT 0;

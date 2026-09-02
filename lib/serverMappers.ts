@@ -83,7 +83,7 @@ export function orderOut(r: any): Order {
   return {
     n: r.order_number, id: r.id, name: r.customer_name, email: r.email, phone: r.phone,
     items: parseArr<OrderLineItem>(r.items), tot: r.total, st: r.status, d: toIso(r.created_at),
-    subtotal: r.subtotal ?? undefined, shippingFee: r.shipping_fee ?? undefined,
+    subtotal: r.subtotal ?? undefined, originalSubtotal: r.original_subtotal ?? undefined, shippingFee: r.shipping_fee ?? undefined,
     depositAmount: r.deposit_amount ?? undefined, amountPaid: r.amount_paid ?? undefined,
     paymentMethod: r.payment_method ?? undefined, paymentStatus: r.payment_status ?? undefined,
     rejectionReason: r.rejection_reason ?? null, approvedAt: r.approved_at ? toIso(r.approved_at) : null,
@@ -99,7 +99,7 @@ export function orderPublicOut(r: any): Order {
   return {
     n: r.order_number, id: r.id,
     items: parseArr<OrderLineItem>(r.items), tot: r.total, st: r.status, d: toIso(r.created_at),
-    subtotal: r.subtotal ?? undefined, shippingFee: r.shipping_fee ?? undefined,
+    subtotal: r.subtotal ?? undefined, originalSubtotal: r.original_subtotal ?? undefined, shippingFee: r.shipping_fee ?? undefined,
     depositAmount: r.deposit_amount ?? undefined, amountPaid: r.amount_paid ?? undefined,
     paymentMethod: r.payment_method ?? undefined, paymentStatus: r.payment_status ?? undefined,
     rejectionReason: r.rejection_reason ?? null, approvedAt: r.approved_at ? toIso(r.approved_at) : null,
