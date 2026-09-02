@@ -56,35 +56,10 @@ const PAYMENT_METHOD_LABEL: Record<string, [string, string]> = {
 const AD = '٠١٢٣٤٥٦٧٨٩';
 
 // Height in cm, not a garment size — how abaya length is actually chosen
-// in Egypt, not the Saudi dress-size numbers this used to hold.
-export const SIZES = ['150', '155', '160', '165', '170', '175', '180'];
-
-// Which actual heights each size fits — a customer picking by the bare
-// number alone (e.g. someone 152cm unsure whether that's "150" or "155")
-// has no way to tell; this is the concrete answer shown next to the
-// picker. hi:null means the top size is open-ended ("181cm and up").
-const SIZE_RANGE: Record<string, [number, number | null]> = {
-  '150': [150, 155], '155': [156, 160], '160': [161, 165], '165': [166, 170],
-  '170': [171, 175], '175': [176, 180], '180': [181, null]
-};
-
-export function sizeRangeLabel(size: string): { en: string; ar: string } | null {
-  const range = SIZE_RANGE[size];
-  if (!range) return null;
-  const [lo, hi] = range;
-  return hi == null
-    ? { en: `Fits heights ${lo}cm and up`, ar: `مناسب للطول من ${lo} سم فما فوق` }
-    : { en: `Fits heights ${lo}–${hi}cm`, ar: `مناسب للطول من ${lo} إلى ${hi} سم` };
-}
-
-// Same range, without the "fits heights" sentence — for a table cell that
-// already carries its own "Fits height" column header.
-export function sizeRangeCompact(size: string): { en: string; ar: string } | null {
-  const range = SIZE_RANGE[size];
-  if (!range) return null;
-  const [lo, hi] = range;
-  return hi == null ? { en: `${lo}cm+`, ar: `${lo} سم+` } : { en: `${lo}–${hi}cm`, ar: `${lo}–${hi} سم` };
-}
+// in Egypt, not the Saudi dress-size numbers this used to hold. Every
+// single centimetre from 150 to 180, not 5cm bands — a height is an
+// exact match now, not a range someone has to be told they fall inside.
+export const SIZES = Array.from({ length: 31 }, (_, i) => String(150 + i));
 
 // The price actually charged — the sale price when the piece is on sale,
 // the regular price otherwise. serverMappers.pieceOut already guarantees

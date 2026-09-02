@@ -1,11 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { sizeRangeCompact } from '@/lib/siteContext';
 
-// One field that opens a table of every height this piece offers, instead
-// of a bare row of number buttons a customer has to guess between — the
-// actual problem being solved is someone 152cm tall not knowing whether
-// that's "150" or "155" until the table spells out each size's range.
+// One field that opens a grid of every exact height (cm) this piece
+// offers, instead of a bare row of number buttons a customer has to
+// guess between.
 export default function SizeGuide({ sizes, value, onChange, L }: {
   sizes: string[];
   value: string | null;
@@ -14,7 +12,6 @@ export default function SizeGuide({ sizes, value, onChange, L }: {
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const selectedRange = value ? sizeRangeCompact(value) : null;
 
   useEffect(() => {
     if (!open) return;
@@ -27,32 +24,26 @@ export default function SizeGuide({ sizes, value, onChange, L }: {
   return (
     <div className="size-select" ref={ref}>
       <button type="button" className="size-trigger" onClick={() => setOpen(true)}>
-        <span>{value || L('Select your height', 'اختاري طولك')}</span>
-        {selectedRange && <b>{L(selectedRange.en, selectedRange.ar)}</b>}
+        <span>{value ? `${value} ${L('cm', 'سم')}` : L('Select your height', 'اختاري طولك')}</span>
         <i className="gov-chev" />
       </button>
 
       <div id="sg-scrim" className={open ? 'open' : ''} onClick={() => setOpen(false)} />
       <div id="sg-panel" className={open ? 'open' : ''} role="dialog" aria-modal="true">
         <div className="sg-head">
-          <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Select your height', 'اختاري طولك')}</span>
+          <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Select your height (cm)', 'اختاري طولك (سم)')}</span>
           <button type="button" className="sg-close" aria-label={L('Close', 'إغلاق')} onClick={() => setOpen(false)}>×</button>
         </div>
-        <div className="sg-th"><span>{L('Size', 'المقاس')}</span><span>{L('Fits height', 'مناسب للطول')}</span></div>
-        <div className="sg-table">
-          {sizes.map((s, i) => {
-            const r = sizeRangeCompact(s)!;
-            return (
-              <button
-                type="button" key={s} className={`sg-row ${value === s ? 'on' : ''}`}
-                style={open ? { transitionDelay: `${i * 45}ms` } : undefined}
-                onClick={() => { onChange(s); setOpen(false); }}
-              >
-                <span>{s}</span>
-                <span>{L(r.en, r.ar)}</span>
-              </button>
-            );
-          })}
+        <div className="sg-grid">
+          {sizes.map((s, i) => (
+            <button
+              type="button" key={s} className={`sg-tile ${value === s ? 'on' : ''}`}
+              style={open ? { transitionDelay: `${Math.min(i * 12, 300)}ms` } : undefined}
+              onClick={() => { onChange(s); setOpen(false); }}
+            >
+              {s}
+            </button>
+          ))}
         </div>
       </div>
     </div>
