@@ -103,6 +103,9 @@ export default function OrderDetailPage() {
 
           <div className="price-breakdown" style={{ marginTop: 24, maxWidth: 420 }}>
             <div className="pb-row"><span>{L('Products', 'المنتجات')}</span><b>{fmt(order.subtotal)}</b></div>
+            {(order.originalSubtotal ?? 0) - (order.subtotal ?? 0) > 0 && (
+              <div className="pb-row"><span>{L('Discount', 'الخصم')}</span><b style={{ color: 'var(--emerald)' }}>−{fmt((order.originalSubtotal ?? 0) - (order.subtotal ?? 0))}</b></div>
+            )}
             <div className="pb-row"><span>{L('Shipping', 'الشحن')}{ship?.governorateName ? ` · ${AR() ? ship.governorateNameAr : ship.governorateName}` : ''}</span><b>{fmt(order.shippingFee)}</b></div>
             <div className="pb-row pb-total"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{fmt(order.tot)}</b></div>
             <div className="pb-row"><span>{L('Deposit required', 'العربون المطلوب')}</span><b>{fmt(order.depositAmount)}</b></div>

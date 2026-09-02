@@ -78,6 +78,9 @@ export async function POST(req: Request) {
   // are added as-is, so the deposit/total math below always works in one
   // consistent currency regardless of how the cart's pieces are individually priced.
   let subtotalEgp = 0;
+  // Same math as subtotalEgp, but always at the piece's full price — the
+  // gap between the two is what the thank-you page shows as the discount.
+  let originalSubtotalEgp = 0;
   const cleanItems: { id: string; size: string; qty: number; withPants?: boolean; color?: string }[] = [];
   const itemsForEmail: { name: string; size: string; qty: number; withPants?: boolean; color?: string }[] = [];
 
@@ -148,15 +151,20 @@ export async function POST(req: Request) {
     // discount (lower than the full price) is ever honoured here.
     const withPants = !!it.withPants && p.pants_price != null;
     const base = p.sale_price != null && p.sale_price < p.price ? p.sale_price : p.price;
-    const unitPrice = base + (withPants ? p.pants_price : 0);
+    const pantsAdd = withPants ? p.pants_price : 0;
+    const unitPrice = base + pantsAdd;
     const unitPriceEgp = p.currency === 'EGP' ? unitPrice : Math.round(unitPrice * rate);
     subtotalEgp += unitPriceEgp * qty;
+    const originalUnitPrice = p.price + pantsAdd;
+    const originalUnitPriceEgp = p.currency === 'EGP' ? originalUnitPrice : Math.round(originalUnitPrice * rate);
+    originalSubtotalEgp += originalUnitPriceEgp * qty;
     const size = str(it.size, 40);
     cleanItems.push({ id: p.id, size, qty, withPants, ...(colorMatch ? { color: colorMatch.id } : {}) });
     itemsForEmail.push({ name: p.name_en, size, qty, withPants, ...(colorMatch ? { color: colorMatch.nameEn } : {}) });
   }
 
   const { subtotal, shippingFee, total, deposit } = computeOrderTotals(subtotalEgp, governorate.price, settings);
+  const originalSubtotal = Math.round(originalSubtotalEgp);
 
   const shippingJson = JSON.stringify({
     name: str(ship.name, 200), phone: str(ship.phone, 40),
@@ -169,10 +177,10 @@ export async function POST(req: Request) {
   try {
     rows = await sql`INSERT INTO orders
       (order_number, customer_name, email, phone, items, total, status,
-       subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id)
+       subtotal, original_subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id)
       VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
         ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
-        ${subtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null})
+        ${subtotal}, ${originalSubtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null})
       RETURNING *`;
   } catch (err) {
     // The order row itself failed to write — the stock reserved above for

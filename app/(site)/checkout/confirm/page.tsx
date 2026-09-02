@@ -108,6 +108,7 @@ function ConfirmPageInner() {
     : null;
   const itemCount = order.items.reduce((s, it) => s + (it.qty || 1), 0);
   const remaining = (order.tot || 0) - (order.amountPaid || 0);
+  const discount = (order.originalSubtotal ?? 0) - (order.subtotal ?? 0);
   const govLabel = shipInfo ? L(shipInfo.govName, shipInfo.govNameAr) : '';
   const placedDate = (order.d || '').slice(0, 10);
 
@@ -153,6 +154,9 @@ function ConfirmPageInner() {
       )}
 
       <div className="price-breakdown rv" style={{ marginTop: 40 }}>
+        {discount > 0 && (
+          <div className="pb-row"><span>{L('Discount', 'الخصم')}</span><b style={{ color: 'var(--emerald)' }}>−{fmt(discount)}</b></div>
+        )}
         <div className="pb-row"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{fmt(order.tot)}</b></div>
         <div className="pb-row"><span>{L('Deposit required', 'العربون المطلوب')}</span><b>{fmt(order.depositAmount)}</b></div>
         <div className="pb-row"><span>{L('Amount paid', 'المدفوع')}</span><b>{fmt(order.amountPaid)}</b></div>
