@@ -748,34 +748,29 @@ section{position:relative}
 
 /* Size picker: a gov-trigger-style field (reusing its class — same
    look as the checkout governorate select) that opens #sg-panel, a
-   centered modal listing every height this piece offers with its exact
-   cm range, instead of a bare row of number buttons a customer has to
-   guess between. Rows fade/rise in with a per-row transition-delay set
-   inline in SizeGuide.tsx, so the table visibly populates on open
-   rather than just appearing. */
+   centered modal with every exact height (cm) this piece offers laid
+   out as a grid of tiles, instead of a bare row of number buttons a
+   customer has to guess between. Tiles fade/rise in with a per-tile
+   transition-delay set inline in SizeGuide.tsx (capped, not linear —
+   31 of them shouldn't take a second and a half to finish appearing),
+   so the grid visibly populates on open rather than just appearing. */
 #sg-scrim{position:fixed;inset:0;z-index:210;background:rgba(4,45,41,.46);backdrop-filter:blur(3px);
   opacity:0;visibility:hidden;transition:opacity .5s var(--e),visibility 0s .5s}
 #sg-scrim.open{opacity:1;visibility:visible;transition:opacity .5s var(--e)}
 #sg-panel{position:fixed;top:50%;left:50%;z-index:211;width:min(420px,92vw);max-height:82vh;overflow-y:auto;
-  background:var(--bone);padding:30px 30px 18px;
+  background:var(--bone);padding:30px 30px 26px;
   transform:translate(-50%,-46%) scale(.94);opacity:0;visibility:hidden;
   transition:transform .6s var(--e),opacity .45s var(--e),visibility 0s .6s}
 #sg-panel.open{transform:translate(-50%,-50%) scale(1);opacity:1;visibility:visible;transition:transform .6s var(--e),opacity .45s var(--e)}
-.sg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.sg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .sg-close{background:none;border:0;cursor:pointer;font-size:22px;line-height:1;color:var(--ink-faint);padding:0}
-.sg-th{display:flex;justify-content:space-between;padding:0 4px 10px;border-bottom:1px solid var(--line);
-  font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-faint)}
-.sg-table{display:flex;flex-direction:column}
-.sg-row{display:flex;justify-content:space-between;align-items:center;width:100%;background:none;border:0;
-  border-bottom:1px solid var(--line-soft);cursor:pointer;padding:15px 4px;text-align:start;
-  font-family:var(--display);font-size:16px;letter-spacing:.02em;color:var(--ink);
-  opacity:0;transform:translateY(8px);transition:opacity .4s var(--e),transform .4s var(--e),background .3s}
-#sg-panel.open .sg-row{opacity:1;transform:translateY(0)}
-.sg-row:last-child{border-bottom:0}
-.sg-row:hover{background:var(--bone-2)}
-.sg-row.on{background:var(--bone-2);color:var(--emerald)}
-.sg-row span:last-child{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--ink-faint);text-transform:uppercase}
-.sg-row.on span:last-child{color:var(--emerald)}
+.sg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:8px}
+.sg-tile{background:none;border:1px solid var(--line);cursor:pointer;padding:12px 0;text-align:center;
+  font-family:var(--display);font-size:14.5px;letter-spacing:.02em;color:var(--ink);border-radius:2px;
+  opacity:0;transform:translateY(8px);transition:opacity .4s var(--e),transform .4s var(--e),background .25s,border-color .25s}
+#sg-panel.open .sg-tile{opacity:1;transform:translateY(0)}
+.sg-tile:hover{border-color:var(--ink-soft);background:var(--bone-2)}
+.sg-tile.on{background:var(--ink);border-color:var(--ink);color:var(--bone)}
 /* A full bordered box, not the checkout's plain underlined field — this
    sits next to real .btn buttons on the product page (not other inputs),
    so it needs its own clearly-clickable affordance: a visible border,
