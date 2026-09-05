@@ -35,6 +35,24 @@ declare global {
   }
 }
 
+// MetaPixel.tsx fetches the Pixel ID from /api/settings before it can call
+// fbq('init', ...), so window.fbq may not exist yet on a very first
+// interaction (e.g. an ad click landing straight on a product page,
+// followed immediately by "Add to selection"). PageView never shows this
+// gap because bootPixel() fires it itself once the ID arrives; any event
+// that's fired *by the user* (AddToCart chief among them) can race that
+// fetch and lose the call for good if it isn't queued here. Calls queue in
+// order and get replayed once markPixelReady() runs — which MetaPixel.tsx
+// calls right after fbq('init', ...), so init always precedes every
+// queued track call, matching what Meta's pixel requires.
+let pixelReady = false;
+const queuedCalls: (() => void)[] = [];
+
+export function markPixelReady() {
+  pixelReady = true;
+  while (queuedCalls.length) queuedCalls.shift()!();
+}
+
 // Fires a standard Meta Pixel event from the browser. `eventId`, when
 // given, is echoed to the Conversions API for the same real-world action
 // (see lib/metaCapi.ts) so Meta can deduplicate the browser call against
@@ -47,9 +65,13 @@ export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?
   // own metadata, so a product view/add-to-cart already carries its
   // product id, price, etc. into the activity log for free.
   logAnalyticsEvent(event, window.location.pathname, params);
-  if (typeof window.fbq !== 'function') return;
-  if (eventId) window.fbq('track', event, params || {}, { eventID: eventId });
-  else window.fbq('track', event, params || {});
+  const fire = () => {
+    if (typeof window.fbq !== 'function') return;
+    if (eventId) window.fbq('track', event, params || {}, { eventID: eventId });
+    else window.fbq('track', event, params || {});
+  };
+  if (pixelReady) fire();
+  else queuedCalls.push(fire);
 }
 
 const PURCHASE_DEDUPE_KEY = 'thaj_pixel_purchased_orders';

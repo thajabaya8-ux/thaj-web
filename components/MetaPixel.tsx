@@ -15,6 +15,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { Settings } from '@/lib/types';
+import { markPixelReady } from '@/lib/pixel';
 
 let pixelBooted = false;
 let cachedPixelId: string | null = null; // null = not fetched yet, '' = fetched but unset
@@ -37,6 +38,9 @@ function bootPixel(pixelId: string) {
 
   window.fbq('init', pixelId);
   window.fbq('track', 'PageView');
+  // Unblocks any trackPixel() call (AddToCart, etc.) that fired while this
+  // was still resolving — see the comment in lib/pixel.ts.
+  markPixelReady();
 }
 
 export default function MetaPixel() {
@@ -48,14 +52,18 @@ export default function MetaPixel() {
     fetch('/api/settings').then((r) => (r.ok ? r.json() : {})).then((s: Settings) => {
       cachedPixelId = s.meta_pixel_id || '';
       setPixelId(cachedPixelId);
-    }).catch(() => { cachedPixelId = ''; setPixelId(''); });
+      // No pixel configured — bootPixel() (and its own markPixelReady()
+      // call) will never run, so release any queued trackPixel() calls
+      // here instead; they no-op since window.fbq never gets created.
+      if (!cachedPixelId) markPixelReady();
+    }).catch(() => { cachedPixelId = ''; setPixelId(''); markPixelReady(); });
   }, []);
 
   useEffect(() => {
     if (!pixelId || pathname.startsWith('/admin')) return;
 
     const wasAlreadyBooted = pixelBooted;
-    bootPixel(pixelId); // no-ops if already booted
+    bootPixel(pixelId); // no-ops if already booted (and already marked ready)
     if (wasAlreadyBooted) window.fbq?.('track', 'PageView'); // first-ever PageView is covered by bootPixel() itself
   }, [pathname, pixelId]);
 
