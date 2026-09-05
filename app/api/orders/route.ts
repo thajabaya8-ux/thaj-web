@@ -201,7 +201,7 @@ export async function POST(req: Request) {
     currency: 'EGP',
     contentIds: cleanItems.map((i) => i.id),
     numItems: cleanItems.reduce((s, i) => s + i.qty, 0),
-    eventSourceUrl: req.headers.get('referer') || 'https://thaj-web.vercel.app/checkout',
+    eventSourceUrl: req.headers.get('referer') || 'https://thajabaya.com/checkout',
     ...capiSignalsFromRequest(req)
   });
 
