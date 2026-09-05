@@ -31,26 +31,8 @@ export interface PixelParams {
 
 declare global {
   interface Window {
-    fbq?: ((...args: unknown[]) => void) & { queue?: unknown[][] };
+    fbq?: ((...args: unknown[]) => void) & { queue?: unknown[][]; callMethod?: (...args: unknown[]) => void };
   }
-}
-
-// MetaPixel.tsx fetches the Pixel ID from /api/settings before it can call
-// fbq('init', ...), so window.fbq may not exist yet on a very first
-// interaction (e.g. an ad click landing straight on a product page,
-// followed immediately by "Add to selection"). PageView never shows this
-// gap because bootPixel() fires it itself once the ID arrives; any event
-// that's fired *by the user* (AddToCart chief among them) can race that
-// fetch and lose the call for good if it isn't queued here. Calls queue in
-// order and get replayed once markPixelReady() runs — which MetaPixel.tsx
-// calls right after fbq('init', ...), so init always precedes every
-// queued track call, matching what Meta's pixel requires.
-let pixelReady = false;
-const queuedCalls: (() => void)[] = [];
-
-export function markPixelReady() {
-  pixelReady = true;
-  while (queuedCalls.length) queuedCalls.shift()!();
 }
 
 // Purchase already reaches Meta server-side with authoritative, DB-verified
@@ -78,7 +60,10 @@ function sendCapiMirror(event: PixelEventName, params: PixelParams, eventId: str
 // (see lib/metaCapi.ts) so Meta can deduplicate the browser call against
 // the matching server-side call instead of double-counting it. When not
 // given for an event that gets a CAPI mirror, one is generated here so
-// the two calls can still be deduped against each other.
+// the two calls can still be deduped against each other. Safe to call
+// before the pixel has finished loading — window.fbq's own stub (see
+// components/MetaPixel.tsx) queues calls internally until it has, the
+// same as Meta's official base snippet does on any site.
 export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?: string) {
   if (typeof window === 'undefined') return;
   // Logged regardless of whether a Meta Pixel ID is even configured —
@@ -90,13 +75,9 @@ export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?
   const mirrored = CAPI_MIRRORED_EVENTS.has(event);
   const id = eventId || (mirrored ? crypto.randomUUID() : undefined);
   if (mirrored && id) sendCapiMirror(event, params || {}, id);
-  const fire = () => {
-    if (typeof window.fbq !== 'function') return;
-    if (id) window.fbq('track', event, params || {}, { eventID: id });
-    else window.fbq('track', event, params || {});
-  };
-  if (pixelReady) fire();
-  else queuedCalls.push(fire);
+  if (typeof window.fbq !== 'function') return;
+  if (id) window.fbq('track', event, params || {}, { eventID: id });
+  else window.fbq('track', event, params || {});
 }
 
 const PURCHASE_DEDUPE_KEY = 'thaj_pixel_purchased_orders';
