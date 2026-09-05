@@ -23,13 +23,23 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 // means the _fbp/_fbc cookies fbevents.js sets never exist — the same
 // cookies app/api/orders/route.ts reads for Conversions API match quality
 // (see lib/metaCapi.ts), so ad-click attribution was silently broken too.
+//
+// googletagmanager.com (script-src, connect-src) is GTM's own loader
+// (gtm.js, in app/layout.tsx) and where it reports back to; the
+// google-analytics.com/analytics.google.com hosts cover GA4, which is the
+// tag almost every GTM container ships with by default. frame-src covers
+// the <noscript> fallback iframe GTM's own install snippet requires
+// (ns.html) for visitors with JS disabled. Same failure mode as the Meta
+// Pixel above if any of these are missing: a silent CSP block, not an
+// error GTM's own debug view would explain.
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' https://connect.facebook.net${IS_PROD ? '' : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' https://connect.facebook.net https://www.googletagmanager.com${IS_PROD ? '' : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://www.facebook.com",
+  "img-src 'self' data: https://www.facebook.com https://www.googletagmanager.com https://www.google-analytics.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.facebook.com",
+  "connect-src 'self' https://www.facebook.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com",
+  "frame-src https://www.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

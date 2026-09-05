@@ -1,10 +1,22 @@
 import './globals.css';
 import { Cairo, Playfair_Display } from 'next/font/google';
+import Script from 'next/script';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import MetaPixel from '@/components/MetaPixel';
 import PwaInstall from '@/components/PwaInstall';
 import Analytics from '@/components/Analytics';
+
+// Google Tag Manager container, added at the media buyer's request —
+// whatever tags they configure inside GTM's own dashboard (GA4, Google
+// Ads conversion tracking, etc.) ship without another deploy here. The
+// container ID itself isn't a secret (same as the Meta Pixel ID — every
+// site using GTM exposes it in its page source), so it's fine inline
+// rather than an env var. `afterInteractive` matches Next.js's own
+// documented pattern for GTM: early enough to catch real user
+// interaction, but never blocking first paint the way an unmanaged
+// <head> script tag would.
+const GTM_ID = 'GTM-T6ZCPS6W';
 
 // Self-hosted Arabic web font (see --ar in globals.css) — without this,
 // [dir="rtl"] text fell back to whatever Arabic serif the visitor's OS
@@ -88,6 +100,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" dir="ltr" className={`${cairoAr.variable} ${playfair.variable}`}>
       <body>
+        <Script id="gtm" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','${GTM_ID}');`}
+        </Script>
+        <noscript>
+          <iframe src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`} height="0" width="0" style={{ display: 'none', visibility: 'hidden' }} />
+        </noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }} />
         <MetaPixel />
         <Analytics />
