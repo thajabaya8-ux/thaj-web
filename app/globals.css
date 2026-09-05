@@ -726,9 +726,9 @@ section{position:relative}
 
 /* ---- printable shipping waybill ---- */
 .waybill{border:1px solid var(--line);padding:26px 28px;max-width:460px}
-.wb-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);
+.wb-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);
   padding-bottom:14px;margin-bottom:16px}
-.wb-brand{font-family:var(--display);font-size:20px;letter-spacing:.04em}
+.wb-brand{height:24px;width:auto;display:block}
 .wb-num{font-family:var(--display);font-size:13px;color:var(--ink-faint)}
 .wb-row{display:flex;justify-content:space-between;gap:18px;padding:8px 0;border-bottom:1px solid var(--line-soft);
   font-size:12.5px}
@@ -739,9 +739,9 @@ section{position:relative}
 .wb-cod b{color:var(--emerald);font-size:17px}
 
 @media print{
-  header,footer,.social-fab,#toast,.wa-cta,.no-print{display:none !important}
+  header,footer,.social-fab,#toast,.wa-cta,.no-print,.adm-side,.adm-mbar{display:none !important}
   body{background:#fff}
-  main{padding-top:0 !important}
+  main,.adm-main{padding-top:0 !important}
   .waybill{border-color:#000;max-width:none}
   .wb-row,.wb-head{border-color:#ccc}
 }

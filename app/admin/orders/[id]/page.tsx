@@ -72,9 +72,13 @@ export default function OrderDetailPage() {
   const waText = encodeURIComponent(
     `${L('Order', 'طلب')} ${order.n}\n${ship?.name || order.name || ''}\n${ship?.phone || order.phone || ''}\n${L('Deposit', 'العربون')}: ${fmt(order.depositAmount)}`
   );
+  const itemCount = order.items.reduce((s, it) => s + (it.qty || 1), 0);
+  const remaining = (order.tot || 0) - (order.amountPaid || 0);
+  const placedDate = (order.d || '').slice(0, 10);
 
   return (
     <>
+      <div className="no-print">
       <div className="adm-head">
         <h1>{order.n}</h1>
         <Link href="/admin/orders" className="body" style={{ fontSize: 11.5 }}>← {L('All orders', 'كل الطلبات')}</Link>
@@ -162,12 +166,32 @@ export default function OrderDetailPage() {
             </a>
           )}
 
+          <button type="button" className="btn fill" style={{ display: 'block', width: '100%', marginTop: 10 }} onClick={() => window.print()}>
+            {L('Print waybill', 'طباعة بوليصة الشحن')}
+          </button>
+
           <p className="body" style={{ fontSize: 11, marginTop: 24, color: 'var(--ink-faint)' }}>{L('Placed', 'اتسجّل')} {(order.d || '').slice(0, 16).replace('T', ' ')}</p>
 
           <button className="btn" disabled={busy} onClick={onDelete} style={{ display: 'block', width: '100%', marginTop: 24 }}>
             {L('Delete order', 'حذف الطلب')}
           </button>
         </div>
+      </div>
+      </div>
+
+      <div className="lbl" style={{ color: 'var(--gold)', margin: '30px 0 14px' }}>{L('Waybill', 'بوليصة الشحن')}</div>
+      <div className="waybill">
+        <div className="wb-head">
+          <img className="wb-brand" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
+          <span className="wb-num">{order.n}</span>
+        </div>
+        <div className="wb-row"><span>{L('Date', 'التاريخ')}</span><b>{placedDate}</b></div>
+        <div className="wb-row"><span>{L('Recipient', 'المستلمة')}</span><b>{ship?.name || order.name || '—'}</b></div>
+        <div className="wb-row"><span>{L('Phone', 'الموبايل')}</span><b dir="ltr">{ship?.phone || order.phone || '—'}</b></div>
+        <div className="wb-row"><span>{L('Address', 'العنوان')}</span><b>{[ship?.governorateName ? (AR() ? ship.governorateNameAr : ship.governorateName) : '', ship?.city].filter(Boolean).join(', ')}{ship?.address ? ` — ${ship.address}` : ''}</b></div>
+        {ship?.notes && <div className="wb-row"><span>{L('Notes', 'ملاحظات')}</span><b>{ship.notes}</b></div>}
+        <div className="wb-row"><span>{L('Items', 'عدد القطع')}</span><b>{itemCount}</b></div>
+        <div className="wb-row wb-cod"><span>{L('Collect on delivery', 'التحصيل عند التسليم')}</span><b>{fmt(remaining)}</b></div>
       </div>
     </>
   );
