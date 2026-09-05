@@ -13,13 +13,23 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 // 'unsafe-eval' is added in development only — React's dev build uses eval()
 // for debugging features (e.g. reconstructing stack traces); it never does
 // in production, so the production CSP stays free of it.
+//
+// connect.facebook.net (script-src) and www.facebook.com (connect-src,
+// img-src) are the Meta Pixel's own script host and event-beacon target —
+// components/MetaPixel.tsx loads fbevents.js from the former and it posts
+// every tracked event to the latter. Without both, the browser silently
+// blocks the pixel outright (a CSP violation, not a network error), which
+// is exactly the "pixel isn't receiving events" Meta reports, and it also
+// means the _fbp/_fbc cookies fbevents.js sets never exist — the same
+// cookies app/api/orders/route.ts reads for Conversions API match quality
+// (see lib/metaCapi.ts), so ad-click attribution was silently broken too.
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${IS_PROD ? '' : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' https://connect.facebook.net${IS_PROD ? '' : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
+  "img-src 'self' data: https://www.facebook.com",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://www.facebook.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
