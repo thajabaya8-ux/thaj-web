@@ -11,11 +11,23 @@
    component re-renders on navigation. Every later pathname change
    fires one more PageView, and /admin/* is never tracked at all
    (no admin session activity is ever sent to Meta).
+
+   The stub below deliberately mirrors Meta's own official base-code
+   snippet, callMethod check included — that check is not boilerplate
+   to trim. Once fbevents.js finishes loading, it patches a
+   `callMethod` property directly onto this exact function object
+   (never replaces window.fbq with a new one), and expects every
+   future call to route through it. A stub that only ever pushes to
+   its queue array — the bug this file had — keeps "working" for the
+   very first call (drained once, when the script finishes loading)
+   and then silently swallows every call after that forever: no
+   error, no network request, nothing. That's exactly why PageView
+   (always the first call on a fresh page load) reached Meta while
+   AddToCart (always a later call on the same page) never did.
    ========================================================== */
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { Settings } from '@/lib/types';
-import { markPixelReady } from '@/lib/pixel';
 
 let pixelBooted = false;
 let cachedPixelId: string | null = null; // null = not fetched yet, '' = fetched but unset
@@ -25,9 +37,11 @@ function bootPixel(pixelId: string) {
   pixelBooted = true;
 
   if (!window.fbq) {
-    const queue: unknown[][] = [];
-    const stub = ((...args: unknown[]) => { queue.push(args); }) as NonNullable<Window['fbq']>;
-    stub.queue = queue;
+    const stub = function (...args: unknown[]) {
+      if (stub.callMethod) stub.callMethod.call(stub, ...args);
+      else stub.queue!.push(args);
+    } as NonNullable<Window['fbq']>;
+    stub.queue = [];
     window.fbq = stub;
 
     const script = document.createElement('script');
@@ -38,9 +52,6 @@ function bootPixel(pixelId: string) {
 
   window.fbq('init', pixelId);
   window.fbq('track', 'PageView');
-  // Unblocks any trackPixel() call (AddToCart, etc.) that fired while this
-  // was still resolving — see the comment in lib/pixel.ts.
-  markPixelReady();
 }
 
 export default function MetaPixel() {
@@ -52,18 +63,14 @@ export default function MetaPixel() {
     fetch('/api/settings').then((r) => (r.ok ? r.json() : {})).then((s: Settings) => {
       cachedPixelId = s.meta_pixel_id || '';
       setPixelId(cachedPixelId);
-      // No pixel configured — bootPixel() (and its own markPixelReady()
-      // call) will never run, so release any queued trackPixel() calls
-      // here instead; they no-op since window.fbq never gets created.
-      if (!cachedPixelId) markPixelReady();
-    }).catch(() => { cachedPixelId = ''; setPixelId(''); markPixelReady(); });
+    }).catch(() => { cachedPixelId = ''; setPixelId(''); });
   }, []);
 
   useEffect(() => {
     if (!pixelId || pathname.startsWith('/admin')) return;
 
     const wasAlreadyBooted = pixelBooted;
-    bootPixel(pixelId); // no-ops if already booted (and already marked ready)
+    bootPixel(pixelId); // no-ops if already booted
     if (wasAlreadyBooted) window.fbq?.('track', 'PageView'); // first-ever PageView is covered by bootPixel() itself
   }, [pathname, pixelId]);
 
