@@ -1,5 +1,6 @@
 'use client';
 import { useLayoutEffect } from 'react';
+import Link from 'next/link';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
 
@@ -13,11 +14,17 @@ interface OrdersAnalytics {
 }
 
 interface PageTraffic { path: string; views: number; events: { type: string; count: number }[] }
-interface TrafficAnalytics { days: number; totalViews: number; pages: PageTraffic[] }
+interface FunnelStep { step: string; count: number }
+interface TrafficAnalytics { days: number; totalViews: number; pages: PageTraffic[]; funnel: FunnelStep[] }
 
 const egp = (n: number) => `${(n || 0).toLocaleString('en-US')} EGP`;
 const METHOD_LABEL: Record<string, [string, string]> = {
   vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي'], unknown: ['Unknown', 'غير معروف']
+};
+const STEP_LABEL: Record<string, [string, string]> = {
+  Visit: ['Visit', 'زيارة'], 'Product View': ['Product view', 'مشاهدة منتج'],
+  'Add to Cart': ['Add to cart', 'إضافة للسلة'], 'Checkout Started': ['Checkout started', 'بدء الدفع'],
+  'Order Created': ['Order created', 'طلب اتعمل'], 'Order Completed': ['Order completed', 'طلب اتأكد']
 };
 
 export default function AnalyticsPage() {
@@ -35,13 +42,41 @@ export default function AnalyticsPage() {
   const maxRev = orders ? Math.max(1, ...orders.revenueByMonth.map((m) => m.total)) : 1;
   const maxGovCount = orders?.byGovernorate.length ? Math.max(...orders.byGovernorate.map((g) => g.count)) : 1;
   const maxViews = traffic?.pages.length ? Math.max(...traffic.pages.map((p) => p.views)) : 1;
+  const maxFunnel = traffic?.funnel.length ? Math.max(1, ...traffic.funnel.map((f) => f.count)) : 1;
 
   return (
     <>
       <div className="adm-head">
         <h1>{L('Analytics', 'الإحصائيات')}</h1>
         <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Sales, and what visitors actually do on the site', 'المبيعات، وإيه اللي الزوار بيعملوه فعليًا في الموقع')}</span>
+        <Link href="/admin/activity" className="btn">{L('View activity log', 'سجل النشاط')}</Link>
       </div>
+
+      {traffic && (
+        <section style={{ marginTop: 4, marginBottom: 30 }}>
+          <div className="adm-head" style={{ marginBottom: 18 }}>
+            <h2 className="h-s" style={{ fontSize: 20 }}>{L('Customer journey', 'رحلة العميل')}</h2>
+            <span className="lbl" style={{ color: 'var(--ink-faint)' }}>{L(`Last ${traffic.days} days · distinct visitors per step`, `آخر ${traffic.days} يوم · زوار مختلفين لكل خطوة`)}</span>
+          </div>
+          <section className="dark adm-panel">
+            {traffic.funnel.map((f, i) => {
+              const prevCount = i > 0 ? traffic.funnel[i - 1].count : f.count;
+              const dropPct = i > 0 && prevCount > 0 ? Math.round((1 - f.count / prevCount) * 100) : 0;
+              const label = STEP_LABEL[f.step] || [f.step, f.step];
+              return (
+                <div className="lrow" key={f.step}>
+                  <div><div className="h-s">{L(label[0], label[1])}</div></div>
+                  <div className="lbar"><b data-w={`${Math.round((f.count / maxFunnel) * 100)}%`}></b></div>
+                  <div className="lbl" style={{ color: 'var(--champagne)' }}>
+                    {f.count.toLocaleString('en-US')}
+                    {i > 0 && dropPct > 0 && <span style={{ color: '#E39A9A', marginInlineStart: 10 }}>−{dropPct}% {L('drop-off', 'انسحاب')}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        </section>
+      )}
 
       {ordersError && <p className="body" style={{ color: '#B75B5B' }}>{ordersError}</p>}
       {orders && (

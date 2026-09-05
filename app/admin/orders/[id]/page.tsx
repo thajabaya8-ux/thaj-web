@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
 import { downloadWaybillPdf } from '@/lib/waybillPdf';
+import { trackEvent } from '@/lib/analytics';
 import type { Order, Piece } from '@/lib/types';
 
 const FULFILMENT_STATUSES = ['Under Review', 'Confirmed', 'Preparing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -34,18 +35,33 @@ export default function OrderDetailPage() {
 
   const onApprove = async () => {
     setBusy(true);
-    try { await call(`/orders/${id}/payment`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) }); toast(L('Payment approved', 'الدفع اتاعتمد')); reload(); }
+    try {
+      await call(`/orders/${id}/payment`, { method: 'POST', body: JSON.stringify({ action: 'approve' }) });
+      toast(L('Payment approved', 'الدفع اتاعتمد'));
+      trackEvent('AdminPaymentApproved', { order_id: id, order_number: order?.n, deposit_amount: order?.depositAmount });
+      reload();
+    }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   };
   const onReject = async () => {
     setBusy(true);
-    try { await call(`/orders/${id}/payment`, { method: 'POST', body: JSON.stringify({ action: 'reject', reason }) }); toast(L('Payment rejected', 'الدفع اترفض')); reload(); }
+    try {
+      await call(`/orders/${id}/payment`, { method: 'POST', body: JSON.stringify({ action: 'reject', reason }) });
+      toast(L('Payment rejected', 'الدفع اترفض'));
+      trackEvent('AdminPaymentRejected', { order_id: id, order_number: order?.n, reason: reason || null });
+      reload();
+    }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   };
   const onStatus = async (status: string) => {
-    try { await call(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) }); toast(L('Updated', 'اتحدّث')); reload(); }
+    try {
+      await call(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify({ status }) });
+      toast(L('Updated', 'اتحدّث'));
+      trackEvent('AdminOrderStatusChanged', { order_id: id, order_number: order?.n, previous_status: order?.st, new_status: status });
+      reload();
+    }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); }
   };
   const onDelete = async () => {
@@ -54,7 +70,12 @@ export default function OrderDetailPage() {
       'تمسحي الطلب ده نهائيًا؟ الخطوة دي بتشيله خالص مش بس تحطه ملغى — أي مخزون محجوز أو متخصوم هيرجع الأول. الخطوة دي ما بترجعش.'
     ))) return;
     setBusy(true);
-    try { await call(`/orders/${id}`, { method: 'DELETE' }); toast(L('Order deleted', 'الطلب اتمسح')); router.push('/admin/orders'); }
+    try {
+      await call(`/orders/${id}`, { method: 'DELETE' });
+      toast(L('Order deleted', 'الطلب اتمسح'));
+      trackEvent('AdminOrderDeleted', { order_id: id, order_number: order?.n });
+      router.push('/admin/orders');
+    }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); setBusy(false); }
   };
   const onDownloadWaybill = async () => {

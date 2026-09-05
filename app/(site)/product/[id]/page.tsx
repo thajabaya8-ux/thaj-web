@@ -4,6 +4,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
 import { SIZES } from '@/lib/siteContext';
 import { trackPixel } from '@/lib/pixel';
+import { trackEvent } from '@/lib/analytics';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 import ReviewForm from '@/components/ReviewForm';
@@ -46,7 +47,16 @@ function ProductPageInner() {
   const saved = wish.includes(p.id);
   const sizes = p.sizes.length ? p.sizes : SIZES;
   const activeColor = p.colors.find((c) => c.id === color) || null;
-  const selectColor = (cid: string) => { setColor(cid); setActive(0); };
+  const selectColor = (cid: string) => {
+    setColor(cid);
+    setActive(0);
+    const c = p.colors.find((x) => x.id === cid);
+    trackEvent('SelectColor', { product_id: p.id, product_name: pName(p), color_id: cid, color_name: c ? L(c.nameEn, c.nameAr) : cid });
+  };
+  const selectSize = (s: string) => {
+    setSize(s);
+    trackEvent('SelectSize', { product_id: p.id, product_name: pName(p), size: s });
+  };
   // The trousers photo (if any) rides along at the end of the same
   // gallery, tagged, instead of only ever living inside the small
   // pants-select thumbnail — so it's browsable/swipeable like any other
@@ -210,7 +220,7 @@ function ProductPageInner() {
           )}
           <div className="rv">
             <div className="lbl" style={{ color: 'var(--ink-faint)' }}>{L('Height', 'الطول')}</div>
-            <SizeGuide sizes={sizes} value={size} onChange={setSize} L={L} />
+            <SizeGuide sizes={sizes} value={size} onChange={selectSize} L={L} />
           </div>
           <div className="rv" style={{ marginTop: 6 }}>
             <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L('Add a note', 'ضيفي ملاحظة')}</div>
