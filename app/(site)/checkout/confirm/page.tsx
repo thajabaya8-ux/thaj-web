@@ -173,7 +173,7 @@ function ConfirmPageInner() {
       {showNext && shipInfo && (
         <div className="waybill rv" style={{ marginTop: 40 }}>
           <div className="wb-head">
-            <span className="wb-brand">THAJ</span>
+            <img className="wb-brand" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
             <span className="wb-num">{esc(order.n)}</span>
           </div>
           <div className="wb-row"><span>{L('Date', 'التاريخ')}</span><b>{placedDate}</b></div>
