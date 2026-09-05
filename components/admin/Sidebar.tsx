@@ -7,6 +7,7 @@ import { useAdmin } from '@/lib/adminContext';
 const NAV: [string, string, string][] = [
   ['/admin', 'Dashboard', 'الرئيسية'], ['/admin/collections', 'Categories', 'الفئات'],
   ['/admin/orders', 'Orders', 'الطلبات'], ['/admin/analytics', 'Analytics', 'الإحصائيات'],
+  ['/admin/activity', 'Activity', 'النشاط'],
   ['/admin/users', 'Customers', 'العميلات'], ['/admin/shipping', 'Shipping', 'الشحن'],
   ['/admin/reviews', 'Reviews', 'الرسائل'], ['/admin/media', 'Site images', 'صور الموقع'],
   ['/admin/homepage', 'Homepage content', 'محتوى الرئيسية'],

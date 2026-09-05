@@ -216,19 +216,33 @@ CREATE TABLE IF NOT EXISTS marquee_pieces (
   sort INTEGER NOT NULL DEFAULT 0
 );
 
--- First-party analytics — powers /admin/analytics. `type` is either
--- 'pageview' or one of the same Meta Pixel event names already fired by
--- lib/pixel.ts's trackPixel() (ViewContent, AddToCart, InitiateCheckout,
--- Purchase, Lead, CompleteRegistration, Contact), so this table is always
--- exactly what's been sent to Meta — no separate tracking plan to keep in
--- sync. Pageviews are logged unconditionally by components/Analytics.tsx
--- regardless of whether a Meta Pixel ID is even configured, since this
--- dashboard has to work on its own either way.
+-- Every first-party event the site fires — page views, the same Meta
+-- Pixel events trackPixel() sends (ViewContent, AddToCart, ...), plus
+-- events with no Meta equivalent (RemoveFromCart, SelectColor, admin
+-- actions on an order, ...). visitor_id is a random id lib/analytics.ts
+-- generates once per browser and stores in localStorage — not a login,
+-- just enough to reconstruct one visitor's own path through the site
+-- and to count *distinct* visitors per funnel step rather than events.
+-- user_id is filled in only when the request carries a valid session
+-- (customer or admin) — see getSession() in app/api/analytics/track.
+-- metadata is a free-form JSON blob (TEXT, same convention as items/
+-- colors/shipping_json elsewhere in this schema — parsed with
+-- JSON.parse in application code, not a native jsonb column): whatever
+-- detail that particular event type carries (product id, color, qty,
+-- order number, ...), so adding a new event's fields never needs a
+-- new column.
 CREATE TABLE IF NOT EXISTS analytics_events (
   id SERIAL PRIMARY KEY,
   type TEXT NOT NULL,
   path TEXT NOT NULL,
+  visitor_id TEXT,
+  user_id INTEGER REFERENCES users(id),
+  metadata TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_analytics_events_created_at ON analytics_events(created_at);
 CREATE INDEX IF NOT EXISTS idx_analytics_events_type_path ON analytics_events(type, path);
+CREATE INDEX IF NOT EXISTS idx_analytics_events_visitor_id ON analytics_events(visitor_id);
+ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS visitor_id TEXT;
+ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
+ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS metadata TEXT;

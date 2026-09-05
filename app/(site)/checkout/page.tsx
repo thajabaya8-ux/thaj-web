@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { computeOrderTotals } from '@/lib/payment';
 import { trackPixel } from '@/lib/pixel';
+import { trackEvent } from '@/lib/analytics';
 import Mast from '@/components/Mast';
 import GovernorateSelect from '@/components/GovernorateSelect';
 import type { Governorate, PaymentMethod } from '@/lib/types';
@@ -81,6 +82,15 @@ export default function CheckoutPage() {
   }, [cart.length]);
 
   const selectedGov = useMemo(() => govs?.find((g) => g.key === govKey) || null, [govs, govKey]);
+  const onSelectGov = (key: string) => {
+    setGovKey(key);
+    const g = govs?.find((x) => x.key === key);
+    trackEvent('SelectGovernorate', { governorate_key: key, governorate_name: g ? L(g.name, g.nameAr) : key, shipping_fee: g?.price ?? null });
+  };
+  const onSelectMethod = (m: PaymentMethod) => {
+    setMethod(m);
+    trackEvent('SelectPaymentMethod', { method: m });
+  };
   const totals = useMemo(
     () => computeOrderTotals(cartTotalEgp, selectedGov?.price || 0, settings),
     [cartTotalEgp, selectedGov, settings]
@@ -112,17 +122,26 @@ export default function CheckoutPage() {
     setCoData(merged);
 
     if (coStep === 1 && !selectedGov) { toast(L('Choose your governorate to see the shipping fee', 'اختاري محافظتك عشان تشوفي رسوم الشحن')); return; }
-    if (coStep < 2) { setCoStep(coStep + 1); return; }
+    if (coStep < 2) {
+      trackEvent('CheckoutStep', { step: coStep + 2, step_name: steps[coStep + 1] });
+      setCoStep(coStep + 1);
+      return;
+    }
 
     if (!method) { toast(L('Choose a payment method', 'اختاري طريقة الدفع')); return; }
     if (!receiptKey) { toast(L('Upload your transfer receipt to continue', 'ارفعي صورة إيصال التحويل عشان تكمّلي')); return; }
 
+    trackEvent('ConfirmOrderClick', {
+      value: totals.total, currency: 'EGP', payment_method: method, num_items: cart.reduce((s, c) => s + c.q, 0)
+    });
     setSubmitting(true);
     const order = await submitOrder(method, receiptKey, selectedGov?.name, selectedGov?.nameAr);
     setSubmitting(false);
     if (order) {
       orderPlacedRef.current = true;
       router.push(`/checkout/confirm?order=${encodeURIComponent(order.n)}`);
+    } else {
+      trackEvent('OrderFailed', { value: totals.total, currency: 'EGP', payment_method: method });
     }
   };
 
@@ -162,7 +181,7 @@ export default function CheckoutPage() {
                   <div className="field">
                     <label>{L('Governorate', 'المحافظة')}</label>
                     <GovernorateSelect
-                      governorates={govs} value={govKey} onChange={setGovKey} L={L}
+                      governorates={govs} value={govKey} onChange={onSelectGov} L={L}
                       placeholder={L('Select your governorate', 'اختاري محافظتك')}
                       loading={!govs && !govsError} error={govsError}
                     />
@@ -187,13 +206,13 @@ export default function CheckoutPage() {
                   <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '28px 0 12px' }}>{L('Pay with', 'الدفع بواسطة')}</div>
                   <div className="pm-list">
                     <PaymentOption
-                      active={method === 'vodafone_cash'} onSelect={() => setMethod('vodafone_cash')}
+                      active={method === 'vodafone_cash'} onSelect={() => onSelectMethod('vodafone_cash')}
                       name="Vodafone Cash" sub={methodInfo.vodafone_cash.sub}
                       account={methodInfo.vodafone_cash.account} handle={methodInfo.vodafone_cash.handle}
                       handleLabel={L('Number', 'الرقم')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}
                     />
                     <PaymentOption
-                      active={method === 'instapay'} onSelect={() => setMethod('instapay')}
+                      active={method === 'instapay'} onSelect={() => onSelectMethod('instapay')}
                       name="InstaPay" sub={methodInfo.instapay.sub}
                       account={methodInfo.instapay.account} handle={methodInfo.instapay.handle}
                       handleLabel={L('Handle', 'المعرّف')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}

@@ -15,6 +15,7 @@ import type {
   CartItem, CheckoutDraft, Collection, CollectionMap, Facets, Order, PaymentMethod, Piece, PieceColor, PieceCurrency, Settings
 } from '@/lib/types';
 import { trackPixel, trackPurchase } from '@/lib/pixel';
+import { trackEvent } from '@/lib/analytics';
 
 type Lang = 'en' | 'ar';
 
@@ -335,28 +336,50 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
       const value = p.price + (withPants && p.pantsPrice ? p.pantsPrice : 0);
       trackPixel('AddToCart', {
         content_ids: [p.id], content_name: L(p.n, p.ar), content_type: 'product',
-        contents: [{ id: p.id, quantity: 1 }], value, currency: p.currency
+        contents: [{ id: p.id, quantity: 1 }], value, currency: p.currency,
+        size: useSize, color: color || null, with_pants: !!withPants
       });
     }
   }, [byId, pName, L, toast]);
 
+  // Reads the target item from `cart` directly (not inside the setCart
+  // updater) so trackEvent() — a side effect — never runs from within a
+  // state updater function, which React expects to stay pure.
   const qty = useCallback((i: number, d: number) => {
+    const item = cart[i];
+    if (!item) return;
+    const q = item.q + d;
+    const p = byId(item.pid);
+    trackEvent('UpdateQuantity', {
+      product_id: item.pid, product_name: p ? pName(p) : item.pid, size: item.size, color: item.color || null,
+      previous_quantity: item.q, new_quantity: Math.max(0, q), direction: d > 0 ? 'increase' : 'decrease'
+    });
     setCart((cur) => {
       const next = [...cur];
-      const q = next[i].q + d;
       if (q < 1) { next.splice(i, 1); } else { next[i] = { ...next[i], q }; }
       return next;
     });
-  }, []);
-  const rmItem = useCallback((i: number) => setCart((cur) => cur.filter((_, idx) => idx !== i)), []);
+  }, [cart, byId, pName]);
+  const rmItem = useCallback((i: number) => {
+    const item = cart[i];
+    if (item) {
+      const p = byId(item.pid);
+      trackEvent('RemoveFromCart', {
+        product_id: item.pid, product_name: p ? pName(p) : item.pid, size: item.size, color: item.color || null, quantity: item.q
+      });
+    }
+    setCart((cur) => cur.filter((_, idx) => idx !== i));
+  }, [cart, byId, pName]);
 
   const toggleWish = useCallback((id: string) => {
     setWish((cur) => {
       const has = cur.includes(id);
       toast(has ? L('Removed from archive', 'اتشالت من أرشيفك') : L('Saved to archive', 'اتحفظت في أرشيفك'));
+      const p = byId(id);
+      trackEvent(has ? 'RemoveFromWishlist' : 'AddToWishlist', { product_id: id, product_name: p ? pName(p) : id });
       return has ? cur.filter((x) => x !== id) : [...cur, id];
     });
-  }, [L, toast]);
+  }, [L, toast, byId, pName]);
 
   const uploadReceipt = useCallback(async (file: File) => {
     try {

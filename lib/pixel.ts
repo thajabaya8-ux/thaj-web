@@ -21,6 +21,12 @@ export interface PixelParams {
   value?: number;
   currency?: string;
   num_items?: number;
+  // Anything else a call site wants to carry — Meta ignores keys it
+  // doesn't recognise, and it doubles as this event's first-party
+  // analytics metadata (see logAnalyticsEvent below), so a call site
+  // can attach whatever detail is actually useful there (size, color, ...)
+  // without this interface needing a new field for every one.
+  [key: string]: unknown;
 }
 
 declare global {
@@ -37,8 +43,10 @@ export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?
   if (typeof window === 'undefined') return;
   // Logged regardless of whether a Meta Pixel ID is even configured —
   // /admin/analytics has to work on its own, not only once Marketing
-  // settings are filled in.
-  logAnalyticsEvent(event, window.location.pathname);
+  // settings are filled in. params doubles as the first-party event's
+  // own metadata, so a product view/add-to-cart already carries its
+  // product id, price, etc. into the activity log for free.
+  logAnalyticsEvent(event, window.location.pathname, params);
   if (typeof window.fbq !== 'function') return;
   if (eventId) window.fbq('track', event, params || {}, { eventID: eventId });
   else window.fbq('track', event, params || {});
