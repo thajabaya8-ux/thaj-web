@@ -53,10 +53,32 @@ export function markPixelReady() {
   while (queuedCalls.length) queuedCalls.shift()!();
 }
 
+// Purchase already reaches Meta server-side with authoritative, DB-verified
+// order data (app/api/orders/route.ts) — mirroring it again from here would
+// just be a redundant, less-trustworthy duplicate. Every other standard
+// event only ever reached Meta through the one browser call below, which
+// on this site was confirmed to be exactly what gets silently stripped by
+// ad blockers / browser privacy features — no console warning, no network
+// trace, while plain PageView pings went through untouched. Those get a
+// server-side mirror (app/api/analytics/capi/route.ts) too now, deduped
+// against the browser call by eventId, the same pattern Purchase uses.
+const CAPI_MIRRORED_EVENTS = new Set<PixelEventName>(['ViewContent', 'AddToCart', 'InitiateCheckout', 'Lead', 'CompleteRegistration', 'Contact']);
+
+function sendCapiMirror(event: PixelEventName, params: PixelParams, eventId: string) {
+  fetch('/api/analytics/capi', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, eventId, customData: params, eventSourceUrl: window.location.href }),
+    keepalive: true
+  }).catch(() => {});
+}
+
 // Fires a standard Meta Pixel event from the browser. `eventId`, when
 // given, is echoed to the Conversions API for the same real-world action
 // (see lib/metaCapi.ts) so Meta can deduplicate the browser call against
-// the matching server-side call instead of double-counting it.
+// the matching server-side call instead of double-counting it. When not
+// given for an event that gets a CAPI mirror, one is generated here so
+// the two calls can still be deduped against each other.
 export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?: string) {
   if (typeof window === 'undefined') return;
   // Logged regardless of whether a Meta Pixel ID is even configured —
@@ -65,9 +87,12 @@ export function trackPixel(event: PixelEventName, params?: PixelParams, eventId?
   // own metadata, so a product view/add-to-cart already carries its
   // product id, price, etc. into the activity log for free.
   logAnalyticsEvent(event, window.location.pathname, params);
+  const mirrored = CAPI_MIRRORED_EVENTS.has(event);
+  const id = eventId || (mirrored ? crypto.randomUUID() : undefined);
+  if (mirrored && id) sendCapiMirror(event, params || {}, id);
   const fire = () => {
     if (typeof window.fbq !== 'function') return;
-    if (eventId) window.fbq('track', event, params || {}, { eventID: eventId });
+    if (id) window.fbq('track', event, params || {}, { eventID: id });
     else window.fbq('track', event, params || {});
   };
   if (pixelReady) fire();
