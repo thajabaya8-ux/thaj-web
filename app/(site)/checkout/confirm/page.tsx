@@ -1,8 +1,9 @@
 'use client';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
+import { downloadWaybillPdf } from '@/lib/waybillPdf';
 import type { Order, SocialLink } from '@/lib/types';
 
 const STAGES: [string, string, string][] = [
@@ -37,11 +38,13 @@ export default function ConfirmPage() {
 }
 
 function ConfirmPageInner() {
-  const { L, esc, settings } = useSite();
+  const { L, esc, settings, toast } = useSite();
   const orderNumber = useSearchParams().get('order');
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
   const [shipInfo, setShipInfo] = useState<SavedShipping | null>(null);
   const [social, setSocial] = useState<SocialLink[]>([]);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const waybillRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!orderNumber) return; // the !orderNumber branch below covers this — no fetch needed
@@ -109,6 +112,13 @@ function ConfirmPageInner() {
   const itemCount = order.items.reduce((s, it) => s + (it.qty || 1), 0);
   const remaining = (order.tot || 0) - (order.amountPaid || 0);
   const discount = (order.originalSubtotal ?? 0) - (order.subtotal ?? 0);
+  const onDownloadWaybill = async () => {
+    if (!waybillRef.current) return;
+    setPdfBusy(true);
+    try { await downloadWaybillPdf(waybillRef.current, `${order.n}-waybill.pdf`); }
+    catch { toast(L('Could not create the PDF — try again.', 'معرفناش ننشئ الـ PDF — جرّبي تاني.')); }
+    finally { setPdfBusy(false); }
+  };
   const govLabel = shipInfo ? L(shipInfo.govName, shipInfo.govNameAr) : '';
   const placedDate = (order.d || '').slice(0, 10);
 
@@ -171,20 +181,22 @@ function ConfirmPageInner() {
       </div>
 
       {showNext && shipInfo && (
-        <div className="waybill rv" style={{ marginTop: 40 }}>
-          <div className="wb-head">
-            <img className="wb-brand" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
-            <span className="wb-num">{esc(order.n)}</span>
+        <div className="rv" style={{ marginTop: 40 }}>
+          <div className="waybill" ref={waybillRef}>
+            <div className="wb-head">
+              <img className="wb-brand" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
+              <span className="wb-num">{esc(order.n)}</span>
+            </div>
+            <div className="wb-row"><span>{L('Date', 'التاريخ')}</span><b>{placedDate}</b></div>
+            <div className="wb-row"><span>{L('Recipient', 'المستلمة')}</span><b>{esc(shipInfo.name)}</b></div>
+            <div className="wb-row"><span>{L('Phone', 'الموبايل')}</span><b dir="ltr">{esc(shipInfo.phone)}</b></div>
+            <div className="wb-row"><span>{L('Address', 'العنوان')}</span><b>{esc([govLabel, shipInfo.city].filter(Boolean).join(', '))}{shipInfo.address ? ` — ${esc(shipInfo.address)}` : ''}</b></div>
+            {shipInfo.notes && <div className="wb-row"><span>{L('Notes', 'ملاحظات')}</span><b>{esc(shipInfo.notes)}</b></div>}
+            <div className="wb-row"><span>{L('Items', 'عدد القطع')}</span><b>{itemCount}</b></div>
+            <div className="wb-row wb-cod"><span>{L('Collect on delivery', 'التحصيل عند التسليم')}</span><b>{fmt(remaining)}</b></div>
           </div>
-          <div className="wb-row"><span>{L('Date', 'التاريخ')}</span><b>{placedDate}</b></div>
-          <div className="wb-row"><span>{L('Recipient', 'المستلمة')}</span><b>{esc(shipInfo.name)}</b></div>
-          <div className="wb-row"><span>{L('Phone', 'الموبايل')}</span><b dir="ltr">{esc(shipInfo.phone)}</b></div>
-          <div className="wb-row"><span>{L('Address', 'العنوان')}</span><b>{esc([govLabel, shipInfo.city].filter(Boolean).join(', '))}{shipInfo.address ? ` — ${esc(shipInfo.address)}` : ''}</b></div>
-          {shipInfo.notes && <div className="wb-row"><span>{L('Notes', 'ملاحظات')}</span><b>{esc(shipInfo.notes)}</b></div>}
-          <div className="wb-row"><span>{L('Items', 'عدد القطع')}</span><b>{itemCount}</b></div>
-          <div className="wb-row wb-cod"><span>{L('Collect on delivery', 'التحصيل عند التسليم')}</span><b>{fmt(remaining)}</b></div>
-          <button type="button" className="btn no-print" style={{ marginTop: 18 }} onClick={() => window.print()}>
-            {L('Print / Save as PDF', 'طباعة / حفظ PDF')}
+          <button type="button" className="btn" disabled={pdfBusy} style={{ marginTop: 18 }} onClick={onDownloadWaybill}>
+            {pdfBusy ? L('Preparing PDF…', 'بيجهّز الـ PDF…') : L('Save waybill as PDF', 'حفظ بوليصة الشحن PDF')}
           </button>
         </div>
       )}

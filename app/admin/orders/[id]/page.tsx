@@ -1,9 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
+import { downloadWaybillPdf } from '@/lib/waybillPdf';
 import type { Order, Piece } from '@/lib/types';
 
 const FULFILMENT_STATUSES = ['Under Review', 'Confirmed', 'Preparing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -26,6 +27,8 @@ export default function OrderDetailPage() {
   const { call, toast, L, AR } = useAdmin();
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const waybillRef = useRef<HTMLDivElement>(null);
 
   const byId = (pid: string) => (pieces || []).find((p) => p.id === pid);
 
@@ -53,6 +56,13 @@ export default function OrderDetailPage() {
     setBusy(true);
     try { await call(`/orders/${id}`, { method: 'DELETE' }); toast(L('Order deleted', 'الطلب اتمسح')); router.push('/admin/orders'); }
     catch (e) { toast(e instanceof Error ? e.message : String(e)); setBusy(false); }
+  };
+  const onDownloadWaybill = async () => {
+    if (!waybillRef.current || !order) return;
+    setPdfBusy(true);
+    try { await downloadWaybillPdf(waybillRef.current, `${order.n}-waybill.pdf`); }
+    catch { toast(L('Could not create the PDF — try again.', 'معرفناش ننشئ الـ PDF — جرّبي تاني.')); }
+    finally { setPdfBusy(false); }
   };
 
   if (loading) return null;
@@ -166,8 +176,8 @@ export default function OrderDetailPage() {
             </a>
           )}
 
-          <button type="button" className="btn fill" style={{ display: 'block', width: '100%', marginTop: 10 }} onClick={() => window.print()}>
-            {L('Print waybill', 'طباعة بوليصة الشحن')}
+          <button type="button" className="btn fill" disabled={pdfBusy} style={{ display: 'block', width: '100%', marginTop: 10 }} onClick={onDownloadWaybill}>
+            {pdfBusy ? L('Preparing PDF…', 'بيجهّز الـ PDF…') : L('Save waybill as PDF', 'حفظ بوليصة الشحن PDF')}
           </button>
 
           <p className="body" style={{ fontSize: 11, marginTop: 24, color: 'var(--ink-faint)' }}>{L('Placed', 'اتسجّل')} {(order.d || '').slice(0, 16).replace('T', ' ')}</p>
@@ -180,7 +190,7 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="lbl" style={{ color: 'var(--gold)', margin: '30px 0 14px' }}>{L('Waybill', 'بوليصة الشحن')}</div>
-      <div className="waybill">
+      <div className="waybill" ref={waybillRef}>
         <div className="wb-head">
           <img className="wb-brand" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
           <span className="wb-num">{order.n}</span>
