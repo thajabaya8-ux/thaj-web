@@ -246,3 +246,13 @@ CREATE INDEX IF NOT EXISTS idx_analytics_events_visitor_id ON analytics_events(v
 ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS visitor_id TEXT;
 ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
 ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS metadata TEXT;
+
+-- Backs lib/rateLimit.ts — one row per (endpoint, IP) sliding window,
+-- reused for every rate-limited route rather than one table per route.
+-- No separate Redis/Upstash service for a site this size; this table
+-- fits the existing "everything lives in the one Postgres DB" pattern.
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key TEXT PRIMARY KEY,
+  count INTEGER NOT NULL DEFAULT 1,
+  window_start TIMESTAMPTZ NOT NULL DEFAULT now()
+);

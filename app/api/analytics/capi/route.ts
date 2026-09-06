@@ -17,6 +17,7 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { str } from '@/lib/serverValidators';
 import { sendEventToCapi, capiSignalsFromRequest } from '@/lib/metaCapi';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import type { Settings } from '@/lib/types';
 
 const KNOWN_EVENTS = new Set(['ViewContent', 'AddToCart', 'InitiateCheckout', 'Lead', 'CompleteRegistration', 'Contact']);
@@ -39,6 +40,11 @@ export async function POST(req: Request) {
   const customData = cleanCustomData(body?.customData);
 
   if (!KNOWN_EVENTS.has(event) || !eventId) return NextResponse.json({ ok: true });
+  // Generous — this only exists to stop a runaway script from burning
+  // through the Conversions API token's quota. Silently drops rather
+  // than 429s, matching app/api/analytics/track/route.ts: the client
+  // never awaits or inspects this response (see trackPixel in lib/pixel.ts).
+  if (await isRateLimited(`analytics-capi:${clientIp(req)}`, 150, 300)) return NextResponse.json({ ok: true });
 
   try {
     const settingsRows = await sql`SELECT key, value FROM settings`;

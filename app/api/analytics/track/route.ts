@@ -13,6 +13,7 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { str } from '@/lib/serverValidators';
 import { getSession } from '@/lib/session';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 const KNOWN_TYPES = new Set([
   // Meta Pixel standard events — trackPixel() (lib/pixel.ts) already
@@ -47,6 +48,12 @@ export async function POST(req: Request) {
   const metadata = cleanMetadata(body?.metadata);
 
   if (!KNOWN_TYPES.has(type) || !path) return NextResponse.json({ error: 'Invalid event' }, { status: 400 });
+  // Generous — well above what a real visitor's own browsing could ever
+  // trigger — this only exists to stop a runaway script from flooding the
+  // table. Silently drops rather than 429s: the client never awaits or
+  // inspects this response (see logAnalyticsEvent in lib/analytics.ts),
+  // so an error status here would just be ignored anyway.
+  if (await isRateLimited(`analytics-track:${clientIp(req)}`, 300, 300)) return NextResponse.json({ ok: true });
 
   try {
     const session = await getSession();
