@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { createSession } from '@/lib/session';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 // Compared against on every failed lookup so that "unknown email" and
 // "wrong password" take the same amount of time — otherwise the response
@@ -10,6 +11,12 @@ import { createSession } from '@/lib/session';
 const DUMMY_HASH = bcrypt.hashSync(crypto.randomBytes(24).toString('hex'), 12);
 
 export async function POST(req: Request) {
+  // Credential stuffing / brute force guard — generous enough that a
+  // shared office IP or a genuine typo-then-retry never trips it.
+  if (await isRateLimited(`login:${clientIp(req)}`, 15, 300)) {
+    return NextResponse.json({ error: 'Too many attempts — please wait a few minutes and try again' }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => ({}));
   const email = String((body && body.email) || '').trim().toLowerCase();
   const password = String((body && body.password) || '');

@@ -4,8 +4,13 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { str } from '@/lib/serverValidators';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export async function POST(req: Request) {
+  if (await isRateLimited(`reviews:${clientIp(req)}`, 5, 600)) {
+    return NextResponse.json({ error: 'Too many requests — please wait a moment and try again' }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => ({}));
   const pieceId = String(body?.pieceId || '');
   const name = str(body?.name, 200);

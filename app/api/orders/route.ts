@@ -15,6 +15,7 @@ import { releaseColorReserved, reserveColorStock } from '@/lib/colorStock';
 import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
 import { sendOrderNotification } from '@/lib/resend';
 import { getSession } from '@/lib/session';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import type { Settings } from '@/lib/types';
 
 async function nextOrderNumber(): Promise<string> {
@@ -26,6 +27,14 @@ async function nextOrderNumber(): Promise<string> {
 const PAYMENT_METHODS = ['vodafone_cash', 'instapay'];
 
 export async function POST(req: Request) {
+  // Order-spam / stock-lock guard — a real checkout never needs more than
+  // a handful of tries in ten minutes, but repeated fake orders would
+  // otherwise be able to reserve color stock out from under real
+  // customers (see lib/colorStock.ts) for free.
+  if (await isRateLimited(`orders:${clientIp(req)}`, 10, 600)) {
+    return NextResponse.json({ error: 'Too many orders from this connection — please wait a few minutes and try again' }, { status: 429 });
+  }
+
   // Checkout has never required an account — this is null for a guest
   // checkout, same as always, and only links the order to a user_id when
   // one's actually signed in.

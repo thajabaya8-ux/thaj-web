@@ -11,8 +11,14 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextResponse } from 'next/server';
 import { r2, R2_BUCKET } from '@/lib/r2';
 import { MAX_IMAGE_SIZE, detectImageSignature } from '@/lib/imageValidation';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 export async function POST(req: Request) {
+  // Storage-cost guard — a real checkout only ever uploads one receipt.
+  if (await isRateLimited(`receipt-upload:${clientIp(req)}`, 10, 600)) {
+    return NextResponse.json({ error: 'Too many uploads — please wait a moment and try again' }, { status: 429 });
+  }
+
   const form = await req.formData();
   const file = form.get('receipt');
   if (!(file instanceof File)) {

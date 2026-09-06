@@ -3,11 +3,18 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { createSession } from '@/lib/session';
 import { isEmail, str } from '@/lib/serverValidators';
+import { clientIp, isRateLimited } from '@/lib/rateLimit';
 
 // Public self-registration always creates a 'customer' account — role is
 // never taken from the request body, so a visitor can't grant themselves
 // admin access by sending {"role":"admin"}.
 export async function POST(req: Request) {
+  // Mass fake-account guard — a real visitor never needs more than a
+  // couple of tries an hour.
+  if (await isRateLimited(`signup:${clientIp(req)}`, 5, 3600)) {
+    return NextResponse.json({ error: 'Too many attempts — please try again later' }, { status: 429 });
+  }
+
   const body = await req.json().catch(() => ({}));
   const name = str(body?.name, 200);
   const email = String((body && body.email) || '').trim().toLowerCase();
