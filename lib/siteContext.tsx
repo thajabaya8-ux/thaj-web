@@ -16,6 +16,7 @@ import type {
 } from '@/lib/types';
 import { trackPixel, trackPurchase } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
+import { getAttribution } from '@/lib/attribution';
 
 type Lang = 'en' | 'ar';
 
@@ -406,7 +407,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
     try {
       const r = await fetch('/api/orders', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, name, email: coData.email, phone: coData.phone, shipping, paymentMethod, receiptKey, egpPerSar })
+        body: JSON.stringify({ items, name, email: coData.email, phone: coData.phone, shipping, paymentMethod, receiptKey, egpPerSar, attribution: getAttribution() })
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(body.error || 'order failed');

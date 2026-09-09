@@ -146,6 +146,24 @@ export interface Order {
   approvedAt?: string | null;
   shipping?: ShippingInfo;
   hasReceipt?: boolean;
+  // Which ad/campaign the customer arrived from — undefined on any order
+  // placed with no utm_*/fbclid/gclid params on the visit that set it,
+  // and on every order that predates this field. Admin-only, like the
+  // rest of this interface's optional fields. Captured client-side —
+  // see lib/attribution.ts.
+  attribution?: Attribution;
+}
+
+export interface Attribution {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  fbclid?: string;
+  gclid?: string;
+  landing_path: string;
+  captured_at: string;
 }
 
 

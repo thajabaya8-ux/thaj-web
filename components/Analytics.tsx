@@ -10,6 +10,7 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { logAnalyticsEvent } from '@/lib/analytics';
+import { captureAttribution } from '@/lib/attribution';
 
 export default function Analytics() {
   const pathname = usePathname();
@@ -17,6 +18,12 @@ export default function Analytics() {
   useEffect(() => {
     if (pathname.startsWith('/admin')) return;
     logAnalyticsEvent('pageview', pathname);
+    // Reads window.location.search directly rather than useSearchParams()
+    // — that hook requires a <Suspense> boundary in the App Router, which
+    // this component (mounted straight in the root layout) doesn't have,
+    // and by the time this effect runs the query string is already
+    // whatever it should be for this render.
+    captureAttribution(window.location.search);
   }, [pathname]);
 
   return null;

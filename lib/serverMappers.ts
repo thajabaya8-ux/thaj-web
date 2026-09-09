@@ -78,6 +78,11 @@ function parseShipping(v: unknown): ShippingInfo | undefined {
   try { return JSON.parse(v); } catch { return undefined; }
 }
 
+function parseAttribution(v: unknown): Order['attribution'] {
+  if (typeof v !== 'string' || !v) return undefined;
+  try { return JSON.parse(v); } catch { return undefined; }
+}
+
 // Full record — admin only. Includes customer PII (name/email/phone/shipping).
 export function orderOut(r: any): Order {
   return {
@@ -87,7 +92,8 @@ export function orderOut(r: any): Order {
     depositAmount: r.deposit_amount ?? undefined, amountPaid: r.amount_paid ?? undefined,
     paymentMethod: r.payment_method ?? undefined, paymentStatus: r.payment_status ?? undefined,
     rejectionReason: r.rejection_reason ?? null, approvedAt: r.approved_at ? toIso(r.approved_at) : null,
-    shipping: parseShipping(r.shipping_json), hasReceipt: !!r.receipt_key
+    shipping: parseShipping(r.shipping_json), hasReceipt: !!r.receipt_key,
+    attribution: parseAttribution(r.attribution_json)
   };
 }
 

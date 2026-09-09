@@ -143,7 +143,14 @@ CREATE TABLE IF NOT EXISTS orders (
   -- stock_deducted: this order's items have been permanently subtracted
   -- from stock (via Approve) and not yet restored (via Cancel-after-approve).
   reservation_active BOOLEAN NOT NULL DEFAULT false,
-  stock_deducted BOOLEAN NOT NULL DEFAULT false
+  stock_deducted BOOLEAN NOT NULL DEFAULT false,
+  -- Which ad/campaign/link the customer arrived from (utm_*, fbclid,
+  -- gclid), captured client-side at landing (lib/attribution.ts) and
+  -- carried through to checkout — same TEXT-JSON convention as items/
+  -- colors/shipping_json elsewhere in this schema. Null on any order
+  -- placed with no campaign params on the visit that set it, and on
+  -- every order that predates this column.
+  attribution_json TEXT
 );
 
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS subtotal INTEGER;
@@ -160,6 +167,7 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_json TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id INTEGER REFERENCES users(id);
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS reservation_active BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS stock_deducted BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS attribution_json TEXT;
 
 -- The "appointments" table itself (private-room booking, now removed as
 -- a feature) is deliberately left in the live database rather than
