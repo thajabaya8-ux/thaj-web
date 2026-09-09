@@ -203,6 +203,21 @@ export default function OrderDetailPage() {
 
           <p className="body" style={{ fontSize: 11, marginTop: 24, color: 'var(--ink-faint)' }}>{L('Placed', 'اتسجّل')} {(order.d || '').slice(0, 16).replace('T', ' ')}</p>
 
+          {order.attribution && (
+            <div style={{ marginTop: 16, padding: '12px 14px', background: 'var(--sand)' }}>
+              <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 6 }}>{L('Order source', 'مصدر الطلب')}</div>
+              <p className="body" style={{ fontSize: 11.5, lineHeight: 1.9 }}>
+                {order.attribution.utm_source && <>{L('Source', 'المصدر')}: {order.attribution.utm_source}<br /></>}
+                {order.attribution.utm_medium && <>{L('Medium', 'الوسيلة')}: {order.attribution.utm_medium}<br /></>}
+                {order.attribution.utm_campaign && <>{L('Campaign', 'الحملة')}: {order.attribution.utm_campaign}<br /></>}
+                {order.attribution.utm_content && <>{L('Content', 'المحتوى')}: {order.attribution.utm_content}<br /></>}
+                {order.attribution.fbclid && <>{L('Came from a Meta (Facebook/Instagram) ad click', 'جاي من ضغطة إعلان ميتا (فيسبوك/إنستجرام)')}<br /></>}
+                {order.attribution.gclid && <>{L('Came from a Google ad click', 'جاي من ضغطة إعلان جوجل')}<br /></>}
+                {L('Landing page', 'صفحة الدخول')}: {order.attribution.landing_path}
+              </p>
+            </div>
+          )}
+
           <button className="btn" disabled={busy} onClick={onDelete} style={{ display: 'block', width: '100%', marginTop: 24 }}>
             {L('Delete order', 'حذف الطلب')}
           </button>

@@ -26,6 +26,21 @@ async function nextOrderNumber(): Promise<string> {
 
 const PAYMENT_METHODS = ['vodafone_cash', 'instapay'];
 
+// Same allowlist as lib/attribution.ts's PARAMS (plus the two fields it
+// always adds itself) — never trust the shape of client-supplied JSON
+// beyond picking known string keys out of it.
+const ATTRIBUTION_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'landing_path', 'captured_at'];
+
+function cleanAttribution(v: unknown): string | null {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const out: Record<string, string> = {};
+  for (const k of ATTRIBUTION_KEYS) {
+    const val = (v as Record<string, unknown>)[k];
+    if (typeof val === 'string' && val) out[k] = val.slice(0, 200);
+  }
+  return Object.keys(out).length ? JSON.stringify(out) : null;
+}
+
 export async function POST(req: Request) {
   // Order-spam / stock-lock guard — a real checkout never needs more than
   // a handful of tries in ten minutes, but repeated fake orders would
@@ -40,7 +55,8 @@ export async function POST(req: Request) {
   // one's actually signed in.
   const session = await getSession();
   const body = await req.json().catch(() => ({}));
-  const { items, name, email, phone, shipping, paymentMethod, receiptKey, egpPerSar } = body || {};
+  const { items, name, email, phone, shipping, paymentMethod, receiptKey, egpPerSar, attribution } = body || {};
+  const attributionJson = cleanAttribution(attribution);
 
   if (!Array.isArray(items) || !items.length || items.length > 30) {
     return NextResponse.json({ error: 'items is required (1-30 pieces)' }, { status: 400 });
@@ -186,10 +202,10 @@ export async function POST(req: Request) {
   try {
     rows = await sql`INSERT INTO orders
       (order_number, customer_name, email, phone, items, total, status,
-       subtotal, original_subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id)
+       subtotal, original_subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id, attribution_json)
       VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
         ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
-        ${subtotal}, ${originalSubtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null})
+        ${subtotal}, ${originalSubtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null}, ${attributionJson})
       RETURNING *`;
   } catch (err) {
     // The order row itself failed to write — the stock reserved above for
