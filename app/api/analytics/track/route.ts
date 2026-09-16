@@ -14,6 +14,7 @@ import { sql } from '@/lib/db';
 import { str } from '@/lib/serverValidators';
 import { getSession } from '@/lib/session';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { isBotRequest } from '@/lib/botDetect';
 
 const KNOWN_TYPES = new Set([
   // Meta Pixel standard events — trackPixel() (lib/pixel.ts) already
@@ -41,6 +42,12 @@ function cleanMetadata(v: unknown): Record<string, unknown> | null {
 }
 
 export async function POST(req: Request) {
+  // A crawler firing this on every page it sweeps is exactly what keeps
+  // the database busy around the clock for traffic nobody wants tracked
+  // — checked first, before any DB call (the rate-limit check itself is
+  // one), so a bot's request never touches the database at all.
+  if (isBotRequest(req)) return NextResponse.json({ ok: true });
+
   const body = await req.json().catch(() => ({}));
   const type = str(body?.type, 40);
   const path = str(body?.path, 300);
