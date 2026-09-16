@@ -18,6 +18,7 @@ import { sql } from '@/lib/db';
 import { str } from '@/lib/serverValidators';
 import { sendEventToCapi, capiSignalsFromRequest } from '@/lib/metaCapi';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
+import { isBotRequest } from '@/lib/botDetect';
 import type { Settings } from '@/lib/types';
 
 const KNOWN_EVENTS = new Set(['ViewContent', 'AddToCart', 'InitiateCheckout', 'Lead', 'CompleteRegistration', 'Contact']);
@@ -33,6 +34,12 @@ function cleanCustomData(v: unknown): Record<string, unknown> {
 }
 
 export async function POST(req: Request) {
+  // A crawler generates a fake "conversion" event for every page it
+  // sweeps, which is both wasted Conversions API quota and, more
+  // urgently, another database round-trip keeping compute awake for
+  // nothing — checked before any DB call, same as app/api/analytics/track.
+  if (isBotRequest(req)) return NextResponse.json({ ok: true });
+
   const body = await req.json().catch(() => ({}));
   const event = str(body?.event, 40);
   const eventId = str(body?.eventId, 100);
