@@ -14,9 +14,6 @@
    ========================================================== */
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import Link from 'next/link';
-// Aliased: this file also preloads slides via the browser's native
-// `new Image()` (see goTo below) — importing the real name would shadow it.
-import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSite, effectivePrice } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
@@ -160,15 +157,12 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
           const lp = pieces[pieceIdx];
           if (!lp) return null;
           return (
-            <NextImage
+            <img
               key={i}
               className={`hf-img${top === i ? ' on' : ''}`}
               src={`/${lp.img}`}
               alt={pName(lp)}
               aria-hidden={top === i ? undefined : true}
-              fill
-              sizes="100vw"
-              priority={top === i}
             />
           );
         })}
