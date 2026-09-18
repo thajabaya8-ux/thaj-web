@@ -46,7 +46,7 @@ export default function HomePage() {
         <div className={`hm-in${filmPieces.length ? ' hm-film-active' : ''}`}>
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-            <Image className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} priority />
+            <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
             <h1 className="hm-h">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
             <div className="hm-row">
               <p>{applyCount(L(esc(settings.home_hero_desc_en), esc(settings.home_hero_desc_ar)), num(pieces.length))}</p>
@@ -60,7 +60,7 @@ export default function HomePage() {
             <div className="hm-strip"><div className="hm-track">
               {strip.map((p, i) => (
                 <Link key={`${p.id}-${i}`} className="hm-th" href={`/product/${p.id}`} title={pName(p)}>
-                  <Image src={`/${p.img}`} alt={pName(p)} width={300} height={400} /><span>{pName(p)}</span>
+                  <img src={`/${p.img}`} alt={pName(p)} loading="lazy" /><span>{pName(p)}</span>
                 </Link>
               ))}
             </div></div>

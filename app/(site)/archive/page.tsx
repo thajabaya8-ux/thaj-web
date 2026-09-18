@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
@@ -24,7 +23,7 @@ export default function ArchivePage() {
         </div>
         {pieces.map((p) => (
           <Link key={p.id} className="arch-row rv" href={`/product/${p.id}`}>
-            <Image className="thumb" src={`/${p.img}`} alt="" width={210} height={280} />
+            <img className="thumb" src={`/${p.img}`} loading="lazy" alt="" />
             <div>
               <div className="nm">{pName(p)}</div>
               {p.ed && <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 6 }}>{esc(p.ed)}</div>}

@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { computeOrderTotals } from '@/lib/payment';
@@ -252,7 +251,7 @@ export default function CheckoutPage() {
               const img = colr?.images[0] || p.img;
               return (
                 <div className="citem" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`} style={{ gridTemplateColumns: '64px 1fr' }}>
-                  <Image src={`/${img}`} alt="" width={192} height={256} />
+                  <img src={`/${img}`} alt="" />
                   <div className="ci">
                     <div className="top">
                       <span className="h-s" style={{ fontSize: 16 }}>{pName(p)}</span>

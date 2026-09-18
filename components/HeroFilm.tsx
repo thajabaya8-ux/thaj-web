@@ -177,7 +177,7 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
 
       <div className="hf-copy">
         <div className="hf-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-        <NextImage className="hf-logo" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} />
+        <img className="hf-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <h1 className="hf-title">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
         <div className="hf-cta">
           <Link className="btn hf-btn" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link>
