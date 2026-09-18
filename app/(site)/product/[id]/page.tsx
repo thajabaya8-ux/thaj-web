@@ -43,6 +43,22 @@ function ProductPageInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p?.id]);
 
+  // Every thumbnail is tappable straight away, not just the next/previous
+  // one, so (unlike the homepage film) there's no single "next" photo to
+  // preload — warm the browser cache for the whole gallery up front instead,
+  // so switching never has to wait on a fresh network fetch.
+  const activeColorForPreload = p?.colors?.find((c) => c.id === color) || null;
+  const galleryPaths = p
+    ? [...(activeColorForPreload?.images.length ? activeColorForPreload.images : (p.images.length ? p.images : [p.img])), ...(p.pantsImg ? [p.pantsImg] : [])]
+    : [];
+  useEffect(() => {
+    // `Image` here is the next/image component (imported below for the
+    // thumbnails/gallery), not the DOM constructor — window.Image reaches
+    // the real one.
+    galleryPaths.forEach((img) => { const im = new window.Image(); im.src = `/${img}`; });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [galleryPaths.join('|')]);
+
   if (!p) return null;
   const rel = pieces.filter((x) => x.coll === p.coll && x.id !== p.id).slice(0, 3);
   const saved = wish.includes(p.id);
