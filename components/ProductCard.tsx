@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite, availableStock, colorSoldOut } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
@@ -45,7 +46,7 @@ export default function ProductCard({ piece, className }: { piece?: Piece | null
           className={`save ${saved ? 'on' : ''}`}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWish(piece.id); }}
         >{saved ? '●' : '○'}</button>
-        <img key={img} src={`/${img}`} alt={pName(piece)} loading="lazy" style={shownOut ? { opacity: .55 } : undefined} />
+        <Image key={img} src={`/${img}`} alt={pName(piece)} fill sizes="(max-width: 640px) 50vw, 25vw" style={shownOut ? { opacity: .55 } : undefined} />
       </Link>
       {piece.colors.length > 0 && (
         <div className="card-colours">

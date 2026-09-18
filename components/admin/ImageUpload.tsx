@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { abs, useAdmin } from '@/lib/adminContext';
 
 export default function ImageUpload({ value, onChange, aspectRatio = '3/4' }: {
@@ -25,7 +26,7 @@ export default function ImageUpload({ value, onChange, aspectRatio = '3/4' }: {
     <div className="field">
       <label>{L('Photo', 'الصورة')}</label>
       <div className="adm-upload">
-        {value ? <img src={abs(value)} style={{ width: 110, aspectRatio, objectFit: 'cover', background: 'var(--sand)' }} alt="" /> : null}
+        {value ? <Image src={abs(value)} alt="" width={220} height={220} style={{ width: 110, aspectRatio, objectFit: 'cover', background: 'var(--sand)' }} /> : null}
         <input type="file" accept="image/*" onChange={onFile} />
       </div>
     </div>

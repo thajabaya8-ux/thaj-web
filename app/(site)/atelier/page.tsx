@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { stockImg } from '@/lib/img';
@@ -24,7 +25,7 @@ export default function AtelierPage() {
         {steps.map((s, i) => (
           <div className="split rv" key={s[0]} style={{ gridTemplateColumns: 'repeat(12,1fr)', marginBottom: 'clamp(40px,7vw,110px)', alignItems: 'center' }}>
             <div style={{ gridColumn: i % 2 ? '7/13' : '1/7', order: i % 2 ? 2 : 1, position: 'relative', overflow: 'hidden', aspectRatio: i % 2 ? '4/5' : '4/3', background: 'var(--sand)' }}>
-              <div className="veil" /><img src={`/${stockImg(settings, s[2])}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: `50% ${30 + i * 10}%` }} alt="" />
+              <div className="veil" /><Image src={`/${stockImg(settings, s[2])}`} alt="" fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: 'cover', objectPosition: `50% ${30 + i * 10}%` }} />
             </div>
             <div style={{ gridColumn: i % 2 ? '1/6' : '8/13', order: i % 2 ? 1 : 2 }}>
               <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 14 }}>{ord(i + 1)}</div>

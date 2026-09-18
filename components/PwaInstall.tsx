@@ -16,6 +16,7 @@
    action, so it gets its own instructional banner instead.
    ========================================================== */
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 const DISMISS_KEY = 'thaj-pwa-dismissed';
 const DISMISS_DAYS = 14;
@@ -82,7 +83,7 @@ export default function PwaInstall() {
 
   return (
     <div className="pwa-banner" dir={ar ? 'rtl' : 'ltr'}>
-      <img src="/assets/logo/icon-192.png" alt="" width={36} height={36} />
+      <Image src="/assets/logo/icon-192.png" alt="" width={36} height={36} />
       <div className="pwa-banner-body">
         <b>{L('Install THAJ', 'ثبّتي تطبيق ثاج')}</b>
         <span>

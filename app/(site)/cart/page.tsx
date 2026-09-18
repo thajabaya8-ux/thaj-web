@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
@@ -30,7 +31,7 @@ export default function CartPage() {
           return (
             <div className="split cart-row rv" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`} style={{ gridTemplateColumns: 'repeat(12,1fr)', padding: '26px 0', borderBottom: '1px solid var(--line-soft)', alignItems: 'center' }}>
               <div className="cr-img" style={{ gridColumn: '1/3', position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--sand)' }}>
-                <img src={`/${img}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                <Image src={`/${img}`} alt="" fill sizes="(max-width: 640px) 100px, 200px" style={{ objectFit: 'cover' }} />
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>

@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import ProductCard from '@/components/ProductCard';
@@ -14,7 +15,7 @@ export default function CollectionPage() {
   return (
     <>
       <section className="hero bleed rv" style={{ height: 'min(80vh,780px)' }}>
-        <img src={`/${c.img}`} alt={L(c.name, c.nameAr)} style={{ objectPosition: '50% 26%' }} />
+        <Image src={`/${c.img}`} alt={L(c.name, c.nameAr)} fill sizes="100vw" style={{ objectPosition: '50% 26%' }} priority />
         <div className="h-in">
           <div className="lbl">{L('Chapter', 'فصل')} · {esc(L(c.mood, c.moodAr))}</div>
           <h1>{esc(L(c.line, c.lineAr))}</h1>
