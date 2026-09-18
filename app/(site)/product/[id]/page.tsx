@@ -114,7 +114,7 @@ function ProductPageInner() {
       <section className="pdp">
         <div className="gal">
           <div className="gal-main" onPointerDown={onGalPointerDown} onPointerUp={onGalPointerUp}>
-            <Image key={activeImg} src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} width={900} height={1200} style={{ width: 'auto', height: 'auto' }} priority />
+            <img key={activeImg} src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} />
             {activeIsPants && <span className="gal-pants-tag">{L('Trousers', 'البنطلون')}</span>}
             {gallery.length > 1 && (
               <>
