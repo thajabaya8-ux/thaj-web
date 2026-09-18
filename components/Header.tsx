@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
@@ -33,8 +32,8 @@ export default function Header() {
   return (
     <header id="hdr" className={`${solid ? 'solid' : ''} ${onDark ? 'on-dark' : ''}`.trim()}>
       <Link className="brand" href="/">
-        <Image className="lg-lt" src="/assets/logo/wordmark-emerald.png" alt="THAJ" width={900} height={349} priority />
-        <Image className="lg-dk" src="/assets/logo/wordmark-beige.png" alt="THAJ" width={900} height={349} priority />
+        <img className="lg-lt" src="/assets/logo/wordmark-emerald.png" alt="THAJ" />
+        <img className="lg-dk" src="/assets/logo/wordmark-beige.png" alt="THAJ" />
       </Link>
       <nav id="nav">
         {NAVLINKS.map(([href, e, a]) => (

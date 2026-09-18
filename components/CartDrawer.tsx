@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 
@@ -24,7 +23,7 @@ export default function CartDrawer() {
             const img = colr?.images[0] || p.img;
             return (
               <div className="citem" key={`${c.pid}-${c.size}-${c.color || ''}-${i}`}>
-                <Image src={`/${img}`} alt="" width={210} height={280} />
+                <img src={`/${img}`} alt="" />
                 <div className="ci">
                   <div className="top">
                     <span className="h-s" style={{ fontSize: 17 }}>{esc(p.n)}</span>

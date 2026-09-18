@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { SOCIAL_ICONS, SOCIAL_LABELS } from './socialIcons';
@@ -59,7 +58,7 @@ export default function Footer() {
             )}
           </div>
         </div>
-        <Image className="fmark" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} />
+        <img className="fmark" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <div className="fbot">
           <span>© 2026 THAJ · {L('Kingdom of Saudi Arabia', 'المملكة العربية السعودية')}</span>
           <span className="arabic" style={{ letterSpacing: 0 }}>الأناقة صمت</span>

@@ -9,7 +9,6 @@
    this page sits outside both SiteProvider and AdminProvider.
    ========================================================== */
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { trackPixel } from '@/lib/pixel';
 
@@ -89,7 +88,7 @@ export default function AuthForm() {
           <i>/</i>
           <button type="button" className={AR ? 'on' : ''} onClick={() => setLang('ar')}>ع</button>
         </div>
-        <Image className="adm-login-mark" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} priority />
+        <img className="adm-login-mark" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <div className="lbl" style={{ color: 'var(--champagne)', textAlign: 'center', marginBottom: 34 }}>
           {mode === 'login' ? L('Sign in to THAJ', 'تسجيل الدخول لثاج') : L('Create your THAJ account', 'إنشاء حساب في ثاج')}
         </div>

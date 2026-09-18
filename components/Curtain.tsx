@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 export default function Curtain() {
   const [go, setGo] = useState(false);
@@ -16,7 +15,7 @@ export default function Curtain() {
     <div id="curtain" className={`${go ? 'go' : ''} ${out ? 'out' : ''}`.trim()}>
       <div className="c-glow" />
       <div className="c-mark-wrap">
-        <Image className="c-mark" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} priority />
+        <img className="c-mark" src="/assets/logo/logo-beige.png" alt="THAJ" />
         <div className="c-shimmer" />
       </div>
       <div className="c-sub lbl" style={{ color: 'var(--on-dark-soft)' }}>
