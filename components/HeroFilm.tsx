@@ -14,6 +14,9 @@
    ========================================================== */
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import Link from 'next/link';
+// Aliased: this file also preloads slides via the browser's native
+// `new Image()` (see goTo below) — importing the real name would shadow it.
+import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSite, effectivePrice } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
@@ -157,12 +160,15 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
           const lp = pieces[pieceIdx];
           if (!lp) return null;
           return (
-            <img
+            <NextImage
               key={i}
               className={`hf-img${top === i ? ' on' : ''}`}
               src={`/${lp.img}`}
               alt={pName(lp)}
               aria-hidden={top === i ? undefined : true}
+              fill
+              sizes="100vw"
+              priority={top === i}
             />
           );
         })}
@@ -171,7 +177,7 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
 
       <div className="hf-copy">
         <div className="hf-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-        <img className="hf-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
+        <NextImage className="hf-logo" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} />
         <h1 className="hf-title">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
         <div className="hf-cta">
           <Link className="btn hf-btn" href="/shop">{L('Enter the shop', 'ادخلي المتجر')}</Link>
