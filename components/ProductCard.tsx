@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSite, availableStock, colorSoldOut } from '@/lib/siteContext';
@@ -13,6 +13,15 @@ const MAX_DOTS = 6;
 export default function ProductCard({ piece, className }: { piece?: Piece | null; className?: string }) {
   const { L, AR, esc, pName, money, wish, toggleWish, AVAIL_AR } = useSite();
   const [cardColor, setCardColor] = useState<string | null>(null);
+  // Tapping a colour dot swaps the card photo via a key-based remount —
+  // same as the product page's own gallery — so every colour's first
+  // photo gets warmed into the browser cache up front, otherwise that tap
+  // blanks the card while the new photo fetches from scratch.
+  const swatchPaths = piece ? [piece.img, ...piece.colors.map((c) => c.images[0]).filter((i): i is string => !!i)] : [];
+  useEffect(() => {
+    swatchPaths.forEach((path) => { const im = new window.Image(); im.src = `/${path}`; });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swatchPaths.join('|')]);
   if (!piece) return null;
   const saved = wish.includes(piece.id);
   // Out of real stock overrides whatever the admin last set availability
