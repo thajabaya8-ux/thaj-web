@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { stockImg } from '@/lib/img';
@@ -14,7 +15,7 @@ export default function MaisonPage() {
   return (
     <>
       <section className="hero bleed rv" style={{ height: 'min(84vh,820px)' }}>
-        <img src={`/${stockImg(settings, 2)}`} alt="THAJ" style={{ objectPosition: '50% 58%' }} />
+        <Image src={`/${stockImg(settings, 2)}`} alt="THAJ" fill sizes="100vw" style={{ objectPosition: '50% 58%' }} priority />
         <div className="h-in">
           <div className="lbl">{L('The Maison', 'الدار')}</div>
           <h1>{L('A house built on proportion, not ornament.', 'دار مبنية على النسبة، مش على الزخرفة.')}</h1>

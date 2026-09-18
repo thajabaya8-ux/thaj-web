@@ -1,5 +1,6 @@
 'use client';
 import { Suspense, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
 import { SIZES } from '@/lib/siteContext';
@@ -113,7 +114,7 @@ function ProductPageInner() {
       <section className="pdp">
         <div className="gal">
           <div className="gal-main" onPointerDown={onGalPointerDown} onPointerUp={onGalPointerUp}>
-            <img key={activeImg} src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} />
+            <Image key={activeImg} src={`/${activeImg}`} alt={activeIsPants ? L('Trousers', 'البنطلون') : pName(p)} width={900} height={1200} style={{ width: 'auto', height: 'auto' }} priority />
             {activeIsPants && <span className="gal-pants-tag">{L('Trousers', 'البنطلون')}</span>}
             {gallery.length > 1 && (
               <>
@@ -126,7 +127,7 @@ function ProductPageInner() {
             <div className="gal-thumbs">
               {gallery.map((g, i) => (
                 <button key={g.img + i} type="button" className={i === active ? 'on' : ''} onClick={() => setActive(i)}>
-                  <img src={`/${g.img}`} alt="" />
+                  <Image src={`/${g.img}`} alt="" fill sizes="52px" />
                   {g.isPants && <span className="gal-pants-tag">{L('Trousers', 'بنطلون')}</span>}
                 </button>
               ))}
@@ -164,7 +165,7 @@ function ProductPageInner() {
                   card snapped back to invisible right as it was tapped. */}
               <div className="rv pants-select" data-on={withPants || undefined}>
                 <div className="ps-img">
-                  <img src={`/${p.pantsImg}`} alt="" />
+                  <Image src={`/${p.pantsImg}`} alt="" fill sizes="96px" />
                   <span className="ps-check">
                     <svg viewBox="0 0 12 10" fill="none"><path d="M1 5l3.5 3.5L11 1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </span>
@@ -257,7 +258,7 @@ function ProductPageInner() {
             ))}
           </div>
           <div className="rv" style={{ gridColumn: '7/13', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: 'var(--sand)' }}>
-            <div className="veil" /><img src={`/${p.img}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 60%' }} alt="" />
+            <div className="veil" /><Image src={`/${p.img}`} alt="" fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: 'cover', objectPosition: '50% 60%' }} />
           </div>
         </div>
       </section>

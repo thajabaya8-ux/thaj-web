@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import type { Piece } from '@/lib/types';
@@ -50,7 +51,7 @@ export default function SearchOverlay() {
       <div className="sres">
         {results.length ? results.map((p) => (
           <Link key={p.id} className="card in" href={`/product/${p.id}`} onClick={close}>
-            <div className="frame"><img src={`/${p.img}`} alt="" loading="lazy" /></div>
+            <div className="frame"><Image src={`/${p.img}`} alt="" width={300} height={400} style={{ width: 'auto', height: 'auto' }} /></div>
             <div className="meta"><h3>{pName(p)}</h3><div className="pr">{money(p.price, p.currency)}</div></div>
           </Link>
         )) : (

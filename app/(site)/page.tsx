@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { stockImg } from '@/lib/img';
@@ -45,7 +46,7 @@ export default function HomePage() {
         <div className={`hm-in${filmPieces.length ? ' hm-film-active' : ''}`}>
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
-            <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
+            <Image className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" width={1200} height={552} priority />
             <h1 className="hm-h">{L(esc(settings.hero_title_en), esc(settings.hero_title_ar))}</h1>
             <div className="hm-row">
               <p>{applyCount(L(esc(settings.home_hero_desc_en), esc(settings.home_hero_desc_ar)), num(pieces.length))}</p>
@@ -59,7 +60,7 @@ export default function HomePage() {
             <div className="hm-strip"><div className="hm-track">
               {strip.map((p, i) => (
                 <Link key={`${p.id}-${i}`} className="hm-th" href={`/product/${p.id}`} title={pName(p)}>
-                  <img src={`/${p.img}`} alt={pName(p)} loading="lazy" /><span>{pName(p)}</span>
+                  <Image src={`/${p.img}`} alt={pName(p)} width={300} height={400} /><span>{pName(p)}</span>
                 </Link>
               ))}
             </div></div>
@@ -92,10 +93,10 @@ export default function HomePage() {
           </div>
           <div style={{ gridColumn: '7/13', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(14px,2vw,28px)' }}>
             <div className="rv" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--emerald)' }}>
-              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${stockImg(settings, 4)}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><Image src={`/${stockImg(settings, 4)}`} alt="" fill sizes="(max-width: 900px) 50vw, 25vw" style={{ objectFit: 'cover' }} />
             </div>
             <div className="rv" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--emerald)', marginTop: 'clamp(24px,5vw,70px)' }}>
-              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><img src={`/${stockImg(settings, 7)}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+              <div className="veil" style={{ background: 'var(--emerald-deep)' }} /><Image src={`/${stockImg(settings, 7)}`} alt="" fill sizes="(max-width: 900px) 50vw, 25vw" style={{ objectFit: 'cover' }} />
             </div>
           </div>
         </div>
@@ -106,7 +107,7 @@ export default function HomePage() {
         <div className="compose">
           {Object.entries(collections).map(([k, c], i) => (
             <Link key={k} className={`card rv ${['c-1', 'c-2', 'c-3', 'c-4'][i]}`} href={`/collections/${k}`}>
-              <div className="frame" style={{ aspectRatio: i % 2 ? '3/4' : '4/5' }}><div className="veil" /><img src={`/${c.img}`} loading="lazy" alt="" /></div>
+              <div className="frame" style={{ aspectRatio: i % 2 ? '3/4' : '4/5' }}><div className="veil" /><Image src={`/${c.img}`} alt="" fill sizes="(max-width: 640px) 50vw, 25vw" /></div>
               <div className="meta">
                 <h3>{esc(L(c.name, c.nameAr))}</h3>
                 <div className="pr" style={{ fontSize: 11, letterSpacing: '.2em', fontFamily: 'var(--sans)', textTransform: 'uppercase' }}>{esc(L(c.line, c.lineAr))}</div>
@@ -119,7 +120,7 @@ export default function HomePage() {
       <section className="tone pad">
         <div className="wrap split">
           <div className="rv" style={{ gridColumn: '1/7', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: 'var(--sand)' }}>
-            <div className="veil" /><img src={`/${stockImg(settings, 8)}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 30%' }} alt="" />
+            <div className="veil" /><Image src={`/${stockImg(settings, 8)}`} alt="" fill sizes="(max-width: 900px) 100vw, 50vw" style={{ objectFit: 'cover', objectPosition: '50% 30%' }} />
           </div>
           <div style={{ gridColumn: '8/13' }}>
             <div className="lbl rv" style={{ color: 'var(--gold)', marginBottom: 18 }}>{L(esc(settings.home_s4_eyebrow_en), esc(settings.home_s4_eyebrow_ar))}</div>

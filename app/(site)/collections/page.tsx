@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import Mast from '@/components/Mast';
@@ -16,7 +17,7 @@ export default function CollectionsPage() {
         <div className="compose">
           {Object.entries(collections).map(([k, c], i) => (
             <Link key={k} className={`card rv ${['c-1 tall', 'c-2', 'c-3', 'c-4 wide'][i]}`} href={`/collections/${k}`}>
-              <div className="frame"><div className="veil" /><img src={`/${c.img}`} loading="lazy" alt="" /></div>
+              <div className="frame"><div className="veil" /><Image src={`/${c.img}`} alt="" fill sizes="(max-width: 640px) 50vw, 25vw" /></div>
               <div className="meta">
                 <h3>{esc(L(c.name, c.nameAr))}</h3>
                 <div className="pr" style={{ fontFamily: 'var(--sans)', fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase' }}>

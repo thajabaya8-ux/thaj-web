@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/lib/adminContext';
@@ -36,7 +37,7 @@ export default function Sidebar() {
   return (
     <>
       <div className="adm-mbar">
-        <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}><img src="/assets/logo/wordmark-beige.png" alt="THAJ" /></Link>
+        <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}><Image src="/assets/logo/wordmark-beige.png" alt="THAJ" width={900} height={349} priority /></Link>
         <button type="button" className="adm-burger" onClick={() => setOpen(true)} aria-label={L('Menu', 'القائمة')}>
           <i></i><i></i><i></i>
         </button>
@@ -44,7 +45,7 @@ export default function Sidebar() {
       <div className={`adm-menu-scrim ${open ? 'open' : ''}`} onClick={close} />
       <aside className={`adm-side ${open ? 'open' : ''}`}>
         <button type="button" className="adm-menu-close" onClick={close}>{L('Close', 'إغلاق')}</button>
-        <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}><img src="/assets/logo/wordmark-beige.png" alt="THAJ" /></Link>
+        <Link className="brand" href="/" title={L('Back to the site', 'العودة للموقع')}><Image src="/assets/logo/wordmark-beige.png" alt="THAJ" width={900} height={349} /></Link>
         <div className="lang" style={{ marginBottom: 30 }}>
           <button className={!AR() ? 'on' : ''} onClick={() => setLang('en')}>EN</button>
           <i>/</i>
