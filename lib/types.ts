@@ -83,6 +83,14 @@ export interface Collection {
 
 export type CollectionMap = Record<string, Collection>;
 
+export interface ReviewPhoto {
+  id: number;
+  img: string;
+  caption: string;
+  captionAr: string;
+  sort: number;
+}
+
 export interface OrderLineItem {
   id: string;
   size: string;

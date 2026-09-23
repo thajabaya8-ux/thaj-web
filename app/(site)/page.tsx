@@ -8,6 +8,7 @@ import { applyCount } from '@/lib/homeContent';
 import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 import HeroFilm from '@/components/HeroFilm';
+import CustomerReviews from '@/components/CustomerReviews';
 import type { Piece } from '@/lib/types';
 
 export default function HomePage() {
@@ -131,6 +132,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <CustomerReviews />
     </>
   );
 }
