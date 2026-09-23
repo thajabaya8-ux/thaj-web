@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, PieceColor, Review, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, PieceColor, Review, ReviewPhoto, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -136,4 +136,8 @@ export function reviewOut(r: any): Review {
     pieceName: r.name_en, pieceNameAr: r.name_ar,
     name: r.name, email: r.email, message: r.message, d: toIso(r.created_at)
   };
+}
+
+export function reviewPhotoOut(r: any): ReviewPhoto {
+  return { id: r.id, img: r.image, caption: r.caption_en || '', captionAr: r.caption_ar || '', sort: r.sort };
 }

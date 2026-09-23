@@ -489,6 +489,11 @@ section{position:relative}
 .card .meta .pr small{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-top:4px;white-space:normal}
 .dark .card .meta{border-color:var(--on-dark-line)}
 
+/* Customer-photo strip (admin-curated at /admin/review-photos) — unlike
+   .compose below, this is an arbitrary-length list, so it's a plain
+   auto-fill grid rather than a fixed 4-slot editorial layout. */
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:clamp(20px,3vw,40px)}
+
 /* editorial home composition */
 .compose{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(20px,3vw,52px);grid-auto-flow:dense}
 .c-1{grid-column:1/7}

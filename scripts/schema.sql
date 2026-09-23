@@ -264,3 +264,16 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   count INTEGER NOT NULL DEFAULT 1,
   window_start TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Admin-curated "as worn by our customers" strip on the homepage —
+-- photos customers send in over WhatsApp/DM, uploaded here manually with
+-- an optional caption. Not customer accounts or the text messages in
+-- `reviews` above — purely a curated photo gallery, ordered by `sort`.
+CREATE TABLE IF NOT EXISTS review_photos (
+  id SERIAL PRIMARY KEY,
+  image TEXT NOT NULL,
+  caption_en TEXT,
+  caption_ar TEXT,
+  sort INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
