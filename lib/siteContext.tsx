@@ -397,7 +397,7 @@ export function SiteProvider({ initialPieces, initialCollections, initialSetting
   }, [L, toast]);
 
   const submitOrder = useCallback(async (paymentMethod: PaymentMethod, receiptKey: string, govName?: string, govNameAr?: string) => {
-    const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q, withPants: !!c.withPants }));
+    const items = cart.map((c) => ({ id: c.pid, size: c.size, qty: c.q, withPants: !!c.withPants, ...(c.color ? { color: c.color } : {}) }));
     const name = [coData.fn, coData.ln].filter(Boolean).join(' ');
     const shipping = {
       name: name || coData.fn, phone: coData.phone, governorate: coData.governorate,
