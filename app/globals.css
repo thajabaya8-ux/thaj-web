@@ -677,6 +677,13 @@ section{position:relative}
   padding:12px 16px;margin:-4px 0 4px;font-size:12.5px}
 .ship-fee-line span{color:var(--ink-faint)}
 .ship-fee-line b{font-family:var(--display);font-weight:400;color:var(--emerald)}
+/* Free-shipping is a perk worth noticing, not just another line item —
+   the gold border/tint matches the site's other promotional accents
+   (.sale-badge, the discount CTA), rather than the plain informational
+   .ship-fee-line above. */
+.ship-fee-line.free{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,transparent);margin-top:14px}
+.ship-fee-line.free span{color:var(--ink)}
+.ship-fee-line.free b{color:var(--gold);font-size:14px;letter-spacing:.02em}
 
 .gov-select{position:relative}
 .gov-trigger{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;

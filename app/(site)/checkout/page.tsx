@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
-import { computeOrderTotals } from '@/lib/payment';
+import { computeOrderTotals, isFreeShipping } from '@/lib/payment';
 import { trackPixel } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
 import Mast from '@/components/Mast';
@@ -11,9 +11,9 @@ import type { Governorate, PaymentMethod } from '@/lib/types';
 
 type FormEl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
-function PaymentOption({ active, onSelect, name, sub, account, handle, handleLabel, amount, L, esc }: {
+function PaymentOption({ active, onSelect, name, sub, account, handle, handleLabel, amount, note, L, esc }: {
   active: boolean; onSelect: () => void; name: string; sub: string;
-  account: string; handle: string; handleLabel: string; amount: string;
+  account?: string; handle?: string; handleLabel?: string; amount?: string; note?: string;
   L: <T = string>(e?: T, a?: T) => T; esc: (s: unknown) => string;
 }) {
   return (
@@ -24,10 +24,16 @@ function PaymentOption({ active, onSelect, name, sub, account, handle, handleLab
       </button>
       {active && (
         <div className="pm-instructions">
-          <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 10 }}>{L('Send the deposit to', 'حوّلي العربون على')}</div>
-          <div className="pm-detail"><span>{L('Account name', 'اسم الحساب')}</span><b>{esc(account) || '—'}</b></div>
-          <div className="pm-detail"><span>{handleLabel}</span><b>{esc(handle) || '—'}</b></div>
-          <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{amount}</b></div>
+          {note ? (
+            <p className="body" style={{ fontSize: 12.5, lineHeight: 1.8 }}>{note}</p>
+          ) : (
+            <>
+              <div className="lbl" style={{ color: 'var(--gold)', marginBottom: 10 }}>{L('Send the deposit to', 'حوّلي العربون على')}</div>
+              <div className="pm-detail"><span>{L('Account name', 'اسم الحساب')}</span><b>{esc(account) || '—'}</b></div>
+              <div className="pm-detail"><span>{handleLabel}</span><b>{esc(handle) || '—'}</b></div>
+              <div className="pm-detail pm-detail-amount"><span>{L('Amount', 'المبلغ')}</span><b>{amount}</b></div>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -95,6 +101,7 @@ export default function CheckoutPage() {
     () => computeOrderTotals(cartTotalEgp, selectedGov?.price || 0, settings),
     [cartTotalEgp, selectedGov, settings]
   );
+  const freeShipping = isFreeShipping(settings);
 
   if (!cart.length) {
     return (
@@ -129,13 +136,15 @@ export default function CheckoutPage() {
     }
 
     if (!method) { toast(L('Choose a payment method', 'اختاري طريقة الدفع')); return; }
-    if (!receiptKey) { toast(L('Upload your transfer receipt to continue', 'ارفعي صورة إيصال التحويل عشان تكمّلي')); return; }
+    // Cash on Delivery has nothing to upload — the deposit is arranged over
+    // WhatsApp after the order is placed, not proven with a receipt here.
+    if (method !== 'cash_on_delivery' && !receiptKey) { toast(L('Upload your transfer receipt to continue', 'ارفعي صورة إيصال التحويل عشان تكمّلي')); return; }
 
     trackEvent('ConfirmOrderClick', {
       value: totals.total, currency: 'EGP', payment_method: method, num_items: cart.reduce((s, c) => s + c.q, 0)
     });
     setSubmitting(true);
-    const order = await submitOrder(method, receiptKey, selectedGov?.name, selectedGov?.nameAr);
+    const order = await submitOrder(method, receiptKey || '', selectedGov?.name, selectedGov?.nameAr);
     setSubmitting(false);
     if (order) {
       orderPlacedRef.current = true;
@@ -145,7 +154,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const methodInfo: Record<PaymentMethod, { name: string; sub: string; account: string; handle: string }> = {
+  const methodInfo: Record<'vodafone_cash' | 'instapay', { name: string; sub: string; account: string; handle: string }> = {
     vodafone_cash: {
       name: 'Vodafone Cash', sub: L('Transfer to a mobile wallet', 'تحويل لمحفظة موبايل'),
       account: settings.vodafone_cash_name || '', handle: settings.vodafone_cash_number || ''
@@ -183,7 +192,7 @@ export default function CheckoutPage() {
                     <GovernorateSelect
                       governorates={govs} value={govKey} onChange={onSelectGov} L={L}
                       placeholder={L('Select your governorate', 'اختاري محافظتك')}
-                      loading={!govs && !govsError} error={govsError}
+                      loading={!govs && !govsError} error={govsError} freeShipping={freeShipping}
                     />
                   </div>
                   <div className="field"><label>{L('City / area', 'المدينة / المنطقة')}</label><input data-f="city" defaultValue={coData.city || ''} required /></div>
@@ -197,7 +206,7 @@ export default function CheckoutPage() {
                 <>
                   <div className="price-breakdown pay-summary rv">
                     <div className="pb-row"><span>{L('Products', 'المنتجات')}</span><b>{money(totals.subtotal, 'EGP')}</b></div>
-                    <div className="pb-row"><span>{L('Shipping', 'الشحن')} {selectedGov ? `· ${L(selectedGov.name, selectedGov.nameAr)}` : ''}</span><b>{money(totals.shippingFee, 'EGP')}</b></div>
+                    <div className="pb-row"><span>{L('Shipping', 'الشحن')} {selectedGov ? `· ${L(selectedGov.name, selectedGov.nameAr)}` : ''}</span><b style={freeShipping ? { color: 'var(--emerald)' } : undefined}>{freeShipping ? L('Free', 'مجاني') : money(totals.shippingFee, 'EGP')}</b></div>
                     <div className="pb-row pb-total"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{money(totals.total, 'EGP')}</b></div>
                     <div className="pb-row pb-deposit"><span>{L('Deposit required now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
                     <div className="pb-row"><span>{L('Remaining on delivery', 'الباقي عند التسليم')}</span><b>{money(totals.remaining, 'EGP')}</b></div>
@@ -217,9 +226,15 @@ export default function CheckoutPage() {
                       account={methodInfo.instapay.account} handle={methodInfo.instapay.handle}
                       handleLabel={L('Handle', 'المعرّف')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}
                     />
+                    <PaymentOption
+                      active={method === 'cash_on_delivery'} onSelect={() => onSelectMethod('cash_on_delivery')}
+                      name={L('Cash on Delivery', 'الدفع عند الاستلام')} sub={L('Confirm your deposit over WhatsApp instead', 'أكّدي العربون عن طريق واتساب')}
+                      note={L('To complete and confirm your order, please send us a message on WhatsApp.', 'لإتمام وتأكيد طلبك، الرجاء إرسال رسالة على الواتساب.')}
+                      L={L} esc={esc}
+                    />
                   </div>
 
-                  {method && (
+                  {method && method !== 'cash_on_delivery' && (
                     <div className="receipt-upload">
                       <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '18px 0 10px' }}>{L('Upload your transfer receipt', 'ارفعي صورة إيصال التحويل')}</div>
                       <label className={`receipt-drop ${receiptKey ? 'has-file' : ''} ${uploading ? 'busy' : ''}`}>

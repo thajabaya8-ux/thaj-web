@@ -24,7 +24,7 @@ async function nextOrderNumber(): Promise<string> {
   return `THAJ-${year}-${String(n + 1).padStart(4, '0')}`;
 }
 
-const PAYMENT_METHODS = ['vodafone_cash', 'instapay'];
+const PAYMENT_METHODS = ['vodafone_cash', 'instapay', 'cash_on_delivery'];
 
 // Same allowlist as lib/attribution.ts's PARAMS (plus the two fields it
 // always adds itself) — never trust the shape of client-supplied JSON
@@ -65,9 +65,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
   }
   if (!PAYMENT_METHODS.includes(paymentMethod)) {
-    return NextResponse.json({ error: 'Choose Vodafone Cash or InstaPay' }, { status: 400 });
+    return NextResponse.json({ error: 'Choose Vodafone Cash, InstaPay or Cash on Delivery' }, { status: 400 });
   }
-  if (!str(receiptKey, 300) || !/^receipts\//.test(receiptKey)) {
+  // Cash on Delivery has no transfer to prove up front — the deposit is
+  // arranged over WhatsApp instead (see the confirm page's own WhatsApp
+  // CTA), so it's the one method that never needs a receipt.
+  if (paymentMethod !== 'cash_on_delivery' && (!str(receiptKey, 300) || !/^receipts\//.test(receiptKey))) {
     return NextResponse.json({ error: 'A payment receipt photo is required' }, { status: 400 });
   }
   const ship = shipping || {};

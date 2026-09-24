@@ -51,6 +51,13 @@ body{background:var(--bone-2)}
 .adm-chart .bar b{width:100%;max-width:36px;background:var(--gold);height:0;transition:height 1.1s var(--e);display:block}
 .adm-chart .bar span{margin-top:10px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--on-dark-soft);white-space:nowrap}
 
+/* Free-shipping switch on /admin/shipping — a flat site-wide toggle,
+   visually set apart from the per-governorate rows below it. */
+.free-ship-toggle{display:flex;align-items:center;justify-content:space-between;gap:20px;
+  border:1px solid var(--emerald);background:var(--bone-2);padding:18px 22px;margin-bottom:28px;cursor:pointer}
+.free-ship-toggle b{display:block;font-family:var(--display);font-weight:400;font-size:16px;color:var(--emerald)}
+.free-ship-toggle span{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:6px;max-width:56ch;line-height:1.6}
+
 /* ============ TABLES ============ */
 .adm-row{display:grid;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
 .adm-row-head{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}

@@ -8,7 +8,8 @@ import type { Settings } from '@/lib/types';
 export const PAYMENT_SETTINGS_KEYS = [
   'deposit_percent',
   'vodafone_cash_number', 'vodafone_cash_name',
-  'instapay_handle', 'instapay_name'
+  'instapay_handle', 'instapay_name',
+  'free_shipping'
 ];
 
 export const ADMIN_ONLY_SETTINGS_KEYS = ['admin_whatsapp_number'];
@@ -16,6 +17,15 @@ export const ADMIN_ONLY_SETTINGS_KEYS = ['admin_whatsapp_number'];
 export function depositPercent(settings: Settings): number {
   const n = parseFloat(settings.deposit_percent || '');
   return Number.isFinite(n) && n > 0 && n <= 100 ? n : 50;
+}
+
+// One global switch (set at /admin/shipping), not a per-governorate thing —
+// when it's on, every governorate's own price is ignored everywhere a fee
+// would otherwise show, both in computeOrderTotals below (the single place
+// both the checkout preview and the real order write go through) and in
+// every page that displays a governorate's price on its own.
+export function isFreeShipping(settings: Settings): boolean {
+  return settings.free_shipping === 'true';
 }
 
 // Every amount here is EGP — Vodafone Cash / InstaPay are Egyptian payment
@@ -29,7 +39,7 @@ export function depositPercent(settings: Settings): number {
 // never trusted from the client).
 export function computeOrderTotals(subtotalEgp: number, shippingFeeEgp: number, settings: Settings) {
   const subtotal = Math.round(subtotalEgp);
-  const shippingFee = Math.max(0, Math.round(shippingFeeEgp || 0));
+  const shippingFee = isFreeShipping(settings) ? 0 : Math.max(0, Math.round(shippingFeeEgp || 0));
   const total = subtotal + shippingFee;
   const deposit = Math.round(total * (depositPercent(settings) / 100));
   const remaining = total - deposit;

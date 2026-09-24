@@ -29,6 +29,10 @@ function esc(v: unknown): string {
   return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
 
+const PAYMENT_METHOD_AR: Record<string, string> = {
+  vodafone_cash: 'فودافون كاش', instapay: 'إنستاباي', cash_on_delivery: 'الدفع عند الاستلام (عربون عبر واتساب)'
+};
+
 export async function sendOrderNotification(input: OrderNotifyInput): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
@@ -55,7 +59,7 @@ export async function sendOrderNotification(input: OrderNotifyInput): Promise<vo
         ${row('المدينة', esc(input.city))}
         ${row('العنوان', esc(input.address))}
         ${input.notes ? row('ملاحظات', esc(input.notes)) : ''}
-        ${row('طريقة الدفع', esc(input.paymentMethod))}
+        ${row('طريقة الدفع', esc(PAYMENT_METHOD_AR[input.paymentMethod] || input.paymentMethod))}
         ${row('الإجمالي', `${input.total.toLocaleString('en-US')} ج.م`)}
         ${row('العربون', `${input.deposit.toLocaleString('en-US')} ج.م`)}
       </table>
