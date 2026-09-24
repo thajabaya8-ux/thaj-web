@@ -9,7 +9,8 @@ import ProductCard from '@/components/ProductCard';
 import EdHead from '@/components/EdHead';
 import HeroFilm from '@/components/HeroFilm';
 import CustomerReviews from '@/components/CustomerReviews';
-import type { Piece } from '@/lib/types';
+import type { MarqueeItem } from '@/lib/types';
+import { marqueeItemImg, marqueeItemKey, marqueeItemHref } from '@/lib/marqueeItem';
 
 export default function HomePage() {
   const { L, esc, num, pName, pieces, collections, settings } = useSite();
@@ -20,18 +21,19 @@ export default function HomePage() {
   const featuredPicks = pieces.filter((p) => p.featured);
   const feat = (featuredPicks.length ? featuredPicks : pieces.slice(-4).reverse()).slice(0, 4);
 
-  // Curated by the admin at /admin/marquee — not every piece in the
-  // catalogue, and empty (so the strip stays hidden) until they pick some.
-  const [marquee, setMarquee] = useState<Piece[]>([]);
+  // Curated by the admin at /admin/marquee — a mix of real pieces and
+  // plain banner images (see MarqueeItem in lib/types.ts), in this order,
+  // and empty (so the strip stays hidden) until they pick some.
+  const [marquee, setMarquee] = useState<MarqueeItem[]>([]);
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/marquee').then((r) => (r.ok ? r.json() : [])).then((p: Piece[]) => { if (!cancelled) setMarquee(p); }).catch(() => {});
+    fetch('/api/marquee').then((r) => (r.ok ? r.json() : [])).then((m: MarqueeItem[]) => { if (!cancelled) setMarquee(m); }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
   const strip = [...marquee, ...marquee];
-  // Same curated list powers the mobile film below — pieces without a
-  // photo can't appear in an image carousel.
-  const filmPieces = marquee.filter((p) => p.img);
+  // Same curated list powers the mobile film below — an item with no
+  // image at all can't appear in an image carousel.
+  const filmItems = marquee.filter((it) => marqueeItemImg(it));
 
   return (
     <>
@@ -44,7 +46,7 @@ export default function HomePage() {
           React is free to re-render normally. */}
       <section className="hero-m bleed rv" id="hero">
         <div className="hm-glow" /><div className="hm-rules" />
-        <div className={`hm-in${filmPieces.length ? ' hm-film-active' : ''}`}>
+        <div className={`hm-in${filmItems.length ? ' hm-film-active' : ''}`}>
           <div className="hm-copy">
             <div className="lbl hm-eyebrow">{L(esc(settings.hero_eyebrow_en), esc(settings.hero_eyebrow_ar))}</div>
             <img className="hm-logo" src="/assets/logo/logo-beige.png" alt="THAJ" />
@@ -59,15 +61,18 @@ export default function HomePage() {
           </div>
           {marquee.length > 0 && (
             <div className="hm-strip"><div className="hm-track">
-              {strip.map((p, i) => (
-                <Link key={`${p.id}-${i}`} className="hm-th" href={`/product/${p.id}`} title={pName(p)}>
-                  <img src={`/${p.img}`} alt={pName(p)} loading="lazy" /><span>{pName(p)}</span>
-                </Link>
-              ))}
+              {strip.map((it, i) => {
+                const label = it.kind === 'piece' ? pName(it.piece) : L(it.caption, it.captionAr) || 'THAJ';
+                return (
+                  <Link key={`${marqueeItemKey(it)}-${i}`} className="hm-th" href={marqueeItemHref(it)} title={label}>
+                    <img src={`/${marqueeItemImg(it)}`} alt={label} loading="lazy" /><span>{label}</span>
+                  </Link>
+                );
+              })}
             </div></div>
           )}
         </div>
-        {filmPieces.length > 0 && <HeroFilm pieces={filmPieces} />}
+        {filmItems.length > 0 && <HeroFilm items={filmItems} />}
         <div className="hm-scroll">{L(esc(settings.home_scroll_en), esc(settings.home_scroll_ar))}<i></i></div>
       </section>
 

@@ -4,7 +4,7 @@
    the front-end expects (lib/types.ts) — ported from
    thaj-site/server/mappers.js unchanged.
    ========================================================== */
-import type { Collection, Customer, Governorate, Order, OrderLineItem, Piece, PieceColor, Review, ReviewPhoto, ShippingInfo, SocialLink } from '@/lib/types';
+import type { Collection, Customer, Governorate, MarqueeItem, Order, OrderLineItem, Piece, PieceColor, Review, ReviewPhoto, ShippingInfo, SocialLink } from '@/lib/types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -60,6 +60,17 @@ export function pieceOut(r: any): Piece {
     colors: normalizePieceColors(r.colors),
     sizes: parseArr<string>(r.sizes)
   };
+}
+
+// A row from marquee_items, left-joined to pieces — `kind`/`mi_image`/
+// `mi_caption_en`/`mi_caption_ar` are the aliases both /api/marquee and
+// /api/admin/marquee select them under (see either route), chosen so
+// they never collide with any of pieceOut's own column names above.
+export function marqueeItemOut(r: any): MarqueeItem {
+  if (r.kind === 'image') {
+    return { kind: 'image', img: r.mi_image || '', caption: r.mi_caption_en || '', captionAr: r.mi_caption_ar || '' };
+  }
+  return { kind: 'piece', piece: pieceOut(r) };
 }
 
 export function collectionOut(r: any): Collection {
