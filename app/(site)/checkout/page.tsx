@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
 import { computeOrderTotals, isFreeShipping } from '@/lib/payment';
+import { deliveryEstimate } from '@/lib/delivery';
 import { trackPixel } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
 import Mast from '@/components/Mast';
@@ -102,6 +103,7 @@ export default function CheckoutPage() {
     [cartTotalEgp, selectedGov, settings]
   );
   const freeShipping = isFreeShipping(settings);
+  const delivery = deliveryEstimate(settings);
 
   if (!cart.length) {
     return (
@@ -210,6 +212,10 @@ export default function CheckoutPage() {
                     <div className="pb-row pb-total"><span>{L('Order total', 'إجمالي الطلب')}</span><b>{money(totals.total, 'EGP')}</b></div>
                     <div className="pb-row pb-deposit"><span>{L('Deposit required now', 'العربون المطلوب الآن')}</span><b>{money(totals.deposit, 'EGP')}</b></div>
                     <div className="pb-row"><span>{L('Remaining on delivery', 'الباقي عند التسليم')}</span><b>{money(totals.remaining, 'EGP')}</b></div>
+                  </div>
+                  <div className="ship-fee-line rv">
+                    <span>{L('Delivery', 'التسليم')}</span>
+                    <b>{L(delivery.en, delivery.ar)}</b>
                   </div>
 
                   <div className="lbl" style={{ color: 'var(--ink-faint)', margin: '28px 0 12px' }}>{L('Pay with', 'الدفع بواسطة')}</div>
