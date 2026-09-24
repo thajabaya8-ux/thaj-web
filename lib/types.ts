@@ -67,6 +67,23 @@ export interface Piece {
   sizes: string[];
 }
 
+// One slot in the homepage's marquee strip / mobile hero film
+// (components/HeroFilm.tsx, /admin/marquee) — either a real catalogue
+// piece (the original, only behaviour this ever had) or a plain banner
+// image with its own caption and no product behind it at all (no price,
+// tapping it goes to /shop rather than a product page).
+export interface MarqueePieceItem {
+  kind: 'piece';
+  piece: Piece;
+}
+export interface MarqueeImageItem {
+  kind: 'image';
+  img: string;
+  caption: string;
+  captionAr: string;
+}
+export type MarqueeItem = MarqueePieceItem | MarqueeImageItem;
+
 export interface Collection {
   key: string;
   name: string;

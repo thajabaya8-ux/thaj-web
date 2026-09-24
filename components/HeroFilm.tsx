@@ -2,10 +2,11 @@
 /* ==========================================================
    THAJ — mobile hero film
    Under 900px the homepage hero becomes a full-bleed, auto-advancing
-   product-image film instead of a static panel. Two <img> layers
-   cross-fade (the next image is preloaded before it's shown), each
-   slide gets a slow constant-speed zoom, and a bottom bar tracks
-   progress + the current piece's name/edition/price.
+   image film instead of a static panel. Two <img> layers cross-fade
+   (the next image is preloaded before it's shown), each slide gets a
+   slow constant-speed zoom, and a bottom bar tracks progress + the
+   current slide's caption (a piece's name/edition/price, or a plain
+   banner's own caption — see MarqueeItem in lib/types.ts).
 
    SLIDE_MS/FADE_MS below are the one place the timing lives — the
    zoom, the progress-bar fill and the autoplay timer all read them
@@ -16,7 +17,8 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPoi
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSite, effectivePrice } from '@/lib/siteContext';
-import type { Piece } from '@/lib/types';
+import type { MarqueeItem } from '@/lib/types';
+import { marqueeItemImg as itemImg, marqueeItemKey as itemKey, marqueeItemHref as itemHref } from '@/lib/marqueeItem';
 
 const SLIDE_MS = 5000;
 const FADE_MS = 1500;
@@ -40,7 +42,7 @@ function HfFillCurrent({ reduced }: { reduced: boolean }) {
   return <span className={`hf-seg-fill${reduced ? ' done' : on ? ' fill' : ''}`} />;
 }
 
-export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
+export default function HeroFilm({ items }: { items: MarqueeItem[] }) {
   const { L, esc, pName, money, settings, collections } = useSite();
   const router = useRouter();
 
@@ -48,7 +50,7 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
   const [tabActive, setTabActive] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [current, setCurrent] = useState(0);
-  const [layers, setLayers] = useState<[number, number]>([0, pieces.length > 1 ? 1 : 0]);
+  const [layers, setLayers] = useState<[number, number]>([0, items.length > 1 ? 1 : 0]);
   const [top, setTop] = useState<0 | 1>(0);
 
   const mountedRef = useRef(true);
@@ -88,8 +90,8 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
   }, []);
 
   const goTo = useCallback((dir: 1 | -1) => {
-    if (!mountedRef.current || pieces.length < 2) return;
-    const nextIdx = (current + dir + pieces.length) % pieces.length;
+    if (!mountedRef.current || items.length < 2) return;
+    const nextIdx = (current + dir + items.length) % items.length;
     const back = top === 0 ? 1 : 0;
     const commit = () => {
       if (!mountedRef.current) return;
@@ -104,14 +106,14 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
     const img = new Image();
     img.onload = commit;
     img.onerror = commit;
-    img.src = `/${pieces[nextIdx].img}`;
-  }, [current, top, pieces, reduced]);
+    img.src = `/${itemImg(items[nextIdx])}`;
+  }, [current, top, items, reduced]);
 
   useEffect(() => { goToRef.current = goTo; }, [goTo]);
 
   // Autoplay — a fresh timeout per slide (not setInterval) so any manual
   // swipe, which changes `current` itself, naturally resets the count.
-  const running = isMobile && tabActive && !reduced && pieces.length > 1;
+  const running = isMobile && tabActive && !reduced && items.length > 1;
   useEffect(() => {
     if (!running) return;
     const t = setTimeout(() => goToRef.current(1), SLIDE_MS);
@@ -127,7 +129,7 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
   const onPointerUp = useCallback((e: ReactPointerEvent) => {
     const g = gesture.current;
     gesture.current = null;
-    if (!g || pieces.length < 1) return;
+    if (!g || items.length < 1) return;
     const dx = e.clientX - g.x;
     const dy = e.clientY - g.y;
     const dt = Date.now() - g.t;
@@ -136,14 +138,14 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
       return;
     }
     if (Math.abs(dx) < TAP_PX && Math.abs(dy) < TAP_PX && dt < TAP_MS) {
-      const p = pieces[current];
-      if (p) router.push(`/product/${p.id}`);
+      const it = items[current];
+      if (it) router.push(itemHref(it));
     }
-  }, [goTo, pieces, current, router]);
+  }, [goTo, items, current, router]);
 
-  if (!pieces.length) return null;
-  const p = pieces[current];
-  if (!p) return null;
+  if (!items.length) return null;
+  const current_ = items[current];
+  if (!current_) return null;
 
   return (
     <div
@@ -153,15 +155,15 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
       onPointerUp={onPointerUp}
     >
       <div className="hf-stage">
-        {layers.map((pieceIdx, i) => {
-          const lp = pieces[pieceIdx];
-          if (!lp) return null;
+        {layers.map((itemIdx, i) => {
+          const lit = items[itemIdx];
+          if (!lit) return null;
           return (
             <img
               key={i}
               className={`hf-img${top === i ? ' on' : ''}`}
-              src={`/${lp.img}`}
-              alt={pName(lp)}
+              src={`/${itemImg(lit)}`}
+              alt={lit.kind === 'piece' ? pName(lit.piece) : (lit.caption || lit.captionAr || 'THAJ')}
               aria-hidden={top === i ? undefined : true}
             />
           );
@@ -181,8 +183,8 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
 
       <div className="hf-bar">
         <div className="hf-progress">
-          {pieces.map((piece, i) => (
-            <span className="hf-seg" key={piece.id}>
+          {items.map((it, i) => (
+            <span className="hf-seg" key={itemKey(it)}>
               {i < current ? <span className="hf-seg-fill done" />
                 : i === current ? <HfFillCurrent key={current} reduced={reduced} />
                 : <span className="hf-seg-fill" />}
@@ -190,8 +192,14 @@ export default function HeroFilm({ pieces }: { pieces: Piece[] }) {
           ))}
         </div>
         <div className="hf-meta">
-          <span className="hf-name">{pName(p)}</span>
-          <span className="hf-price">{p.ed ? `${esc(p.ed)} · ` : ''}{money(effectivePrice(p), p.currency)}</span>
+          {current_.kind === 'piece' ? (
+            <>
+              <span className="hf-name">{pName(current_.piece)}</span>
+              <span className="hf-price">{current_.piece.ed ? `${esc(current_.piece.ed)} · ` : ''}{money(effectivePrice(current_.piece), current_.piece.currency)}</span>
+            </>
+          ) : (current_.caption || current_.captionAr) ? (
+            <span className="hf-name">{L(current_.caption, current_.captionAr)}</span>
+          ) : null}
         </div>
       </div>
     </div>

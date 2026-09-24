@@ -224,6 +224,28 @@ CREATE TABLE IF NOT EXISTS marquee_pieces (
   sort INTEGER NOT NULL DEFAULT 0
 );
 
+-- Supersedes marquee_pieces above: the same curated, ordered strip, but
+-- each slot can now be either a real piece OR a plain banner image with
+-- its own caption (e.g. a Saudi National Day graphic) — see MarqueeItem
+-- in lib/types.ts. marquee_pieces is left in place, unused, rather than
+-- dropped — schema.sql only ever adds.
+CREATE TABLE IF NOT EXISTS marquee_items (
+  id SERIAL PRIMARY KEY,
+  kind TEXT NOT NULL DEFAULT 'piece',
+  piece_id TEXT REFERENCES pieces(id) ON DELETE CASCADE,
+  image TEXT,
+  caption_en TEXT,
+  caption_ar TEXT,
+  sort INTEGER NOT NULL DEFAULT 0
+);
+
+-- One-time carry-over of whatever's already picked in marquee_pieces, so
+-- switching to the combined table doesn't blank out an admin's existing
+-- homepage strip. Safe to re-run: skips any piece already present here.
+INSERT INTO marquee_items (kind, piece_id, sort)
+SELECT 'piece', mp.piece_id, mp.sort FROM marquee_pieces mp
+WHERE NOT EXISTS (SELECT 1 FROM marquee_items mi WHERE mi.kind = 'piece' AND mi.piece_id = mp.piece_id);
+
 -- Every first-party event the site fires — page views, the same Meta
 -- Pixel events trackPixel() sends (ViewContent, AddToCart, ...), plus
 -- events with no Meta equivalent (RemoveFromCart, SelectColor, admin
