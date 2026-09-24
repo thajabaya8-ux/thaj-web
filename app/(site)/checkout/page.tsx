@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSite } from '@/lib/siteContext';
-import { computeOrderTotals, isFreeShipping } from '@/lib/payment';
+import { computeOrderTotals, isCodEnabled, isFreeShipping } from '@/lib/payment';
 import { deliveryEstimate } from '@/lib/delivery';
 import { trackPixel } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
@@ -104,6 +104,7 @@ export default function CheckoutPage() {
   );
   const freeShipping = isFreeShipping(settings);
   const delivery = deliveryEstimate(settings);
+  const codEnabled = isCodEnabled(settings);
 
   if (!cart.length) {
     return (
@@ -232,12 +233,12 @@ export default function CheckoutPage() {
                       account={methodInfo.instapay.account} handle={methodInfo.instapay.handle}
                       handleLabel={L('Handle', 'المعرّف')} amount={money(totals.deposit, 'EGP')} L={L} esc={esc}
                     />
-                    <PaymentOption
+                    {codEnabled && <PaymentOption
                       active={method === 'cash_on_delivery'} onSelect={() => onSelectMethod('cash_on_delivery')}
                       name={L('Cash on Delivery', 'الدفع عند الاستلام')} sub={L('Confirm your deposit over WhatsApp instead', 'أكّدي العربون عن طريق واتساب')}
                       note={L('To complete and confirm your order, please send us a message on WhatsApp.', 'لإتمام وتأكيد طلبك، الرجاء إرسال رسالة على الواتساب.')}
                       L={L} esc={esc}
-                    />
+                    />}
                   </div>
 
                   {method && method !== 'cash_on_delivery' && (

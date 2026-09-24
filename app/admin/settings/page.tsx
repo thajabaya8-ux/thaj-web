@@ -1,7 +1,9 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
+import { isCodEnabled } from '@/lib/payment';
 import { DEFAULT_DELIVERY_ESTIMATE_EN, DEFAULT_DELIVERY_ESTIMATE_AR } from '@/lib/delivery';
 import type { Settings } from '@/lib/types';
 
@@ -37,6 +39,22 @@ const ALL_KEYS = [...ALL_FIELDS.map(([k]) => k), ...POLICY_FIELDS, ...DELIVERY_F
 export default function SettingsPage() {
   const { data: settings, loading, error } = useAdminFetch<Settings>('/settings');
   const { call, toast, L } = useAdmin();
+  const [codEnabled, setCodEnabled] = useState(true);
+  const [codBusy, setCodBusy] = useState(false);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { if (settings) setCodEnabled(isCodEnabled(settings)); }, [settings]);
+
+  // Instant, not part of the form below — same reasoning as free_shipping
+  // on /admin/shipping: an on/off switch like this shouldn't wait on the
+  // admin remembering to hit "Save settings" at the bottom of the page.
+  const onToggleCod = async (next: boolean) => {
+    setCodEnabled(next);
+    setCodBusy(true);
+    try { await call('/settings', { method: 'PUT', body: JSON.stringify({ cash_on_delivery_enabled: next ? 'true' : 'false' }) }); }
+    catch (e) { setCodEnabled(!next); toast(e instanceof Error ? e.message : String(e)); }
+    finally { setCodBusy(false); }
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,6 +94,17 @@ export default function SettingsPage() {
           {L('Shown to shoppers at checkout, in EGP — these are the numbers customers transfer their deposit to. Shipping fees are managed per governorate on the ', 'بتتعرض للعميلات وقت الدفع، بالجنيه المصري — دي الأرقام اللي العميلة بتحوّل عليها العربون. رسوم الشحن بتتدار لكل محافظة من صفحة ')}
           <Link href="/admin/shipping">{L('Shipping page', 'الشحن')}</Link>.
         </p>
+        <label className="toggle-card">
+          <div>
+            <b>{L('Accept Cash on Delivery', 'قبول الدفع عند الاستلام')}</b>
+            <span>{L('Turn this off any time to hide Cash on Delivery at checkout — only Vodafone Cash and InstaPay will show. Existing orders are unaffected.', 'قفليها في أي وقت عشان تختفي خيار الدفع عند الاستلام وقت الدفع — هيفضل بس فودافون كاش وإنستاباي. الطلبات القديمة مش هتتأثر.')}</span>
+          </div>
+          <input
+            type="checkbox" checked={codEnabled} disabled={codBusy}
+            onChange={(e) => onToggleCod(e.target.checked)}
+            style={{ width: 20, height: 20, accentColor: 'var(--emerald)', flex: '0 0 auto' }}
+          />
+        </label>
         {PAYMENT_FIELDS.map(renderField)}
         <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>
           {L('Return & exchange policy', 'سياسة الاسترجاع والاستبدال')}

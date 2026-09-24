@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server';
 import { sql } from '@/lib/db';
 import { normalizePieceColors, orderPublicOut } from '@/lib/serverMappers';
 import { isEmail, str } from '@/lib/serverValidators';
-import { computeOrderTotals } from '@/lib/payment';
+import { computeOrderTotals, isCodEnabled } from '@/lib/payment';
 import { releaseColorReserved, reserveColorStock } from '@/lib/colorStock';
 import { capiSignalsFromRequest, sendPurchaseToCapi } from '@/lib/metaCapi';
 import { sendOrderNotification } from '@/lib/resend';
@@ -67,6 +67,18 @@ export async function POST(req: Request) {
   if (!PAYMENT_METHODS.includes(paymentMethod)) {
     return NextResponse.json({ error: 'Choose Vodafone Cash, InstaPay or Cash on Delivery' }, { status: 400 });
   }
+
+  const settingsRows = await sql`SELECT key, value FROM settings`;
+  const settings: Settings = {};
+  for (const r of settingsRows) settings[r.key] = r.value;
+
+  // The admin can switch Cash on Delivery off at any time (/admin/settings)
+  // — checked server-side too, not just hidden in the checkout UI, since a
+  // client could otherwise still submit paymentMethod: 'cash_on_delivery'
+  // directly.
+  if (paymentMethod === 'cash_on_delivery' && !isCodEnabled(settings)) {
+    return NextResponse.json({ error: 'Cash on Delivery is not available right now' }, { status: 400 });
+  }
   // Cash on Delivery has no transfer to prove up front — the deposit is
   // arranged over WhatsApp instead (see the confirm page's own WhatsApp
   // CTA), so it's the one method that never needs a receipt.
@@ -89,10 +101,6 @@ export async function POST(req: Request) {
   // rejects obviously-malformed values; the receipt's authenticity is a
   // human judgement call the admin makes on Approve/Reject.
   const receiptKeySafe = str(receiptKey, 300);
-
-  const settingsRows = await sql`SELECT key, value FROM settings`;
-  const settings: Settings = {};
-  for (const r of settingsRows) settings[r.key] = r.value;
   // The rate the shopper saw is echoed back from the client only to keep
   // the total they were quoted stable through checkout; it's clamped to
   // the server's own current rate settings ever drift far, and every

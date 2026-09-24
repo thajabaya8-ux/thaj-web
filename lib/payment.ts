@@ -9,7 +9,7 @@ export const PAYMENT_SETTINGS_KEYS = [
   'deposit_percent',
   'vodafone_cash_number', 'vodafone_cash_name',
   'instapay_handle', 'instapay_name',
-  'free_shipping'
+  'free_shipping', 'cash_on_delivery_enabled'
 ];
 
 export const ADMIN_ONLY_SETTINGS_KEYS = ['admin_whatsapp_number'];
@@ -26,6 +26,13 @@ export function depositPercent(settings: Settings): number {
 // every page that displays a governorate's price on its own.
 export function isFreeShipping(settings: Settings): boolean {
   return settings.free_shipping === 'true';
+}
+
+// On by default — the setting only exists to let the admin switch it off
+// (e.g. during a period they don't want to chase WhatsApp deposits), so an
+// unset/missing value must read as enabled, not disabled.
+export function isCodEnabled(settings: Settings): boolean {
+  return settings.cash_on_delivery_enabled !== 'false';
 }
 
 // Every amount here is EGP — Vodafone Cash / InstaPay are Egyptian payment
