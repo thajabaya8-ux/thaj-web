@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useAdminFetch } from '@/lib/useAdminFetch';
 import { useAdmin } from '@/lib/adminContext';
+import { DEFAULT_DELIVERY_ESTIMATE_EN, DEFAULT_DELIVERY_ESTIMATE_AR } from '@/lib/delivery';
 import type { Settings } from '@/lib/types';
 
 const NUMBER_FIELDS = new Set(['egp_per_sar', 'deposit_percent']);
@@ -28,9 +29,10 @@ const MARKETING_FIELDS: [string, string, string][] = [
 ];
 
 const POLICY_FIELDS = ['return_policy_en', 'return_policy_ar'];
+const DELIVERY_FIELDS = ['delivery_estimate_en', 'delivery_estimate_ar'];
 
 const ALL_FIELDS = [...CONTENT_FIELDS, ...PAYMENT_FIELDS, ...MARKETING_FIELDS];
-const ALL_KEYS = [...ALL_FIELDS.map(([k]) => k), ...POLICY_FIELDS];
+const ALL_KEYS = [...ALL_FIELDS.map(([k]) => k), ...POLICY_FIELDS, ...DELIVERY_FIELDS];
 
 export default function SettingsPage() {
   const { data: settings, loading, error } = useAdminFetch<Settings>('/settings');
@@ -89,6 +91,22 @@ export default function SettingsPage() {
           <div className="field">
             <label>{L('Policy (AR)', 'السياسة (عربي)')}</label>
             <textarea name="return_policy_ar" rows={4} dir="rtl" defaultValue={settings.return_policy_ar || ''} />
+          </div>
+        </div>
+        <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>
+          {L('Delivery estimate', 'مدة التسليم')}
+        </div>
+        <p className="body" style={{ fontSize: 12, marginBottom: 18, color: 'var(--ink-faint)' }}>
+          {L('Every abaya is made to order, so shoppers see this next to the shipping fee on the product page, cart and checkout — leave a field blank to use the default.', 'كل عباية بتتفصّل عند الطلب، فالعميلة بتشوف الجملة دي جنب رسوم الشحن في صفحة المنتج والسلة والدفع — سيبي الخانة فاضية عشان تستخدم القيمة الافتراضية.')}
+        </p>
+        <div className="f2">
+          <div className="field">
+            <label>{L('Estimate (EN)', 'المدة (إنجليزي)')}</label>
+            <input name="delivery_estimate_en" defaultValue={settings.delivery_estimate_en || ''} placeholder={DEFAULT_DELIVERY_ESTIMATE_EN} />
+          </div>
+          <div className="field">
+            <label>{L('Estimate (AR)', 'المدة (عربي)')}</label>
+            <input name="delivery_estimate_ar" dir="rtl" defaultValue={settings.delivery_estimate_ar || ''} placeholder={DEFAULT_DELIVERY_ESTIMATE_AR} />
           </div>
         </div>
         <div className="lbl" style={{ color: 'var(--gold)', margin: '10px 0 6px' }}>

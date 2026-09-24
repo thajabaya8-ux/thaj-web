@@ -12,7 +12,7 @@ import { HOME_CONTENT_KEYS } from '@/lib/homeContent';
 const SETTINGS_ALLOWLIST = [
   ...HOME_CONTENT_KEYS,
   'contact_email', 'contact_location_en', 'contact_location_ar', 'egp_per_sar',
-  'return_policy_en', 'return_policy_ar',
+  'return_policy_en', 'return_policy_ar', 'delivery_estimate_en', 'delivery_estimate_ar',
   ...IMAGE_SETTINGS_KEYS, ...PAYMENT_SETTINGS_KEYS, ...ADMIN_ONLY_SETTINGS_KEYS,
   ...META_SETTINGS_KEYS, ...META_ADMIN_ONLY_SETTINGS_KEYS
 ];

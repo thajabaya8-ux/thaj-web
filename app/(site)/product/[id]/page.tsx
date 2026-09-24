@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
 import { SIZES } from '@/lib/siteContext';
 import { isFreeShipping } from '@/lib/payment';
+import { deliveryEstimate } from '@/lib/delivery';
 import { trackPixel } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
 import ProductCard from '@/components/ProductCard';
@@ -101,6 +102,7 @@ function ProductPageInner() {
   const pct = onSale ? Math.round((1 - p.salePrice! / p.price) * 100) : 0;
   const total = effectivePrice(p) + (withPants && p.pantsPrice ? p.pantsPrice : 0);
   const freeShipping = isFreeShipping(settings);
+  const delivery = deliveryEstimate(settings);
   const specs: [string, string][] = [
     [L('Material', 'الخامة'), esc(L(p.mat, p.matAr))],
     [L('Silhouette', 'السيلويت'), esc(L(p.silf, p.silfAr))],
@@ -212,6 +214,10 @@ function ProductPageInner() {
                   <b>{L('Free Shipping', 'شحن مجاني')}</b>
                 </div>
               )}
+              <div className="ship-fee-line rv">
+                <span>{L('Delivery', 'التسليم')}</span>
+                <b>{L(delivery.en, delivery.ar)}</b>
+              </div>
             </>
           )}
 

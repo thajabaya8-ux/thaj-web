@@ -1,12 +1,16 @@
 'use client';
 import { useSite } from '@/lib/siteContext';
+import { deliveryEstimate } from '@/lib/delivery';
 import Mast from '@/components/Mast';
 
 export default function ShippingPage() {
   const { L, esc, settings } = useSite();
+  const delivery = deliveryEstimate(settings);
   const rows: [string, string][] = [
     [L('Deposit & confirmation', 'العربون والتأكيد'),
       L('A 50% deposit is paid at checkout by Vodafone Cash or InstaPay to confirm an order. The atelier reviews the payment before the piece is prepared; you\'ll hear back over WhatsApp once it\'s checked.', 'بيتحصّل عربون ٥٠٪ وقت الدفع عن طريق فودافون كاش أو InstaPay عشان يتأكد الطلب. الأتيليه بيراجع الدفع قبل ما القطعة تتجهّز، وهيوصلك رد على واتساب بعد المراجعة.')],
+    [L('Preparation & delivery time', 'مدة التجهيز والتسليم'),
+      L(delivery.en, delivery.ar)],
     [L('Delivery area', 'منطقة التوصيل'),
       L('Delivered across Egypt\'s governorates. The shipping fee depends on your governorate and is shown at checkout before you pay.', 'التوصيل متاح لكل محافظات مصر. رسوم الشحن بتختلف حسب المحافظة، وبتظهر لك وقت الدفع قبل ما تأكدي.')],
     [L('On delivery', 'عند التسليم'),

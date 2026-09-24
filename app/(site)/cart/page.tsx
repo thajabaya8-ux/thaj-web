@@ -3,11 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
 import { isFreeShipping } from '@/lib/payment';
+import { deliveryEstimate } from '@/lib/delivery';
 import Mast from '@/components/Mast';
 
 export default function CartPage() {
   const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotalEgp, itemPrice, money, settings } = useSite();
   const freeShipping = isFreeShipping(settings);
+  const delivery = deliveryEstimate(settings);
 
   if (!cart.length) {
     return (
@@ -56,6 +58,7 @@ export default function CartPage() {
                 ? <b style={{ color: 'var(--emerald)' }}>{L('Free', 'مجاني')}</b>
                 : <span className="body" style={{ fontSize: 12 }}>{L('Calculated at checkout', 'بيتحسب عند الدفع')}</span>}
             </div>
+            <div className="tot"><span className="lbl">{L('Delivery', 'التسليم')}</span><span className="body" style={{ fontSize: 12 }}>{L(delivery.en, delivery.ar)}</span></div>
             <Link className="btn fill wide" href="/checkout">{L('Proceed', 'كمّلي')}</Link>
             <div style={{ textAlign: 'center', marginTop: 16 }}><Link className="link" href="/shop">{L('Continue', 'كمّلي تسوّق')}</Link></div>
           </div>
