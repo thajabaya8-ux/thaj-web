@@ -203,6 +203,7 @@ export interface Settings {
   egp_per_sar?: string;
   deposit_percent?: string;
   free_shipping?: string;
+  cash_on_delivery_enabled?: string;
   delivery_estimate_en?: string;
   delivery_estimate_ar?: string;
   vodafone_cash_number?: string;

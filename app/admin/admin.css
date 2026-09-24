@@ -58,6 +58,14 @@ body{background:var(--bone-2)}
 .free-ship-toggle b{display:block;font-family:var(--display);font-weight:400;font-size:16px;color:var(--emerald)}
 .free-ship-toggle span{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:6px;max-width:56ch;line-height:1.6}
 
+/* Same flat toggle-card look, reused for other instant on/off switches
+   (e.g. the Cash on Delivery switch on /admin/settings) that aren't
+   about shipping specifically. */
+.toggle-card{display:flex;align-items:center;justify-content:space-between;gap:20px;
+  border:1px solid var(--emerald);background:var(--bone-2);padding:18px 22px;margin-bottom:28px;cursor:pointer}
+.toggle-card b{display:block;font-family:var(--display);font-weight:400;font-size:16px;color:var(--emerald)}
+.toggle-card span{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:6px;max-width:56ch;line-height:1.6}
+
 /* ============ TABLES ============ */
 .adm-row{display:grid;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
 .adm-row-head{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line)}
