@@ -38,7 +38,7 @@ export default function ConfirmPage() {
 }
 
 function ConfirmPageInner() {
-  const { L, esc, settings, toast } = useSite();
+  const { L, esc, settings, toast, byId, pName } = useSite();
   const orderNumber = useSearchParams().get('order');
   const [order, setOrder] = useState<Order | null | undefined>(undefined);
   const [shipInfo, setShipInfo] = useState<SavedShipping | null>(null);
@@ -205,7 +205,19 @@ function ConfirmPageInner() {
             <div className="wb-row"><span>{L('Phone', 'الموبايل')}</span><b dir="ltr">{esc(shipInfo.phone)}</b></div>
             <div className="wb-row"><span>{L('Address', 'العنوان')}</span><b>{esc([govLabel, shipInfo.city].filter(Boolean).join(', '))}{shipInfo.address ? ` — ${esc(shipInfo.address)}` : ''}</b></div>
             {shipInfo.notes && <div className="wb-row"><span>{L('Notes', 'ملاحظات')}</span><b>{esc(shipInfo.notes)}</b></div>}
-            <div className="wb-row"><span>{L('Items', 'عدد القطع')}</span><b>{itemCount}</b></div>
+            <div className="wb-items">
+              <span>{L('Items', 'القطع')} ({itemCount})</span>
+              {order.items.map((it, i) => {
+                const p = byId(it.id);
+                const colr = p && it.color ? p.colors.find((c) => c.id === it.color) : null;
+                return (
+                  <div className="wb-item" key={i}>
+                    <span className="wb-item-name">{p ? pName(p) : it.id}{(it.qty || 1) > 1 ? ` ×${it.qty}` : ''}</span>
+                    <span className="wb-item-size">{L('Height', 'الطول')} {esc(it.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}</span>
+                  </div>
+                );
+              })}
+            </div>
             <div className="wb-row wb-cod"><span>{L('Collect on delivery', 'التحصيل عند التسليم')}</span><b>{fmt(remaining)}</b></div>
           </div>
           <button type="button" className="btn" disabled={pdfBusy} style={{ marginTop: 18 }} onClick={onDownloadWaybill}>

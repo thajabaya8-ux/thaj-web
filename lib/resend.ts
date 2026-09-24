@@ -40,8 +40,11 @@ export async function sendOrderNotification(input: OrderNotifyInput): Promise<vo
   const row = (label: string, value: string) =>
     `<tr><td style="padding:5px 14px 5px 0;color:#777;white-space:nowrap">${esc(label)}</td><td>${value}</td></tr>`;
 
+  // The size is bolded on its own — two lines for the same piece that
+  // differ only by size (e.g. two heights of the same abaya) must never
+  // read as "2 of the same" at a glance while packing.
   const itemsHtml = input.items
-    .map((it) => `<li>${esc(it.name)} — ${esc(it.size)}${it.color ? ` · ${esc(it.color)}` : ''} × ${it.qty}${it.withPants ? ' (+ trousers)' : ''}</li>`)
+    .map((it) => `<li>${esc(it.name)} — <b>${esc(it.size)}</b>${it.color ? ` · ${esc(it.color)}` : ''} × ${it.qty}${it.withPants ? ' (+ trousers)' : ''}</li>`)
     .join('');
 
   const html = `

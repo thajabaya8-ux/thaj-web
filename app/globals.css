@@ -750,6 +750,15 @@ section{position:relative}
 .wb-cod span{color:var(--ink);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .wb-cod b{color:var(--emerald);font-size:17px}
 
+/* Same order, different heights, printed on one waybill is exactly the
+   case that must never read as "2 of the same" — each line gets its own
+   row with the height called out in bold, not folded into a bare count. */
+.wb-items{padding:8px 0 2px;border-bottom:1px solid var(--line-soft)}
+.wb-items>span{display:block;color:var(--ink-faint);font-size:12.5px;margin-bottom:8px}
+.wb-item{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:5px 0;font-size:12.5px}
+.wb-item-name{color:var(--ink)}
+.wb-item-size{font-family:var(--display);font-weight:700;color:var(--emerald);font-size:14px;white-space:nowrap}
+
 @media print{
   header,footer,.social-fab,#toast,.wa-cta,.no-print,.adm-side,.adm-mbar{display:none !important}
   body{background:#fff}

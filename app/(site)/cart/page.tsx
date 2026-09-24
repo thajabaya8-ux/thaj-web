@@ -39,7 +39,10 @@ export default function CartPage() {
               </div>
               <div className="cr-info" style={{ gridColumn: '4/8' }}>
                 <div className="h-s">{pName(p)}</div>
-                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>{p.ed ? `${esc(p.ed)} · ` : ''}{L('Height', 'الطول')} {esc(c.size)}{colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}</div>
+                <div className="lbl" style={{ color: 'var(--ink-faint)', marginTop: 8 }}>
+                  {p.ed ? `${esc(p.ed)} · ` : ''}{L('Height', 'الطول')} <b style={{ color: 'var(--emerald)' }}>{esc(c.size)}</b>
+                  {colr ? ` · ${esc(L(colr.nameEn, colr.nameAr))}` : ''}{c.withPants ? ` · ${L('+ Trousers', '+ بنطلون')}` : ''}
+                </div>
               </div>
               <div style={{ gridColumn: '8/11' }}>
                 <div className="qty"><button onClick={() => qty(i, -1)}>−</button><span>{c.q}</span><button onClick={() => qty(i, 1)}>+</button></div>
