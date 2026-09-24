@@ -2,10 +2,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSite } from '@/lib/siteContext';
+import { isFreeShipping } from '@/lib/payment';
 import Mast from '@/components/Mast';
 
 export default function CartPage() {
-  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotalEgp, itemPrice, money } = useSite();
+  const { L, AR, esc, pName, cart, byId, qty, rmItem, cartTotalEgp, itemPrice, money, settings } = useSite();
+  const freeShipping = isFreeShipping(settings);
 
   if (!cart.length) {
     return (
@@ -48,7 +50,12 @@ export default function CartPage() {
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 34 }}>
           <div style={{ width: 'min(360px,100%)' }}>
             <div className="tot"><span className="lbl">{L('Subtotal', 'المجموع')}</span><b>{money(cartTotalEgp, 'EGP')}</b></div>
-            <div className="tot"><span className="lbl">{L('Shipping', 'الشحن')}</span><span className="body" style={{ fontSize: 12 }}>{L('Calculated at checkout', 'بيتحسب عند الدفع')}</span></div>
+            <div className="tot">
+              <span className="lbl">{L('Shipping', 'الشحن')}</span>
+              {freeShipping
+                ? <b style={{ color: 'var(--emerald)' }}>{L('Free', 'مجاني')}</b>
+                : <span className="body" style={{ fontSize: 12 }}>{L('Calculated at checkout', 'بيتحسب عند الدفع')}</span>}
+            </div>
             <Link className="btn fill wide" href="/checkout">{L('Proceed', 'كمّلي')}</Link>
             <div style={{ textAlign: 'center', marginTop: 16 }}><Link className="link" href="/shop">{L('Continue', 'كمّلي تسوّق')}</Link></div>
           </div>

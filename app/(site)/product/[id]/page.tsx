@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useSite, effectivePrice, availableStock, colorSoldOut } from '@/lib/siteContext';
 import { SIZES } from '@/lib/siteContext';
+import { isFreeShipping } from '@/lib/payment';
 import { trackPixel } from '@/lib/pixel';
 import { trackEvent } from '@/lib/analytics';
 import ProductCard from '@/components/ProductCard';
@@ -99,6 +100,7 @@ function ProductPageInner() {
   const onSale = p.salePrice != null;
   const pct = onSale ? Math.round((1 - p.salePrice! / p.price) * 100) : 0;
   const total = effectivePrice(p) + (withPants && p.pantsPrice ? p.pantsPrice : 0);
+  const freeShipping = isFreeShipping(settings);
   const specs: [string, string][] = [
     [L('Material', 'الخامة'), esc(L(p.mat, p.matAr))],
     [L('Silhouette', 'السيلويت'), esc(L(p.silf, p.silfAr))],
@@ -204,6 +206,12 @@ function ProductPageInner() {
                 {withPants && <div className="pb-row"><span>{L('Trousers', 'البنطلون')}</span><b>{money(p.pantsPrice || 0, p.currency)}</b></div>}
                 <div className="pb-row pb-total"><span>{L('Total', 'الإجمالي')}</span><b>{money(total, p.currency)}</b></div>
               </div>
+              {freeShipping && (
+                <div className="ship-fee-line free rv">
+                  <span>{L('Shipping', 'الشحن')}</span>
+                  <b>{L('Free Shipping', 'شحن مجاني')}</b>
+                </div>
+              )}
             </>
           )}
 

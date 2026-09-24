@@ -53,7 +53,8 @@ const STATUS_AR: Record<string, string> = {
 const PAYMENT_STATUS_AR: Record<string, string> = { under_review: 'قيد المراجعة', approved: 'معتمد', rejected: 'مرفوض' };
 const PAYMENT_STATUS_EN: Record<string, string> = { under_review: 'Under review', approved: 'Approved', rejected: 'Rejected' };
 const PAYMENT_METHOD_LABEL: Record<string, [string, string]> = {
-  vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي']
+  vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي'],
+  cash_on_delivery: ['Cash on Delivery', 'الدفع عند الاستلام']
 };
 const AD = '٠١٢٣٤٥٦٧٨٩';
 

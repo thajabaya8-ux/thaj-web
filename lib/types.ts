@@ -100,7 +100,7 @@ export interface OrderLineItem {
   color?: string;
 }
 
-export type PaymentMethod = 'vodafone_cash' | 'instapay';
+export type PaymentMethod = 'vodafone_cash' | 'instapay' | 'cash_on_delivery';
 export type PaymentStatus = 'under_review' | 'approved' | 'rejected';
 
 export interface Governorate {
@@ -185,6 +185,7 @@ export interface Settings {
   contact_location_ar?: string;
   egp_per_sar?: string;
   deposit_percent?: string;
+  free_shipping?: string;
   vodafone_cash_number?: string;
   vodafone_cash_name?: string;
   instapay_handle?: string;

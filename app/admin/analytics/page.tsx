@@ -19,7 +19,8 @@ interface TrafficAnalytics { days: number; totalViews: number; pages: PageTraffi
 
 const egp = (n: number) => `${(n || 0).toLocaleString('en-US')} EGP`;
 const METHOD_LABEL: Record<string, [string, string]> = {
-  vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي'], unknown: ['Unknown', 'غير معروف']
+  vodafone_cash: ['Vodafone Cash', 'فودافون كاش'], instapay: ['InstaPay', 'إنستاباي'],
+  cash_on_delivery: ['Cash on Delivery', 'الدفع عند الاستلام'], unknown: ['Unknown', 'غير معروف']
 };
 const STEP_LABEL: Record<string, [string, string]> = {
   Visit: ['Visit', 'زيارة'], 'Product View': ['Product view', 'مشاهدة منتج'],

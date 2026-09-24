@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Governorate } from '@/lib/types';
 
-export default function GovernorateSelect({ governorates, value, onChange, L, placeholder, loading, error }: {
+export default function GovernorateSelect({ governorates, value, onChange, L, placeholder, loading, error, freeShipping }: {
   governorates: Governorate[] | null;
   value: string;
   onChange: (key: string) => void;
@@ -10,10 +10,14 @@ export default function GovernorateSelect({ governorates, value, onChange, L, pl
   placeholder: string;
   loading?: boolean;
   error?: boolean;
+  freeShipping?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const money = (n: number) => `${n.toLocaleString('en-US')} ${L('EGP', 'ج.م')}`;
+  // Every governorate still carries its own real price underneath — this
+  // only ever changes what's shown, never what's passed to onChange, so
+  // switching free shipping back off needs no migration of anything here.
+  const money = (n: number) => (freeShipping ? L('Free', 'مجاني') : `${n.toLocaleString('en-US')} ${L('EGP', 'ج.م')}`);
   const selected = governorates?.find((g) => g.key === value) || null;
 
   useEffect(() => {

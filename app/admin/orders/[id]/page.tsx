@@ -16,7 +16,7 @@ const PAY_LABEL: Record<string, [string, string]> = {
   under_review: ['Under review', 'قيد المراجعة'], approved: ['Approved', 'معتمد'], rejected: ['Rejected', 'مرفوض']
 };
 const PAY_CLASS: Record<string, string> = { under_review: '', approved: 'ok', rejected: 'bad' };
-const METHOD_LABEL: Record<string, string> = { vodafone_cash: 'Vodafone Cash', instapay: 'InstaPay' };
+const METHOD_LABEL: Record<string, string> = { vodafone_cash: 'Vodafone Cash', instapay: 'InstaPay', cash_on_delivery: 'Cash on Delivery' };
 
 const fmt = (n?: number) => `${(n || 0).toLocaleString('en-US')} EGP`;
 

@@ -106,8 +106,17 @@ function ConfirmPageInner() {
   const cancelled = order.st === 'Cancelled';
   const showNext = !rejected && !cancelled;
   const whatsapp = social.find((s) => s.platform === 'whatsapp');
+  const isCod = order.paymentMethod === 'cash_on_delivery';
+  // Cash on Delivery skips the receipt upload entirely — the deposit gets
+  // arranged right here instead, so the pre-filled message says so and
+  // names the amount, rather than the generic "confirm my order" every
+  // other method's customer (who's already uploaded a receipt) gets.
+  const waMessage = isCod
+    ? L(`Hi, I'd like to confirm my order ${order.n} and arrange the ${(order.depositAmount || 0).toLocaleString('en-US')} EGP deposit.`,
+        `مرحبًا، عايزة أأكد طلبي رقم ${order.n} وأرتّب دفع العربون (${(order.depositAmount || 0).toLocaleString('en-US')} ج.م).`)
+    : L(`Hi, I'd like to confirm my order ${order.n}.`, `مرحبًا، عايزة أأكد طلبي رقم ${order.n}.`);
   const waLink = whatsapp
-    ? `${whatsapp.url}${whatsapp.url.includes('?') ? '&' : '?'}text=${encodeURIComponent(L(`Hi, I'd like to confirm my order ${order.n}.`, `مرحبًا، عايزة أأكد طلبي رقم ${order.n}.`))}`
+    ? `${whatsapp.url}${whatsapp.url.includes('?') ? '&' : '?'}text=${encodeURIComponent(waMessage)}`
     : null;
   const itemCount = order.items.reduce((s, it) => s + (it.qty || 1), 0);
   const remaining = (order.tot || 0) - (order.amountPaid || 0);
@@ -151,7 +160,11 @@ function ConfirmPageInner() {
 
       {showNext && idx <= 1 && whatsapp && (
         <div className="wa-cta rv">
-          <p className="body">{L('Please go to WhatsApp and send us a message to confirm your order.', 'يرجى التوجه إلى واتساب وإرسال رسالة لتأكيد طلبك.')}</p>
+          <p className="body">
+            {isCod
+              ? L('Please go to WhatsApp and send us a message to arrange your deposit and confirm your order.', 'يرجى التوجه إلى واتساب وإرسال رسالة لترتيب دفع العربون وتأكيد طلبك.')
+              : L('Please go to WhatsApp and send us a message to confirm your order.', 'يرجى التوجه إلى واتساب وإرسال رسالة لتأكيد طلبك.')}
+          </p>
           <a className="btn fill" href={waLink!} target="_blank" rel="noopener noreferrer">{L('Message us on WhatsApp', 'راسلينا على واتساب')}</a>
           <p className="body" style={{ marginTop: 14, fontSize: 11.5, color: 'var(--ink-faint)' }}>
             {L('Your order is under review — the atelier will confirm it with you over WhatsApp once your payment has been checked.', 'طلبك قيد المراجعة من الأتيليه، وهيوصلك تأكيد عبر واتساب بعد ما نراجع الدفع.')}
