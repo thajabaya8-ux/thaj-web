@@ -24,6 +24,20 @@ async function nextOrderNumber(): Promise<string> {
   return `THAJ-${year}-${String(n + 1).padStart(4, '0')}`;
 }
 
+// A count-then-insert number isn't atomic — two checkouts landing in the
+// same instant can both count the same N and both try to insert
+// THAJ-<year>-<N+1>, and the DB's own UNIQUE constraint on order_number
+// is what actually catches that (confirmed in production: a real
+// "duplicate key value violates unique constraint orders_order_number_key"
+// crashed the whole order with no retry). Postgres error code 23505 is
+// unique_violation; re-counting and trying again a few times resolves the
+// collision for both requests without needing a dedicated sequence or
+// changing the human-readable THAJ-<year>-<N> format at all.
+function isDuplicateOrderNumber(err: unknown): boolean {
+  return !!err && typeof err === 'object' && (err as { code?: string }).code === '23505'
+    && (err as { constraint?: string }).constraint === 'orders_order_number_key';
+}
+
 const PAYMENT_METHODS = ['vodafone_cash', 'instapay', 'cash_on_delivery'];
 
 // Same allowlist as lib/attribution.ts's PARAMS (plus the two fields it
@@ -225,21 +239,27 @@ async function handleCreateOrder(req: Request) {
     city: str(ship.city, 100), address: str(ship.address, 500), notes: str(ship.notes, 500)
   });
 
-  const orderNumber = await nextOrderNumber();
+  const MAX_ORDER_NUMBER_ATTEMPTS = 5;
   let rows;
-  try {
-    rows = await sql`INSERT INTO orders
-      (order_number, customer_name, email, phone, items, total, status,
-       subtotal, original_subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id, attribution_json)
-      VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
-        ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
-        ${subtotal}, ${originalSubtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null}, ${attributionJson})
-      RETURNING *`;
-  } catch (err) {
-    // The order row itself failed to write — the stock reserved above for
-    // this attempt would otherwise leak forever with nothing to release it.
-    await releaseReserved();
-    throw err;
+  let orderNumber = '';
+  for (let attempt = 1; ; attempt++) {
+    orderNumber = await nextOrderNumber();
+    try {
+      rows = await sql`INSERT INTO orders
+        (order_number, customer_name, email, phone, items, total, status,
+         subtotal, original_subtotal, shipping_fee, deposit_amount, amount_paid, payment_method, payment_status, receipt_key, shipping_json, reservation_active, user_id, attribution_json)
+        VALUES (${orderNumber}, ${str(ship.name, 200) || str(name, 200) || null}, ${str(email, 254) || null}, ${str(ship.phone, 40) || str(phone, 40) || null},
+          ${JSON.stringify(cleanItems)}, ${total}, 'Under Review',
+          ${subtotal}, ${originalSubtotal}, ${shippingFee}, ${deposit}, 0, ${paymentMethod}, 'under_review', ${receiptKeySafe}, ${shippingJson}, true, ${session?.userId ?? null}, ${attributionJson})
+        RETURNING *`;
+      break;
+    } catch (err) {
+      if (isDuplicateOrderNumber(err) && attempt < MAX_ORDER_NUMBER_ATTEMPTS) continue;
+      // The order row itself failed to write — the stock reserved above for
+      // this attempt would otherwise leak forever with nothing to release it.
+      await releaseReserved();
+      throw err;
+    }
   }
 
   // Fire-and-forget server-side mirror of the browser Purchase event — never
