@@ -41,7 +41,24 @@ function cleanAttribution(v: unknown): string | null {
   return Object.keys(out).length ? JSON.stringify(out) : null;
 }
 
+// A customer-facing checkout failure is a lost sale (and, worse, a
+// confusing one) — every unexpected throw below is caught here so the
+// client always gets back real JSON with a message, never a bare 500
+// that reads as "couldn't reach the server" when the server was in fact
+// reached and the real cause is only visible in these server logs.
 export async function POST(req: Request) {
+  try {
+    return await handleCreateOrder(req);
+  } catch (err) {
+    console.error('POST /api/orders failed:', err);
+    return NextResponse.json(
+      { error: 'Something went wrong placing your order — please try again, or message us on WhatsApp if it keeps happening.' },
+      { status: 500 }
+    );
+  }
+}
+
+async function handleCreateOrder(req: Request) {
   // Order-spam / stock-lock guard — a real checkout never needs more than
   // a handful of tries in ten minutes, but repeated fake orders would
   // otherwise be able to reserve color stock out from under real
@@ -239,7 +256,7 @@ export async function POST(req: Request) {
     numItems: cleanItems.reduce((s, i) => s + i.qty, 0),
     eventSourceUrl: req.headers.get('referer') || 'https://thajabaya.com/checkout',
     ...capiSignalsFromRequest(req)
-  });
+  }).catch((err) => console.error('sendPurchaseToCapi failed:', err));
 
   // Fire-and-forget email to the shop's own inbox — see lib/resend.ts.
   sendOrderNotification({
@@ -247,7 +264,7 @@ export async function POST(req: Request) {
     phone: str(ship.phone, 40) || str(phone, 40) || '—', email: str(email, 254) || undefined,
     governorate: governorate.name_en, city: str(ship.city, 100), address: str(ship.address, 500),
     notes: str(ship.notes, 500) || undefined, items: itemsForEmail, total, deposit, paymentMethod
-  });
+  }).catch((err) => console.error('sendOrderNotification failed:', err));
 
   return NextResponse.json(orderPublicOut(rows[0]), { status: 201 });
 }
