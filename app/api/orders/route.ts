@@ -18,21 +18,38 @@ import { getSession } from '@/lib/session';
 import { clientIp, isRateLimited } from '@/lib/rateLimit';
 import type { Settings } from '@/lib/types';
 
+// Based on the highest existing number this year, NOT a COUNT(*) of rows —
+// a COUNT undercounts the moment any order this year is ever deleted (the
+// admin can delete one), and then permanently keeps recomputing the same
+// already-used number forever, since nothing about a failed insert changes
+// the count on the next attempt. Confirmed in production: deleting a test
+// order left orders table with a gap, and every single checkout after that
+// kept colliding on the same THAJ-<year>-<N> no matter how many times it
+// retried. MAX is immune to gaps — it reflects the real highest number in
+// use regardless of what was deleted below it.
 async function nextOrderNumber(): Promise<string> {
   const year = new Date().getFullYear();
-  const [{ n }] = await sql`SELECT COUNT(*)::int AS n FROM orders WHERE order_number LIKE ${`THAJ-${year}-%`}`;
-  return `THAJ-${year}-${String(n + 1).padStart(4, '0')}`;
+  const prefix = `THAJ-${year}-`;
+  const rows = await sql`
+    SELECT order_number FROM orders
+    WHERE order_number LIKE ${`${prefix}%`}
+    ORDER BY order_number DESC
+    LIMIT 1
+  `;
+  const last: string | undefined = rows[0]?.order_number;
+  const lastN = last ? parseInt(last.slice(prefix.length), 10) || 0 : 0;
+  return `${prefix}${String(lastN + 1).padStart(4, '0')}`;
 }
 
-// A count-then-insert number isn't atomic — two checkouts landing in the
-// same instant can both count the same N and both try to insert
-// THAJ-<year>-<N+1>, and the DB's own UNIQUE constraint on order_number
-// is what actually catches that (confirmed in production: a real
-// "duplicate key value violates unique constraint orders_order_number_key"
-// crashed the whole order with no retry). Postgres error code 23505 is
-// unique_violation; re-counting and trying again a few times resolves the
-// collision for both requests without needing a dedicated sequence or
-// changing the human-readable THAJ-<year>-<N> format at all.
+// Even MAX-based generation isn't fully atomic — two checkouts landing in
+// the same instant can both read the same MAX and both try to insert
+// THAJ-<year>-<N+1>, and the DB's own UNIQUE constraint on order_number is
+// what actually catches that (confirmed in production: a real "duplicate
+// key value violates unique constraint orders_order_number_key" crashed
+// the whole order). Postgres error code 23505 is unique_violation;
+// re-reading MAX and trying again a few times resolves a genuine race for
+// both requests without needing a dedicated sequence or changing the
+// human-readable THAJ-<year>-<N> format at all.
 function isDuplicateOrderNumber(err: unknown): boolean {
   return !!err && typeof err === 'object' && (err as { code?: string }).code === '23505'
     && (err as { constraint?: string }).constraint === 'orders_order_number_key';
